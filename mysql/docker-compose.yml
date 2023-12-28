@@ -1,0 +1,21 @@
+version: "3.1"
+
+services:
+    mysql:
+        image: mysql:8.2.0
+        restart: always
+        container_name: study_mysql
+        environment:
+            MYSQL_ROOT_PASSWORD: mysql123!
+            MYSQL_DATABASE: study
+            MYSQL_USER: mysql
+            MYSQL_PASSWORD: mysql123!
+        ports:
+            - "3307:3306"
+        volumes:
+            - MYDATA:/var/lib/mysql
+
+volumes:
+    MYDATA:
+
+
