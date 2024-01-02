@@ -11,12 +11,10 @@ Google Meet를 활용한 개인 공부 스터디에서 참여율을 높이고 �
 
 ### (2) 팀원 및 역할
 
-//여기는 나중에 각자 부분 정리해서 추가 필요!
-
  |이다연|이찬혁|정주환|최예희|
 |------|---|---|---|
 |통계, 알림, 프로젝트 init |회원가입, 화면 전체 틀, 프로젝트 일정 관리|부재 일정, 배포|게시판, DB entity 생성|
-|https://github.com/dayeon-dayeon|https://github.com/MeMyself-And-I|https://github.com/jeong-joohwan|https://github.com/ZinnaChoi/Study-Management|
+|https://github.com/dayeon-dayeon|https://github.com/MeMyself-And-I|https://github.com/jeong-joohwan|https://github.com/ZinnaChoi|
 
 ### (3) 배포 URL
 ```
@@ -55,7 +53,7 @@ npm start
 #### DataBase Setup
 
 ```
-cd database
+cd mysql
 docker-compose up -d
 ```
 
@@ -107,9 +105,5 @@ jdbc:mysql://localhost:3307/study
 
 
 ## 05. 아키 텍쳐
-//디렉토리 구조 트리형태로 그려서 넣기
 ## 06. 기타 추가 사항
-- 일정 관리 https://docs.google.com/spreadsheets/d/1RD2U2rl4fpvk43hxKZ_HhsXNYWChZ3w51x-A86cXwtA/edit?usp=drive_web&ouid=110358388331338720805
-- Entitiy 설계 https://drive.google.com/drive/folders/1n0oPXu8aTIPMCrwyYjg_g89UCt4B8oLD
-- 화면 설계 https://drive.google.com/drive/folders/1UOLlp9U3eQFkuUrSzGVjT1V5-RZeA2ex
 
