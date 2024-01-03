@@ -33,6 +33,7 @@ Google Meet를 활용한 개인 공부 스터디에서 참여율을 높이고 �
 java 17
 react
 mysql
+npm 8.19.2
 ```
 
 ### (2) 설치 및 실행
@@ -46,7 +47,8 @@ git clone https://github.com/ZinnaChoi/Study-Management
 #### Backend
 
 ```
-
+cd Study-Management
+./gradlew bootRun
 ```
 
 #### Frontend
