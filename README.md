@@ -47,7 +47,6 @@ git clone https://github.com/ZinnaChoi/Study-Management
 #### Backend
 
 ```
-cd Study-Management
 ./gradlew bootRun
 ```
 
