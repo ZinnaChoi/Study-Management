@@ -23,7 +23,7 @@ import lombok.NoArgsConstructor;
 public class AbsentSchedule {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long absentId;
 
     @ManyToOne(fetch = FetchType.LAZY)

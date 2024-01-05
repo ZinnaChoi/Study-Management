@@ -23,7 +23,7 @@ import lombok.NoArgsConstructor;
 public class WakeUp {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long wakeupId;
 
     @ManyToOne(fetch = FetchType.LAZY)

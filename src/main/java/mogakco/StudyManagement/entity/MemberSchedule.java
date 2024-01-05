@@ -23,7 +23,7 @@ import lombok.NoArgsConstructor;
 public class MemberSchedule {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long memberScheduleId;
 
     @ManyToOne(fetch = FetchType.LAZY)

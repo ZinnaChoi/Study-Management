@@ -26,8 +26,8 @@ import mogakco.StudyManagement.enums.LogType;
 public class DailyLog {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    private Long statId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long logId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)

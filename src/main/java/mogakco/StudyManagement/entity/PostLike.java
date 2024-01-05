@@ -22,7 +22,7 @@ import lombok.NoArgsConstructor;
 public class PostLike {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long likesId;
 
     @ManyToOne(fetch = FetchType.LAZY)

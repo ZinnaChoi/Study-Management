@@ -21,7 +21,7 @@ import mogakco.StudyManagement.enums.MemberRole;
 public class Member {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.SEQUENCE)
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long memberId;
 
   @Column(nullable = false, unique = true)

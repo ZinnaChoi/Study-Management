@@ -20,7 +20,7 @@ import lombok.NoArgsConstructor;
 public class StudyInfo {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long studyId;
 
     @Column(nullable = false)

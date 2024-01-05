@@ -25,7 +25,7 @@ import lombok.NoArgsConstructor;
 public class Notice {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long noticeId;
 
     @ManyToOne(fetch = FetchType.LAZY)
