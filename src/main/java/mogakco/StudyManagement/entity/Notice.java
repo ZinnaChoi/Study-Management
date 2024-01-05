@@ -1,5 +1,7 @@
 package mogakco.StudyManagement.entity;
 
+import org.hibernate.annotations.ColumnDefault;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -30,6 +32,22 @@ public class Notice {
     @JoinColumn(name = "member_id")
     private Member member;
 
-    @Column(name = "last_notice_date", nullable = false)
-    private String lastNoticeDate;
+    @Column(name = "wakeup", nullable = false)
+    @ColumnDefault("true")
+    private Boolean wakeup;
+
+    @Column(name = "absent", nullable = false)
+    @ColumnDefault("true")
+    private Boolean absent;
+
+    @Column(name = "new_post", nullable = false)
+    @ColumnDefault("true")
+    private Boolean newPost;
+
+    @Column(name = "link_share", nullable = false)
+    @ColumnDefault("true")
+    private Boolean linkShare;
+
+    @Column(name = "last_share_date", nullable = false)
+    private String lastShareDate;
 }

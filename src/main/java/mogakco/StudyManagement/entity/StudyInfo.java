@@ -2,46 +2,40 @@ package mogakco.StudyManagement.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-import mogakco.StudyManagement.enums.LogType;
 
 @Entity
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
-@Setter
-@Table(name = "daily_log")
-public class DailyLog {
+@Table(name = "study_info")
+public class StudyInfo {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    private Long statId;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id", nullable = false)
-    private Member member;
+    private Long studyId;
 
     @Column(nullable = false)
-    private String date;
+    private String studyName;
+
+    @Column(nullable = true)
+    private byte[] studyLogo;
 
     @Column(nullable = false)
-    private LogType type;
+    private String db_url;
 
     @Column(nullable = false)
-    private Integer score;
+    private String db_user;
 
     @Column(nullable = false)
-    private String createdAt;
+    private String db_password;
+
 }

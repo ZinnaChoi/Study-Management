@@ -13,35 +13,30 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-import mogakco.StudyManagement.enums.LogType;
 
 @Entity
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
-@Setter
-@Table(name = "daily_log")
-public class DailyLog {
+@Table(name = "member_schedule")
+public class MemberSchedule {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    private Long statId;
+    private Long memberScheduleId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
-    @Column(nullable = false)
-    private String date;
-
-    @Column(nullable = false)
-    private LogType type;
-
-    @Column(nullable = false)
-    private Integer score;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "event_name", nullable = false)
+    private Schedule event_name;
 
     @Column(nullable = false)
     private String createdAt;
+
+    @Column(nullable = false)
+    private String updatedAt;
 }
