@@ -1,4 +1,4 @@
-package mogakco.StudyManagement.jwt;
+package mogakco.StudyManagement.config;
 
 import java.io.IOException;
 
@@ -14,13 +14,14 @@ import jakarta.servlet.http.HttpServletResponse;
 import mogakco.StudyManagement.domain.MemberDetails;
 import mogakco.StudyManagement.entity.Member;
 import mogakco.StudyManagement.enums.MemberRole;
+import mogakco.StudyManagement.util.JWTUtil;
 
 // JWT 인증 및 인가 관련 필터
-public class JWTFilter extends OncePerRequestFilter {
+public class JWTConfig extends OncePerRequestFilter {
 
     private final JWTUtil jwtUtil;
 
-    public JWTFilter(JWTUtil jwtUtil) {
+    public JWTConfig(JWTUtil jwtUtil) {
         this.jwtUtil = jwtUtil;
     }
 

@@ -1,16 +1,22 @@
-package mogakco.StudyManagement.service;
+package mogakco.StudyManagement.service.member.impl;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import mogakco.StudyManagement.domain.Login;
+import mogakco.StudyManagement.domain.MemberDetails;
 import mogakco.StudyManagement.entity.Member;
-import mogakco.StudyManagement.jwt.JWTUtil;
 import mogakco.StudyManagement.repository.MemberRepository;
+import mogakco.StudyManagement.service.member.MemberService;
+import mogakco.StudyManagement.util.JWTUtil;
 
 @Service
-public class MemberService {
+public class MemberServiceImpl implements MemberService, UserDetailsService {
 
     private final MemberRepository memberRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
@@ -19,13 +25,23 @@ public class MemberService {
     @Value("${jwt.expired.time}")
     private Long expiredTime;
 
-    public MemberService(MemberRepository memberRepository, BCryptPasswordEncoder bCryptPasswordEncoder,
+    public MemberServiceImpl(MemberRepository memberRepository, BCryptPasswordEncoder bCryptPasswordEncoder,
             JWTUtil jwtUtil) {
         this.memberRepository = memberRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.jwtUtil = jwtUtil;
     }
 
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        Member member = memberRepository.findById(username);
+        if (member != null) {
+            return new MemberDetails(member);
+        }
+        return null;
+    }
+
+    @Override
     public String login(Login loginInfo) {
 
         Member member = memberRepository.findById(loginInfo.getUsername());

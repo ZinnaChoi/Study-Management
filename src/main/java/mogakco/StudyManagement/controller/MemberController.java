@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import mogakco.StudyManagement.domain.Login;
-import mogakco.StudyManagement.service.MemberService;
+import mogakco.StudyManagement.service.member.MemberService;
 
 @Tag(name = "계정 및 권한", description = "계정 및 권한 관련 API 분류")
 @RequestMapping(path = "/api/v1")

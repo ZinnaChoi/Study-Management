@@ -11,8 +11,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import mogakco.StudyManagement.jwt.JWTFilter;
-import mogakco.StudyManagement.jwt.JWTUtil;
+import mogakco.StudyManagement.util.JWTUtil;
 
 @Configuration
 @EnableWebSecurity
@@ -42,7 +41,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/v1/**").hasAnyAuthority("ADMIN", "USER") // 모든 권한 api/user/** 접근 가능!
                 .anyRequest().authenticated()); // 그 외 요청들은 인증된 사용자(유효한 JWT를 가지고있는)만 접근 가능
         // 로그인 필터 전에 동작
-        http.addFilterBefore(new JWTFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(new JWTConfig(jwtUtil), UsernamePasswordAuthenticationFilter.class);
         // 세션 stateless 설정
         http.sessionManagement((session) -> session
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS));

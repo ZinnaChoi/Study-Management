@@ -10,7 +10,7 @@ import mogakco.StudyManagement.enums.MemberRole;
 import mogakco.StudyManagement.repository.MemberRepository;
 
 @Component
-public class AdminAccount {
+public class AccountConfig {
 
     @Value("${account.admin.id}")
     private String adminId;
@@ -21,7 +21,7 @@ public class AdminAccount {
     private final MemberRepository memberRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    public AdminAccount(MemberRepository memberRepository, BCryptPasswordEncoder bCryptPasswordEncoder) {
+    public AccountConfig(MemberRepository memberRepository, BCryptPasswordEncoder bCryptPasswordEncoder) {
         this.memberRepository = memberRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }

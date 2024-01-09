@@ -1,4 +1,4 @@
-package mogakco.StudyManagement.jwt;
+package mogakco.StudyManagement.util;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
