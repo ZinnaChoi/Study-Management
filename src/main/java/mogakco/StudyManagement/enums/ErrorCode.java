@@ -1,7 +1,4 @@
-package mogakco.StudyManagement.domain.enums;
-
-import java.util.Optional;
-import java.util.function.Predicate;
+package mogakco.StudyManagement.enums;
 
 import org.springframework.http.HttpStatus;
 
@@ -30,9 +27,11 @@ public enum ErrorCode {
     }
 
     public String getMessage(String message) {
-        return Optional.ofNullable(message)
-                .filter(Predicate.not(String::isBlank))
-                .orElse(this.getMessage());
+        if (message != null && !message.isBlank()) {
+            return message;
+        } else {
+            return this.getMessage();
+        }
     }
 
     @Override

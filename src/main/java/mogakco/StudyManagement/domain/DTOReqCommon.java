@@ -1,4 +1,4 @@
-package mogakco.StudyManagement.dto;
+package mogakco.StudyManagement.domain;
 
 import lombok.Getter;
 import lombok.Setter;
