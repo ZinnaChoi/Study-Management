@@ -13,7 +13,7 @@ public enum ErrorCode {
     OK(200, HttpStatus.OK, "Ok"),
 
     BAD_REQUEST(400, HttpStatus.BAD_REQUEST, "Bad request"),
-    NOT_FOUND(404, HttpStatus.NOT_FOUND, "Requested resource is not found"),
+    NOT_FOUND(404, HttpStatus.NOT_FOUND, "Requested resource %s is not found"),
     UNAUTHORIZED(401, HttpStatus.UNAUTHORIZED, "User unauthorized"),
 
     INTERNAL_ERROR(500, HttpStatus.INTERNAL_SERVER_ERROR, "Internal error");
