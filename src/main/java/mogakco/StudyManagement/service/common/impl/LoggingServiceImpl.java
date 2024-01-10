@@ -4,6 +4,7 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.Getter;
 import lombok.Setter;
 import mogakco.StudyManagement.service.common.LoggingService;
@@ -24,10 +25,10 @@ public class LoggingServiceImpl implements LoggingService {
         timeAPI = System.currentTimeMillis();
     }
 
-    @Override
-    public void setAPIEnd() {
+    public void setAPIEnd(HttpServletRequest request, String systemId) {
         timeAPI = System.currentTimeMillis() - timeAPI;
-        logger.info("API Duration: {} ms, DB Duration: {} ms", timeAPI, timeDB);
+        logger.info("SystemId: {}, Method: {}, Endpoint: {}, API Duration: {} ms, DB Duration: {} ms", systemId,
+                request.getMethod(), request.getRequestURI(), timeAPI, timeDB);
         resetDurations();
     }
 
