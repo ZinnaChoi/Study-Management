@@ -17,7 +17,7 @@ public class CalculatorController {
     }
 
     @GetMapping("/add/{a}/{b}")
-    public int add(@PathVariable int a, @PathVariable int b) {
+    public int add(@PathVariable(name = "a") int a, @PathVariable(name = "b") int b) {
         return calculatorService.add(a, b);
     }
 }
