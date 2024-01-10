@@ -1,5 +1,7 @@
 package mogakco.StudyManagement.enums;
 
+import java.text.MessageFormat;
+
 import org.springframework.http.HttpStatus;
 
 import lombok.Getter;
@@ -13,7 +15,7 @@ public enum ErrorCode {
     OK(200, HttpStatus.OK, "Ok"),
 
     BAD_REQUEST(400, HttpStatus.BAD_REQUEST, "Bad request"),
-    NOT_FOUND(404, HttpStatus.NOT_FOUND, "Requested resource %s is not found"),
+    NOT_FOUND(404, HttpStatus.NOT_FOUND, "{0} not found"),
     UNAUTHORIZED(401, HttpStatus.UNAUTHORIZED, "User unauthorized"),
 
     INTERNAL_ERROR(500, HttpStatus.INTERNAL_SERVER_ERROR, "Internal error");
@@ -26,12 +28,8 @@ public enum ErrorCode {
         return this.getMessage(this.getMessage() + " - " + e.getMessage());
     }
 
-    public String getMessage(String message) {
-        if (message != null && !message.isBlank()) {
-            return message;
-        } else {
-            return this.getMessage();
-        }
+    public String getMessage(String... args) {
+        return MessageFormat.format(this.message, (Object[]) args);
     }
 
     @Override
