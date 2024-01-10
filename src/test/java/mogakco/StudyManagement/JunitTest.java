@@ -8,6 +8,7 @@ import static org.assertj.core.api.BDDAssertions.then;
 //ParameterizedTest template
 public class JunitTest {
 
+    // @ValueSource를 사용한 문자열 테스트
     @ParameterizedTest
     @ValueSource(strings = { "1", "2" })
     void ValueSource_1(String value) {
@@ -20,6 +21,7 @@ public class JunitTest {
         System.out.println(value);
     }
 
+    // Quarter 열거형의 getValue 메소드를 사용하여 값이 1, 2, 3, 4 중 하나인지 확인
     @ParameterizedTest
     @EnumSource(Quarter.class)
     void enumSource_1(Quarter quarter) {
