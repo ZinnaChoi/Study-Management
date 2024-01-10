@@ -4,7 +4,6 @@ import mogakco.StudyManagement.dto.DTOReqCommon;
 import mogakco.StudyManagement.dto.DTOResCommon;
 import mogakco.StudyManagement.enums.ErrorCode;
 import mogakco.StudyManagement.service.common.LoggingService;
-import mogakco.StudyManagement.service.common.impl.LoggingServiceImpl;
 import mogakco.StudyManagement.service.example.ExampleService;
 
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,18 +23,18 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 public class ExampleController extends CommonController {
 
     private final ExampleService exampleService;
+    private final LoggingService lo;
 
-    public ExampleController(ExampleService exampleService, LoggingService logginService) {
+    public ExampleController(ExampleService exampleService, LoggingService lo) {
         this.exampleService = exampleService;
+        this.lo = lo;
     }
 
     @Operation(summary = "공동 Domain 적용 API", description = "1. 그대로 요청 2. sendDate \"string\"에서 null로 바꾼 뒤 요청")
     @PostMapping("/comment")
     public DTOResCommon createUser(@RequestBody DTOReqCommon userRequest) {
 
-        LoggingService lo = new LoggingServiceImpl();
         lo.setAPIStart();
-
         exampleService.exampleMethod("var1", lo);
 
         // 댓글이 없는 상황 예시
@@ -52,7 +51,6 @@ public class ExampleController extends CommonController {
     @GetMapping("/hello")
     public String test() {
 
-        LoggingService lo = new LoggingServiceImpl();
         lo.setAPIStart();
 
         lo.setAPIEnd();
