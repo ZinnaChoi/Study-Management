@@ -3,6 +3,9 @@ package mogakco.StudyManagement.controller;
 import mogakco.StudyManagement.dto.DTOReqCommon;
 import mogakco.StudyManagement.dto.DTOResCommon;
 import mogakco.StudyManagement.enums.ErrorCode;
+import mogakco.StudyManagement.service.common.LoggingService;
+import mogakco.StudyManagement.service.common.impl.LoggingServiceImpl;
+import mogakco.StudyManagement.service.example.ExampleService;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,9 +23,20 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RestController
 public class ExampleController extends CommonController {
 
+    private final ExampleService exampleService;
+
+    public ExampleController(ExampleService exampleService, LoggingService logginService) {
+        this.exampleService = exampleService;
+    }
+
     @Operation(summary = "공동 Domain 적용 API", description = "1. 그대로 요청 2. sendDate \"string\"에서 null로 바꾼 뒤 요청")
     @PostMapping("/comment")
     public DTOResCommon createUser(@RequestBody DTOReqCommon userRequest) {
+
+        LoggingService lo = new LoggingServiceImpl();
+        lo.setAPIStart();
+
+        exampleService.exampleMethod("var1", lo);
 
         // 댓글이 없는 상황 예시
         // 에러 응답: 'comment not found'
@@ -30,12 +44,19 @@ public class ExampleController extends CommonController {
             return setResult(ErrorCode.NOT_FOUND, "comment");
         }
 
+        lo.setAPIEnd();
         return setResult(ErrorCode.OK);
     }
 
     @Operation(summary = "시큐리티 및 Swagger 테스트 API", description = "1. 그낭 이 API 요청해본다, 2. login API를 통해 받은 토큰을 통해 Swagger login, 3. 다시 이 API 요청해본다")
     @GetMapping("/hello")
     public String test() {
+
+        LoggingService lo = new LoggingServiceImpl();
+        lo.setAPIStart();
+
+        lo.setAPIEnd();
+
         return "Hello~!~~!~!!!";
     }
 }
