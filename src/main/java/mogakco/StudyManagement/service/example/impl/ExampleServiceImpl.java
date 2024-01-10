@@ -15,16 +15,16 @@ public class ExampleServiceImpl implements ExampleService {
     @Override
     public void exampleMethod(String var1, LoggingService lo) {
 
-        if (!var1.equals("var1")) {
+        if (true) {
             lo.setDBStart();
             // EX) Get the List of Post from DB
             // postRepository.findAll();
             lo.setDBEnd();
 
-        } else {
-            // EX) Other Service Logic
-            int var2 = 1234;
         }
+
+        // EX) Other Service Logic
+        int var2 = 1234;
 
         lo.setDBStart();
         // EX) Get the List of Study from DB

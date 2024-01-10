@@ -2,22 +2,31 @@ package mogakco.StudyManagement.controller;
 
 import org.springframework.beans.factory.annotation.Value;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
+import jakarta.servlet.http.HttpServletRequest;
 import mogakco.StudyManagement.dto.DTOResCommon;
 import mogakco.StudyManagement.enums.ErrorCode;
+import mogakco.StudyManagement.service.common.LoggingService;
 import mogakco.StudyManagement.util.DateUtil;
 
 public class CommonController {
 
-    protected ObjectMapper objectMapper = new ObjectMapper()
+    protected final LoggingService lo;
+
+    public CommonController(LoggingService lo) {
+        this.lo = lo;
+    }
+
+    protected ObjectMapper mapper = new ObjectMapper()
             .enable(SerializationFeature.INDENT_OUTPUT);
 
     @Value("${study.systemId}")
     protected String systemId;
 
-    protected DTOResCommon setResult(ErrorCode result, String... vars) {
+    protected DTOResCommon setResult(HttpServletRequest request, ErrorCode result, LoggingService lo, String... vars) {
         DTOResCommon res = new DTOResCommon();
         res.setSendDate(DateUtil.getCurrentDateTime());
         res.setSystemId(systemId);
@@ -28,6 +37,12 @@ public class CommonController {
         } else {
             res.setRetMsg(result.getMessage());
         }
+
+        try {
+            lo.setResponseBody(mapper.writeValueAsString(res));
+        } catch (JsonProcessingException e) {
+        }
+        lo.setAPIEnd(request, result, systemId);
         return res;
     }
 
