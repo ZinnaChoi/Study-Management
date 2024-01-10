@@ -1,4 +1,4 @@
-package mogakco.StudyManagement.entity;
+package mogakco.StudyManagement.domain;
 
 import org.hibernate.annotations.ColumnDefault;
 

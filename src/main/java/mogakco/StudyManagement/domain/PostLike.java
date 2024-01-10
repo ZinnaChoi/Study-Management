@@ -1,9 +1,6 @@
-package mogakco.StudyManagement.entity;
+package mogakco.StudyManagement.domain;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -15,36 +12,24 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-import mogakco.StudyManagement.enums.LogType;
 
 @Entity
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
-@Setter
-@Table(name = "daily_log")
-public class DailyLog {
+@Table(name = "post_like")
+public class PostLike {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long logId;
+    private Long likesId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "post_id", nullable = false)
+    private Post post;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
-
-    @Column(nullable = false)
-    private String date;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private LogType type;
-
-    @Column(nullable = false)
-    private Integer score;
-
-    @Column(nullable = false)
-    private String createdAt;
 }

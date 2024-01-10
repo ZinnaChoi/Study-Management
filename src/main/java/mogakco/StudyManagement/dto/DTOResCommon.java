@@ -1,4 +1,4 @@
-package mogakco.StudyManagement.domain;
+package mogakco.StudyManagement.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

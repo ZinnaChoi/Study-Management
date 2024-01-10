@@ -1,4 +1,4 @@
-package mogakco.StudyManagement.entity;
+package mogakco.StudyManagement.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -19,29 +19,17 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
-@Table(name = "post")
-public class Post {
+@Table(name = "wakeup")
+public class WakeUp {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long postId;
+    private Long wakeupId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
-    @Column(length = 60, nullable = false)
-    private String title;
-
-    @Column(length = 20000, nullable = false)
-    private String content;
-
-    @Column(name = "view_cnt", nullable = false)
-    private Integer viewCnt;
-
     @Column(nullable = false)
-    private String createdAt;
-
-    @Column(nullable = false)
-    private String updatedAt;
+    private String wakeupTime;
 }

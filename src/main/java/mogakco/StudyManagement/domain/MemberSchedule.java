@@ -1,4 +1,4 @@
-package mogakco.StudyManagement.entity;
+package mogakco.StudyManagement.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

@@ -1,4 +1,4 @@
-package mogakco.StudyManagement.entity;
+package mogakco.StudyManagement.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -19,26 +19,27 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
-@Table(name = "absent_schedule")
-public class AbsentSchedule {
+@Table(name = "post_comment")
+public class PostComment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long absentId;
+    private Long commentId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_comment_id")
+    private PostComment parentComment;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "post_id", nullable = false)
+    private Post post;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "event_name", nullable = false)
-    private Schedule event_name;
-
-    @Column(nullable = false)
-    private String description;
-
-    @Column(nullable = false)
-    private String absentDate;
+    @Column(length = 500, nullable = false)
+    private String content;
 
     @Column(nullable = false)
     private String createdAt;
