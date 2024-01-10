@@ -41,6 +41,7 @@ public class CommonController {
         try {
             lo.setResponseBody(mapper.writeValueAsString(res));
         } catch (JsonProcessingException e) {
+            setResult(request, ErrorCode.BAD_REQUEST, lo);
         }
         lo.setAPIEnd(request, result, systemId);
         return res;

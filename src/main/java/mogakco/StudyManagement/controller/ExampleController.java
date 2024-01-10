@@ -40,7 +40,9 @@ public class ExampleController extends CommonController {
         try {
             lo.setRequestBody(mapper.writeValueAsString(reqCommon));
         } catch (JsonProcessingException e) {
+            setResult(request, ErrorCode.BAD_REQUEST, lo);
         }
+
         exampleService.exampleMethod(reqCommon.getSendDate(), lo);
 
         // 댓글이 없는 상황 예시
