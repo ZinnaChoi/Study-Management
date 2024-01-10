@@ -32,14 +32,14 @@ public class ExampleController extends CommonController {
 
     @Operation(summary = "공동 Domain 적용 API", description = "1. 그대로 요청 2. sendDate \"string\"에서 null로 바꾼 뒤 요청")
     @PostMapping("/comment")
-    public DTOResCommon createUser(@RequestBody DTOReqCommon userRequest) {
+    public DTOResCommon example(@RequestBody DTOReqCommon reqCommon) {
 
         lo.setAPIStart();
-        exampleService.exampleMethod("var1", lo);
+        exampleService.exampleMethod(reqCommon.getSendDate(), lo);
 
         // 댓글이 없는 상황 예시
         // 에러 응답: 'comment not found'
-        if (userRequest.getSendDate() == null) {
+        if (reqCommon.getSendDate() == null) {
             return setResult(ErrorCode.NOT_FOUND, "comment");
         }
 

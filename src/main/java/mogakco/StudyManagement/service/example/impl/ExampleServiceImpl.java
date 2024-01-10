@@ -15,7 +15,7 @@ public class ExampleServiceImpl implements ExampleService {
     @Override
     public void exampleMethod(String var1, LoggingService lo) {
 
-        if (var1.equals("var1")) {
+        if (!var1.equals("var1")) {
             lo.setDBStart();
             // EX) Get the List of Post from DB
             // postRepository.findAll();

@@ -27,7 +27,7 @@ public class LoggingServiceImpl implements LoggingService {
     @Override
     public void setAPIEnd() {
         timeAPI = System.currentTimeMillis() - timeAPI;
-        logDuration();
+        logger.info("API Duration: {} ms, DB Duration: {} ms", timeAPI, timeDB);
         resetDurations();
     }
 
@@ -40,11 +40,6 @@ public class LoggingServiceImpl implements LoggingService {
     public void setDBEnd() {
         long duration = System.currentTimeMillis() - dbStartTime;
         timeDB += duration;
-    }
-
-    @Override
-    public void logDuration() {
-        logger.info("API Duration: {} ms, DB Duration: {} ms", timeAPI, timeDB);
     }
 
     private void resetDurations() {

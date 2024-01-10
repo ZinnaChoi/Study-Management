@@ -10,6 +10,4 @@ public interface LoggingService {
 
     void setDBEnd();
 
-    void logDuration();
-
 }
