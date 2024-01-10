@@ -2,11 +2,10 @@ package mogakco.StudyManagement.controller;
 
 import org.springframework.beans.factory.annotation.Value;
 
-import com.fasterxml.jackson.core.json.JsonReadFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
-import mogakco.StudyManagement.domain.DTOResCommon;
+import mogakco.StudyManagement.dto.DTOResCommon;
 import mogakco.StudyManagement.enums.ErrorCode;
 import mogakco.StudyManagement.util.DateUtil;
 

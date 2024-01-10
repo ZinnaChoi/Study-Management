@@ -1,7 +1,7 @@
 package mogakco.StudyManagement.controller;
 
-import mogakco.StudyManagement.domain.DTOReqCommon;
-import mogakco.StudyManagement.domain.DTOResCommon;
+import mogakco.StudyManagement.dto.DTOReqCommon;
+import mogakco.StudyManagement.dto.DTOResCommon;
 import mogakco.StudyManagement.enums.ErrorCode;
 
 import org.springframework.web.bind.annotation.GetMapping;

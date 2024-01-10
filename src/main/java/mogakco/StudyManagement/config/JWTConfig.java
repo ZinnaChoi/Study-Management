@@ -11,8 +11,8 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import mogakco.StudyManagement.domain.MemberDetails;
-import mogakco.StudyManagement.entity.Member;
+import mogakco.StudyManagement.domain.Member;
+import mogakco.StudyManagement.dto.MemberDetails;
 import mogakco.StudyManagement.enums.MemberRole;
 import mogakco.StudyManagement.util.JWTUtil;
 

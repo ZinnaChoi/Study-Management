@@ -5,7 +5,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import jakarta.annotation.PostConstruct;
-import mogakco.StudyManagement.entity.Member;
+import mogakco.StudyManagement.domain.Member;
 import mogakco.StudyManagement.enums.MemberRole;
 import mogakco.StudyManagement.repository.MemberRepository;
 
