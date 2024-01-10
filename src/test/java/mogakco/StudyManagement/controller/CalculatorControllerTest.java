@@ -36,10 +36,10 @@ public class CalculatorControllerTest {
     @WithMockUser // 보안 무시 , 설정안하면 401 에러
     void addShouldReturnCorrectSum() throws Exception {
         when(calculatorService.add(anyInt(), anyInt())).thenReturn(5);
-
+        // "/calculator/add/{a}/{b}" 엔드포인트로 GET 요청을 수행하고, 예상되는 결과를 검증합니다.(테스트하는 메소드 기입)
         mockMvc.perform(MockMvcRequestBuilders.get("/calculator/add/{a}/{b}", 2, 3))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.content().string("5"));
+                .andExpect(MockMvcResultMatchers.status().isOk()) // HTTP 상태가 OK(200) 여부 확인
+                .andExpect(MockMvcResultMatchers.content().string("5")); // 응답 본문이 "5"인지 확인
     }
 
     // 실패 케이스
@@ -50,6 +50,6 @@ public class CalculatorControllerTest {
 
         mockMvc.perform(MockMvcRequestBuilders.get("/calculator/add/{a}/{b}", 2, 3))
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.content().string("6")); // 올바른 값인지 확인
+                .andExpect(MockMvcResultMatchers.content().string("6")); 
     }
 }
