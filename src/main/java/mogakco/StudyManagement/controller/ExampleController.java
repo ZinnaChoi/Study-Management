@@ -3,41 +3,39 @@ package mogakco.StudyManagement.controller;
 import mogakco.StudyManagement.domain.DTOReqCommon;
 import mogakco.StudyManagement.domain.DTOResCommon;
 import mogakco.StudyManagement.enums.ErrorCode;
+
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@RestController
-public class ExampleController {
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
-    @PostMapping("/api/comment")
+@Tag(name = "예시 컨트롤러")
+@SecurityRequirement(name = "bearer-key")
+@RequestMapping(path = "/api/v1/common")
+@RestController
+public class ExampleController extends CommonController {
+
+    @Operation(summary = "공동 Domain 적용 API", description = "1. 그대로 요청 2. sendDate \"string\"에서 null로 바꾼 뒤 요청")
+    @PostMapping("/comment")
     public DTOResCommon createUser(@RequestBody DTOReqCommon userRequest) {
 
         // 댓글이 없는 상황 예시
-        // 에러 응답이 'Requested resource comment is not found'
-        if (userRequest == null) {
-            String resourceName = "comment";
-            ErrorCode errorCode = ErrorCode.NOT_FOUND;
-            return createErrorResponse(errorCode, resourceName);
+        // 에러 응답: 'comment not found'
+        if (userRequest.getSendDate() == null) {
+            return setResult(ErrorCode.NOT_FOUND, "comment");
         }
 
-        return createSuccessResponse();
+        return setResult(ErrorCode.OK);
     }
 
-    // 성공 시 response 생성
-    private DTOResCommon createSuccessResponse() {
-        DTOResCommon response = new DTOResCommon();
-        response.setRetCode(ErrorCode.OK.getCode());
-        response.setRetMsg(ErrorCode.OK.getMessage());
-        return response;
+    @Operation(summary = "시큐리티 및 Swagger 테스트 API", description = "1. 그낭 이 API 요청해본다, 2. login API를 통해 받은 토큰을 통해 Swagger login, 3. 다시 이 API 요청해본다")
+    @GetMapping("/hello")
+    public String test() {
+        return "Hello~!~~!~!!!";
     }
-
-    // 에러 시 response 생성
-    private DTOResCommon createErrorResponse(ErrorCode errorCode, String resourceName) {
-        DTOResCommon response = new DTOResCommon();
-        response.setRetCode(errorCode.getCode());
-        response.setRetMsg(errorCode.getMessage(resourceName));
-        return response;
-    }
-
 }
