@@ -7,51 +7,50 @@ import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import mogakco.StudyManagement.dto.DTOResCommon;
+import jakarta.servlet.http.HttpServletRequest;
 import mogakco.StudyManagement.dto.MemberLoginReq;
 import mogakco.StudyManagement.dto.MemberLoginRes;
 import mogakco.StudyManagement.enums.ErrorCode;
-import mogakco.StudyManagement.service.member.impl.MemberServiceImpl;
+import mogakco.StudyManagement.service.common.LoggingService;
+import mogakco.StudyManagement.service.member.MemberService;
 
 @Tag(name = "계정 및 권한", description = "계정 및 권한 관련 API 분류")
 @RequestMapping(path = "/api/v1")
 @RestController
 public class MemberController extends CommonController {
 
-    private final MemberServiceImpl memberServiceImpl;
+    private final MemberService memberService;
 
-    public MemberController(MemberServiceImpl memberServiceImpl) {
-        this.memberServiceImpl = memberServiceImpl;
+    public MemberController(MemberService memberService, LoggingService lo) {
+        super(lo);
+        this.memberService = memberService;
     }
 
     @Operation(summary = "로그인", description = "로그인을 통해 JWT 발급")
     @PostMapping("/login")
-    public DTOResCommon doLogin(@RequestBody MemberLoginReq loginInfo) {
+    public MemberLoginRes doLogin(HttpServletRequest request, @RequestBody MemberLoginReq loginInfo) {
         MemberLoginRes result = new MemberLoginRes();
-        DTOResCommon res = new DTOResCommon();
 
+        startAPI(lo, loginInfo);
         if (loginInfo.getSendDate() == null) {
-            return setResult(ErrorCode.NOT_FOUND, "sendDate");
+            result = setCommonResult(ErrorCode.NOT_FOUND, lo, MemberLoginRes.class, "sendDate");
+            endAPI(request, ErrorCode.NOT_FOUND, lo, result);
+            return result;
         }
-
         try {
-            result = memberServiceImpl.login(loginInfo);
-            if (result.getToken().isEmpty()) {
-                res = setResult(ErrorCode.BAD_REQUEST);
-            } else {
-                res = setResult(ErrorCode.OK);
-            }
-
-            result.setRetCode(res.getRetCode());
-            result.setRetMsg(res.getRetMsg());
-            result.setSendDate(res.getSendDate());
-            result.setSystemId(res.getSystemId());
+            MemberLoginRes res = memberService.login(loginInfo, lo);
+            ErrorCode code = findErrorCodeByCode(res.getRetCode());
+            result = setCommonResult(code, lo, MemberLoginRes.class,
+                    res.getRetMsg());
+            result.setToken(res.getToken());
+            endAPI(request, code, lo, result);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            result = setCommonResult(ErrorCode.INTERNAL_ERROR, lo, MemberLoginRes.class);
+            endAPI(request, ErrorCode.INTERNAL_ERROR, lo, result);
         }
-
         return result;
+
     }
 
 }

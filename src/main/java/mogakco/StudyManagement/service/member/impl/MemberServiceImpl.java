@@ -11,7 +11,9 @@ import mogakco.StudyManagement.domain.Member;
 import mogakco.StudyManagement.dto.MemberDetails;
 import mogakco.StudyManagement.dto.MemberLoginReq;
 import mogakco.StudyManagement.dto.MemberLoginRes;
+import mogakco.StudyManagement.enums.ErrorCode;
 import mogakco.StudyManagement.repository.MemberRepository;
+import mogakco.StudyManagement.service.common.LoggingService;
 import mogakco.StudyManagement.service.member.MemberService;
 import mogakco.StudyManagement.util.JWTUtil;
 
@@ -42,13 +44,15 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
     }
 
     @Override
-    public MemberLoginRes login(MemberLoginReq loginInfo) {
-
+    public MemberLoginRes login(MemberLoginReq loginInfo, LoggingService lo) {
         MemberLoginRes response = new MemberLoginRes();
+        lo.setDBStart();
         Member member = memberRepository.findById(loginInfo.getUsername());
+        lo.setDBEnd();
 
         if (member == null) {
-            response.setMessage("해당 ID로 존재하는 사용자가 없습니다.");
+            response.setRetMsg("Member");
+            response.setRetCode(ErrorCode.NOT_FOUND.getCode());
             response.setToken("");
             return response;
         }
@@ -57,14 +61,14 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
         String originPwd = member.getPassword();
 
         if (!bCryptPasswordEncoder.matches(targetPwd, originPwd)) {
-            response.setMessage("비밀번호가 맞지 않습니다.");
+            response.setRetMsg("비밀번호가 맞지 않습니다");
+            response.setRetCode(ErrorCode.BAD_REQUEST.getCode());
             response.setToken("");
             return response;
         }
 
-        response.setMessage("Success");
+        response.setRetCode(ErrorCode.OK.getCode());
         response.setToken(jwtUtil.createJwt(member.getId(), member.getRole().toString(), expiredTime));
-
         return response;
     }
 }

@@ -26,8 +26,15 @@ public class CommonController {
     @Value("${study.systemId}")
     protected String systemId;
 
-    protected DTOResCommon setResult(HttpServletRequest request, ErrorCode result, LoggingService lo, String... vars) {
-        DTOResCommon res = new DTOResCommon();
+    protected <T extends DTOResCommon> T setCommonResult(ErrorCode result, LoggingService lo,
+            Class<T> responseClass, String... vars) {
+        T res;
+        try {
+            res = responseClass.getDeclaredConstructor().newInstance();
+        } catch (Exception e) {
+            throw new RuntimeException("Response class instantiation failed", e);
+        }
+
         res.setSendDate(DateUtil.getCurrentDateTime());
         res.setSystemId(systemId);
         res.setRetCode(result.getCode());
@@ -38,13 +45,35 @@ public class CommonController {
             res.setRetMsg(result.getMessage());
         }
 
+        return res;
+    }
+
+    protected <T> void startAPI(LoggingService lo, T... requestBody) {
+        lo.setAPIStart();
         try {
-            lo.setResponseBody(mapper.writeValueAsString(res));
+            if (requestBody.length > 0 && requestBody[0] != null) {
+                lo.setRequestBody(mapper.writeValueAsString(requestBody));
+            }
         } catch (JsonProcessingException e) {
-            setResult(request, ErrorCode.BAD_REQUEST, lo);
+        }
+    }
+
+    protected <T> void endAPI(HttpServletRequest request, ErrorCode result, LoggingService lo, T responseBody) {
+        try {
+            lo.setResponseBody(mapper.writeValueAsString(responseBody));
+        } catch (JsonProcessingException e) {
         }
         lo.setAPIEnd(request, result, systemId);
-        return res;
+
+    }
+
+    protected ErrorCode findErrorCodeByCode(int code) {
+        for (ErrorCode ec : ErrorCode.values()) {
+            if (ec.getCode().equals(code)) {
+                return ec;
+            }
+        }
+        return null;
     }
 
 }
