@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import mogakco.StudyManagement.domain.Member;
 import mogakco.StudyManagement.dto.MemberDetails;
 import mogakco.StudyManagement.dto.MemberLoginReq;
+import mogakco.StudyManagement.dto.MemberLoginRes;
 import mogakco.StudyManagement.repository.MemberRepository;
 import mogakco.StudyManagement.service.member.MemberService;
 import mogakco.StudyManagement.util.JWTUtil;
@@ -41,21 +42,29 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
     }
 
     @Override
-    public String login(MemberLoginReq loginInfo) {
+    public MemberLoginRes login(MemberLoginReq loginInfo) {
 
+        MemberLoginRes response = new MemberLoginRes();
         Member member = memberRepository.findById(loginInfo.getUsername());
 
         if (member == null) {
-            return "해당 ID로 존재하는 사용자가 없습니다.";
+            response.setMessage("해당 ID로 존재하는 사용자가 없습니다.");
+            response.setToken("");
+            return response;
         }
 
         String targetPwd = loginInfo.getPassword();
         String originPwd = member.getPassword();
 
         if (!bCryptPasswordEncoder.matches(targetPwd, originPwd)) {
-            return "비밀번호가 맞지 않습니다.";
+            response.setMessage("비밀번호가 맞지 않습니다.");
+            response.setToken("");
+            return response;
         }
 
-        return jwtUtil.createJwt(member.getId(), member.getRole().toString(), expiredTime);
+        response.setMessage("Success");
+        response.setToken(jwtUtil.createJwt(member.getId(), member.getRole().toString(), expiredTime));
+
+        return response;
     }
 }

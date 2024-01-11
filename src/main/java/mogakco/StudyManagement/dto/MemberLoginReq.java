@@ -6,7 +6,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class MemberLoginReq {
+public class MemberLoginReq extends DTOReqCommon {
 
     @Schema(example = "admin")
     private String username;
