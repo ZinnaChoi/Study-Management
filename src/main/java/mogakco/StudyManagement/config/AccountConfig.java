@@ -8,6 +8,7 @@ import jakarta.annotation.PostConstruct;
 import mogakco.StudyManagement.domain.Member;
 import mogakco.StudyManagement.enums.MemberRole;
 import mogakco.StudyManagement.repository.MemberRepository;
+import mogakco.StudyManagement.util.DateUtil;
 
 @Component
 public class AccountConfig {
@@ -37,8 +38,8 @@ public class AccountConfig {
                     .name("관리자")
                     .contact("")
                     .role(MemberRole.ADMIN)
-                    .createdAt("000000000000000")
-                    .updatedAt("000000000000000")
+                    .createdAt(DateUtil.getCurrentDateTime())
+                    .updatedAt(DateUtil.getCurrentDateTime())
                     .build();
 
             memberRepository.save(member);
