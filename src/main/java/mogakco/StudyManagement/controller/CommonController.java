@@ -48,12 +48,10 @@ public class CommonController {
         return res;
     }
 
-    protected <T> void startAPI(LoggingService lo, T... requestBody) {
+    protected <T> void startAPI(LoggingService lo, T requestBody) {
         lo.setAPIStart();
         try {
-            if (requestBody.length > 0 && requestBody[0] != null) {
-                lo.setRequestBody(mapper.writeValueAsString(requestBody));
-            }
+            lo.setRequestBody(mapper.writeValueAsString(requestBody));
         } catch (JsonProcessingException e) {
         }
     }

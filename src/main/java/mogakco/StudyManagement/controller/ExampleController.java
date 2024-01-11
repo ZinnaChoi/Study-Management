@@ -56,7 +56,7 @@ public class ExampleController extends CommonController {
     @GetMapping("/hello")
     public DTOResCommon test(HttpServletRequest request) {
         DTOResCommon result = new DTOResCommon();
-        startAPI(lo);
+        startAPI(lo, null);
 
         endAPI(request, ErrorCode.OK, lo, new DTOResCommon());
 
