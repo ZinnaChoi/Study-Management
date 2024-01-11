@@ -6,11 +6,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class MemberLoginReq extends DTOReqCommon {
-
+public class MemberIdDuplReq extends DTOReqCommon {
     @Schema(example = "admin")
     private String id;
-
-    @Schema(example = "password")
-    private String password;
 }

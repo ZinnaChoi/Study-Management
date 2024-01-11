@@ -15,6 +15,7 @@ import mogakco.StudyManagement.domain.MemberSchedule;
 import mogakco.StudyManagement.domain.Schedule;
 import mogakco.StudyManagement.domain.WakeUp;
 import mogakco.StudyManagement.dto.MemberDetails;
+import mogakco.StudyManagement.dto.MemberIdDuplReq;
 import mogakco.StudyManagement.dto.MemberJoinReq;
 import mogakco.StudyManagement.dto.MemberLoginReq;
 import mogakco.StudyManagement.dto.MemberLoginRes;
@@ -69,7 +70,7 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
     public MemberLoginRes login(MemberLoginReq loginInfo, LoggingService lo) {
         MemberLoginRes response = new MemberLoginRes();
         lo.setDBStart();
-        Member member = memberRepository.findById(loginInfo.getUsername());
+        Member member = memberRepository.findById(loginInfo.getId());
         lo.setDBEnd();
 
         if (member == null) {
@@ -124,5 +125,14 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
         wakeUpRepository.save(wakeUp);
         memberScheduleRepository.save(memberSchedule);
         lo.setDBEnd();
+    }
+
+    @Override
+    public boolean isIdDuplicated(MemberIdDuplReq idInfo, LoggingService lo) {
+        lo.setDBStart();
+        boolean isExist = memberRepository.existsById(idInfo.getId());
+        lo.setDBEnd();
+
+        return isExist;
     }
 }

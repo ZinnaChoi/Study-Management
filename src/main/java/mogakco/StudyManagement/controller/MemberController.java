@@ -9,6 +9,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import mogakco.StudyManagement.dto.DTOResCommon;
+import mogakco.StudyManagement.dto.MemberIdDuplReq;
+import mogakco.StudyManagement.dto.MemberIdDuplRes;
 import mogakco.StudyManagement.dto.MemberJoinReq;
 import mogakco.StudyManagement.dto.MemberLoginReq;
 import mogakco.StudyManagement.dto.MemberLoginRes;
@@ -77,6 +79,32 @@ public class MemberController extends CommonController {
             endAPI(request, ErrorCode.INTERNAL_ERROR, lo, result);
         }
         return result;
+    }
+
+    @Operation(summary = "중복 아이디 확인", description = "회원가입시 사용자가 입력한 아이디 중복 검증 true: 중복 false: 사용 가능")
+    @PostMapping("/id-duplicated")
+    public MemberIdDuplRes checkIdDuplicated(HttpServletRequest request, @RequestBody MemberIdDuplReq idInfo) {
+        MemberIdDuplRes result = new MemberIdDuplRes();
+
+        startAPI(lo, idInfo);
+        if (idInfo.getSendDate() == null) {
+            result = setCommonResult(ErrorCode.NOT_FOUND, lo, MemberIdDuplRes.class, "sendDate");
+            endAPI(request, ErrorCode.NOT_FOUND, lo, result);
+            return result;
+        }
+        try {
+            boolean isDuplicated = memberService.isIdDuplicated(idInfo, lo);
+
+            result = setCommonResult(ErrorCode.OK, lo, MemberIdDuplRes.class);
+            result.setDuplicated(isDuplicated);
+            endAPI(request, ErrorCode.OK, lo, result);
+
+        } catch (Exception e) {
+            result = setCommonResult(ErrorCode.INTERNAL_ERROR, lo, MemberIdDuplRes.class);
+            endAPI(request, ErrorCode.INTERNAL_ERROR, lo, result);
+        }
+        return result;
+
     }
 
 }
