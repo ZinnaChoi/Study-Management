@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.RestController;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
+import mogakco.StudyManagement.dto.DTOResCommon;
+import mogakco.StudyManagement.dto.MemberJoinReq;
 import mogakco.StudyManagement.dto.MemberLoginReq;
 import mogakco.StudyManagement.dto.MemberLoginRes;
 import mogakco.StudyManagement.enums.ErrorCode;
@@ -51,6 +53,30 @@ public class MemberController extends CommonController {
         }
         return result;
 
+    }
+
+    @Operation(summary = "회원가입", description = "회원가입을 통해 사용자 정보 등록")
+    @PostMapping("/join")
+    public DTOResCommon doJoin(HttpServletRequest request, @RequestBody MemberJoinReq joinInfo) {
+        DTOResCommon result = new DTOResCommon();
+
+        startAPI(lo, joinInfo);
+        if (joinInfo.getSendDate() == null) {
+            result = setCommonResult(ErrorCode.NOT_FOUND, lo, DTOResCommon.class, "sendDate");
+            endAPI(request, ErrorCode.NOT_FOUND, lo, result);
+            return result;
+        }
+        try {
+            memberService.join(joinInfo, lo);
+            result = setCommonResult(ErrorCode.OK, lo, DTOResCommon.class);
+            endAPI(request, ErrorCode.OK, lo, result);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            result = setCommonResult(ErrorCode.INTERNAL_ERROR, lo, DTOResCommon.class);
+            endAPI(request, ErrorCode.INTERNAL_ERROR, lo, result);
+        }
+        return result;
     }
 
 }
