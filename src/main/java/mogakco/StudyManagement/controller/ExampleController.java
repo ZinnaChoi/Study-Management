@@ -12,8 +12,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -36,18 +34,20 @@ public class ExampleController extends CommonController {
     @PostMapping("/comment")
     public DTOResCommon example(HttpServletRequest request, @RequestBody DTOReqCommon reqCommon) {
         DTOResCommon result = new DTOResCommon();
-        startAPI(lo, reqCommon);
-        exampleService.exampleMethod(reqCommon.getSendDate(), lo);
+        try {
+            startAPI(lo, reqCommon);
+            exampleService.exampleMethod(reqCommon.getSendDate(), lo);
 
-        // 댓글이 없는 상황 예시
-        // 에러 응답: 'comment not found'
-        if (reqCommon.getSendDate() == null) {
-            result = setCommonResult(ErrorCode.NOT_FOUND, lo, DTOResCommon.class, "Comment");
-            endAPI(request, ErrorCode.NOT_FOUND, lo, result);
-            return result;
+            // 댓글이 없는 상황 예시
+            // 에러 응답: 'comment not found'
+            if (reqCommon.getSendDate() == null) {
+                result = setCommonResult(ErrorCode.NOT_FOUND, lo, DTOResCommon.class, "Comment");
+            } else {
+                result = setCommonResult(ErrorCode.OK, lo, DTOResCommon.class);
+            }
+        } finally {
+            endAPI(request, ErrorCode.OK, lo, result);
         }
-        result = setCommonResult(ErrorCode.OK, lo, DTOResCommon.class);
-        endAPI(request, ErrorCode.OK, lo, result);
 
         return result;
     }
