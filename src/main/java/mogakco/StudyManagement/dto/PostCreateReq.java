@@ -20,4 +20,10 @@ public class PostCreateReq extends DTOReqCommon {
     @Schema(example = "chatGPT 5.0 도입")
     private String content;
 
+    public PostCreateReq(String sendDate, String systemId, String title, String content) {
+        super(sendDate, systemId);
+        this.title = title;
+        this.content = content;
+    }
+
 }

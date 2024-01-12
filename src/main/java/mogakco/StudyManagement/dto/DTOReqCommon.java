@@ -12,10 +12,15 @@ import lombok.Setter;
 @Setter
 public class DTOReqCommon {
 
-    @Schema(name = "20240112113804899")
+    @Schema(name = "sendDate", example = "20240112113804899")
     private String sendDate;
 
-    @Schema(name = "STUDY_0001")
+    @Schema(name = "systemId", example = "STUDY_0001")
     private String systemId;
+
+    public DTOReqCommon(String sendDate, String systemId) {
+        this.sendDate = sendDate;
+        this.systemId = systemId;
+    }
 
 }
