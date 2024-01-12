@@ -59,21 +59,20 @@ public class MemberController extends CommonController {
     public DTOResCommon doJoin(HttpServletRequest request, @RequestBody MemberJoinReq joinInfo) {
         DTOResCommon result = new DTOResCommon();
 
-        startAPI(lo, joinInfo);
-        if (joinInfo.getSendDate() == null) {
-            result = setCommonResult(ErrorCode.NOT_FOUND, lo, DTOResCommon.class, "sendDate");
-            endAPI(request, ErrorCode.NOT_FOUND, lo, result);
-            return result;
-        }
         try {
-            memberService.join(joinInfo, lo);
-            result = setCommonResult(ErrorCode.OK, lo, DTOResCommon.class);
-            endAPI(request, ErrorCode.OK, lo, result);
-
+            startAPI(lo, joinInfo);
+            if (joinInfo.getSendDate() == null) {
+                result = setCommonResult(ErrorCode.NOT_FOUND, lo, DTOResCommon.class, "sendDate");
+            } else {
+                memberService.join(joinInfo, lo);
+                result = setCommonResult(ErrorCode.OK, lo, DTOResCommon.class);
+                endAPI(request, ErrorCode.OK, lo, result);
+            }
         } catch (Exception e) {
             e.printStackTrace();
             result = setCommonResult(ErrorCode.INTERNAL_ERROR, lo, DTOResCommon.class);
-            endAPI(request, ErrorCode.INTERNAL_ERROR, lo, result);
+        } finally {
+            endAPI(request, findErrorCodeByCode(result.getRetCode()), lo, result);
         }
         return result;
     }
@@ -83,22 +82,20 @@ public class MemberController extends CommonController {
     public MemberIdDuplRes checkIdDuplicated(HttpServletRequest request, @RequestBody MemberIdDuplReq idInfo) {
         MemberIdDuplRes result = new MemberIdDuplRes();
 
-        startAPI(lo, idInfo);
-        if (idInfo.getSendDate() == null) {
-            result = setCommonResult(ErrorCode.NOT_FOUND, lo, MemberIdDuplRes.class, "sendDate");
-            endAPI(request, ErrorCode.NOT_FOUND, lo, result);
-            return result;
-        }
         try {
-            boolean isDuplicated = memberService.isIdDuplicated(idInfo, lo);
+            startAPI(lo, idInfo);
+            if (idInfo.getSendDate() == null) {
+                result = setCommonResult(ErrorCode.NOT_FOUND, lo, MemberIdDuplRes.class, "sendDate");
+            } else {
+                boolean isDuplicated = memberService.isIdDuplicated(idInfo, lo);
 
-            result = setCommonResult(ErrorCode.OK, lo, MemberIdDuplRes.class);
-            result.setDuplicated(isDuplicated);
-            endAPI(request, ErrorCode.OK, lo, result);
-
+                result = setCommonResult(ErrorCode.OK, lo, MemberIdDuplRes.class);
+                result.setDuplicated(isDuplicated);
+            }
         } catch (Exception e) {
             result = setCommonResult(ErrorCode.INTERNAL_ERROR, lo, MemberIdDuplRes.class);
-            endAPI(request, ErrorCode.INTERNAL_ERROR, lo, result);
+        } finally {
+            endAPI(request, findErrorCodeByCode(result.getRetCode()), lo, result);
         }
         return result;
 

@@ -63,10 +63,12 @@ public class CommonController {
             if (responseBody instanceof MemberLoginRes) {
                 MemberLoginRes memberLoginRes = (MemberLoginRes) responseBody;
                 String token = memberLoginRes.getToken();
-                String maskingToken = "*".repeat(token.length());
-                memberLoginRes.setToken(maskingToken);
-                lo.setResponseBody(mapper.writeValueAsString(memberLoginRes));
-                memberLoginRes.setToken(token);
+                if (token != null) {
+                    String maskingToken = "*".repeat(token.length());
+                    memberLoginRes.setToken(maskingToken);
+                    lo.setResponseBody(mapper.writeValueAsString(memberLoginRes));
+                    memberLoginRes.setToken(token);
+                }
             } else {
                 lo.setResponseBody(mapper.writeValueAsString(responseBody));
             }
