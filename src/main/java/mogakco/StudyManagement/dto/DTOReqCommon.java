@@ -1,5 +1,6 @@
 package mogakco.StudyManagement.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,7 +12,10 @@ import lombok.Setter;
 @Setter
 public class DTOReqCommon {
 
+    @Schema(name = "20240112113804899")
     private String sendDate;
+
+    @Schema(name = "STUDY_0001")
     private String systemId;
 
 }
