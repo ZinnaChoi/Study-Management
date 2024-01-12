@@ -27,6 +27,7 @@ public class ControllerExceptionHandler extends CommonController {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<DTOResCommon> handleValidationExceptions(MethodArgumentNotValidException ex)
             throws JsonProcessingException {
+
         Map<String, String> errors = new HashMap<>();
         ex.getBindingResult().getAllErrors().forEach(error -> {
             String fieldName = ((FieldError) error).getField();
