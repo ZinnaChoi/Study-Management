@@ -35,26 +35,23 @@ public class MemberController extends CommonController {
     public MemberLoginRes doLogin(HttpServletRequest request, @RequestBody MemberLoginReq loginInfo) {
         MemberLoginRes result = new MemberLoginRes();
 
-        startAPI(lo, loginInfo);
-        if (loginInfo.getSendDate() == null) {
-            result = setCommonResult(ErrorCode.NOT_FOUND, lo, MemberLoginRes.class, "sendDate");
-            endAPI(request, ErrorCode.NOT_FOUND, lo, result);
-            return result;
-        }
         try {
-            MemberLoginRes res = memberService.login(loginInfo, lo);
-            ErrorCode code = findErrorCodeByCode(res.getRetCode());
-            result = setCommonResult(code, lo, MemberLoginRes.class,
-                    res.getRetMsg());
-            result.setToken(res.getToken());
-            endAPI(request, code, lo, result);
-
+            startAPI(lo, loginInfo);
+            if (loginInfo.getSendDate() == null) {
+                result = setCommonResult(ErrorCode.NOT_FOUND, lo, MemberLoginRes.class, "sendDate");
+            } else {
+                MemberLoginRes res = memberService.login(loginInfo, lo);
+                ErrorCode code = findErrorCodeByCode(res.getRetCode());
+                result = setCommonResult(code, lo, MemberLoginRes.class,
+                        res.getRetMsg());
+                result.setToken(res.getToken());
+            }
         } catch (Exception e) {
             result = setCommonResult(ErrorCode.INTERNAL_ERROR, lo, MemberLoginRes.class);
-            endAPI(request, ErrorCode.INTERNAL_ERROR, lo, result);
+        } finally {
+            endAPI(request, findErrorCodeByCode(result.getRetCode()), lo, result);
         }
         return result;
-
     }
 
     @Operation(summary = "회원가입", description = "회원가입을 통해 사용자 정보 등록")
