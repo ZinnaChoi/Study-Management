@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import mogakco.StudyManagement.util.DateUtil;
 
 /*
  * sendDate 송신 시간(yyyyMMdd24HHmmssSSS)
@@ -22,4 +23,10 @@ public class DTOResCommon {
     private Integer retCode;
     private String retMsg;
 
+    public DTOResCommon(String systemId, Integer retCode, String retMsg) {
+        this.sendDate = DateUtil.getCurrentDateTime();
+        this.setSystemId(systemId);
+        this.retCode = retCode;
+        this.retMsg = retMsg;
+    }
 }
