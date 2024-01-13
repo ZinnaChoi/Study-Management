@@ -10,6 +10,7 @@ import mogakco.StudyManagement.repository.PostRepository;
 import mogakco.StudyManagement.service.common.LoggingService;
 import mogakco.StudyManagement.service.post.PostService;
 import mogakco.StudyManagement.util.DateUtil;
+import mogakco.StudyManagement.util.SecurityUtil;
 
 @Service
 public class PostServiceImpl implements PostService {
@@ -25,8 +26,7 @@ public class PostServiceImpl implements PostService {
     @Override
     public void createPost(PostCreateReq postCreateReq, LoggingService lo) {
 
-        // TODO: 로그인한 스터디원 정보 가져오는 기능 구현 필요
-        Member member = memberRepository.findById("admin");
+        Member member = memberRepository.findById(SecurityUtil.getLoginUserId());
 
         Post post = Post.builder().member(member).title(postCreateReq.getTitle()).content(postCreateReq.getContent())
                 .viewCnt(0).createdAt(DateUtil.getCurrentDateTime()).updatedAt(DateUtil.getCurrentDateTime())
