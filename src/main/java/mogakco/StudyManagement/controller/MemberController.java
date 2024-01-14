@@ -17,6 +17,7 @@ import mogakco.StudyManagement.dto.MemberLoginRes;
 import mogakco.StudyManagement.enums.ErrorCode;
 import mogakco.StudyManagement.service.common.LoggingService;
 import mogakco.StudyManagement.service.member.MemberService;
+import mogakco.StudyManagement.util.DateUtil;
 
 @Tag(name = "계정 및 권한", description = "계정 및 권한 관련 API 분류")
 @RequestMapping(path = "/api/v1")
@@ -38,16 +39,16 @@ public class MemberController extends CommonController {
         try {
             startAPI(lo, loginInfo);
             if (loginInfo.getSendDate() == null) {
-                result = setCommonResult(ErrorCode.NOT_FOUND, lo, MemberLoginRes.class, "sendDate");
+                result = new MemberLoginRes(systemId, ErrorCode.NOT_FOUND.getCode(),
+                        ErrorCode.NOT_FOUND.getMessage("sendDate"), "");
             } else {
-                MemberLoginRes res = memberService.login(loginInfo, lo);
-                ErrorCode code = findErrorCodeByCode(res.getRetCode());
-                result = setCommonResult(code, lo, MemberLoginRes.class,
-                        res.getRetMsg());
-                result.setToken(res.getToken());
+                result = memberService.login(loginInfo, lo);
+                result.setSendDate(DateUtil.getCurrentDateTime());
+                result.setSystemId(systemId);
             }
         } catch (Exception e) {
-            result = setCommonResult(ErrorCode.INTERNAL_ERROR, lo, MemberLoginRes.class);
+            result = new MemberLoginRes(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
+                    ErrorCode.INTERNAL_ERROR.getMessage(), "");
         } finally {
             endAPI(request, findErrorCodeByCode(result.getRetCode()), lo, result);
         }
@@ -62,15 +63,15 @@ public class MemberController extends CommonController {
         try {
             startAPI(lo, joinInfo);
             if (joinInfo.getSendDate() == null) {
-                result = setCommonResult(ErrorCode.NOT_FOUND, lo, DTOResCommon.class, "sendDate");
+                result = new DTOResCommon(systemId, ErrorCode.NOT_FOUND.getCode(),
+                        ErrorCode.NOT_FOUND.getMessage("sendDate"));
             } else {
-                memberService.join(joinInfo, lo);
-                result = setCommonResult(ErrorCode.OK, lo, DTOResCommon.class);
-                endAPI(request, ErrorCode.OK, lo, result);
+                result = memberService.join(joinInfo, lo);
             }
         } catch (Exception e) {
             e.printStackTrace();
-            result = setCommonResult(ErrorCode.INTERNAL_ERROR, lo, DTOResCommon.class);
+            result = new DTOResCommon(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
+                    ErrorCode.INTERNAL_ERROR.getMessage());
         } finally {
             endAPI(request, findErrorCodeByCode(result.getRetCode()), lo, result);
         }
@@ -85,15 +86,16 @@ public class MemberController extends CommonController {
         try {
             startAPI(lo, idInfo);
             if (idInfo.getSendDate() == null) {
-                result = setCommonResult(ErrorCode.NOT_FOUND, lo, MemberIdDuplRes.class, "sendDate");
+                result = new MemberIdDuplRes(systemId, ErrorCode.NOT_FOUND.getCode(),
+                        ErrorCode.NOT_FOUND.getMessage("sendDate"));
             } else {
                 boolean isDuplicated = memberService.isIdDuplicated(idInfo, lo);
-
-                result = setCommonResult(ErrorCode.OK, lo, MemberIdDuplRes.class);
+                result = new MemberIdDuplRes(systemId, ErrorCode.OK.getCode(), ErrorCode.OK.getMessage());
                 result.setDuplicated(isDuplicated);
             }
         } catch (Exception e) {
-            result = setCommonResult(ErrorCode.INTERNAL_ERROR, lo, MemberIdDuplRes.class);
+            result = new MemberIdDuplRes(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
+                    ErrorCode.INTERNAL_ERROR.getMessage());
         } finally {
             endAPI(request, findErrorCodeByCode(result.getRetCode()), lo, result);
         }

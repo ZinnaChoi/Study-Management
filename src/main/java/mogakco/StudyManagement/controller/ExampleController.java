@@ -39,11 +39,13 @@ public class ExampleController extends CommonController {
             exampleService.exampleMethod(reqCommon.getSendDate(), lo);
 
             // 댓글이 없는 상황 예시
-            // 에러 응답: 'comment not found'
+            // 에러 응답: 'Comment not found'
             if (reqCommon.getSendDate() == null) {
-                result = setCommonResult(ErrorCode.NOT_FOUND, lo, DTOResCommon.class, "Comment");
+                result = new DTOResCommon(systemId, ErrorCode.NOT_FOUND.getCode(),
+                        ErrorCode.NOT_FOUND.getMessage("Comment"));
             } else {
-                result = setCommonResult(ErrorCode.OK, lo, DTOResCommon.class);
+                result = new DTOResCommon(systemId, ErrorCode.OK.getCode(),
+                        ErrorCode.OK.getMessage());
             }
         } finally {
             endAPI(request, ErrorCode.OK, lo, result);

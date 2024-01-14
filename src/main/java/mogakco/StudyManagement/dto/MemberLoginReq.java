@@ -16,9 +16,9 @@ public class MemberLoginReq extends DTOReqCommon {
     @Schema(example = "password")
     private String password;
 
-    public MemberLoginReq(String sendDate, String systemId, String username, String password) {
+    public MemberLoginReq(String sendDate, String systemId, String id, String password) {
         super(sendDate, systemId);
-        this.username = username;
+        this.id = id;
         this.password = password;
     }
 }

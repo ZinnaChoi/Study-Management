@@ -27,28 +27,6 @@ public class CommonController {
     @Value("${study.systemId}")
     protected String systemId;
 
-    protected <T extends DTOResCommon> T setCommonResult(ErrorCode result, LoggingService lo,
-            Class<T> responseClass, String... vars) {
-        T res;
-        try {
-            res = responseClass.getDeclaredConstructor().newInstance();
-        } catch (Exception e) {
-            throw new RuntimeException("Response class instantiation failed", e);
-        }
-
-        res.setSendDate(DateUtil.getCurrentDateTime());
-        res.setSystemId(systemId);
-        res.setRetCode(result.getCode());
-
-        if (vars.length > 0 && vars[0] != null && !vars[0].isEmpty()) {
-            res.setRetMsg(result.getMessage(vars[0]));
-        } else {
-            res.setRetMsg(result.getMessage());
-        }
-
-        return res;
-    }
-
     protected <T> void startAPI(LoggingService lo, T requestBody) {
         lo.setAPIStart();
         try {

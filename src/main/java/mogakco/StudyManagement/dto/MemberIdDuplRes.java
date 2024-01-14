@@ -14,4 +14,8 @@ public class MemberIdDuplRes extends DTOResCommon {
 
     @Schema(example = "false")
     private boolean isDuplicated;
+
+    public MemberIdDuplRes(String systemId, int retCode, String retMsg) {
+        super(systemId, retCode, retMsg);
+    }
 }

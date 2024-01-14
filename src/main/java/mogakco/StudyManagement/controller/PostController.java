@@ -12,6 +12,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import mogakco.StudyManagement.dto.DTOResCommon;
 import mogakco.StudyManagement.dto.PostCreateReq;
+
 import mogakco.StudyManagement.enums.ErrorCode;
 import mogakco.StudyManagement.service.common.LoggingService;
 import mogakco.StudyManagement.service.post.PostService;
@@ -37,12 +38,15 @@ public class PostController extends CommonController {
         try {
             startAPI(lo, postCreateReq);
             postService.createPost(postCreateReq, lo);
-            result = setCommonResult(ErrorCode.OK, lo, DTOResCommon.class);
+            result = new DTOResCommon(systemId, ErrorCode.OK.getCode(),
+                    ErrorCode.OK.getMessage());
         } catch (Exception e) {
-            result = setCommonResult(ErrorCode.INTERNAL_ERROR, lo, DTOResCommon.class);
+            result = new DTOResCommon(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
+                    ErrorCode.INTERNAL_ERROR.getMessage());
         } finally {
             endAPI(request, ErrorCode.OK, lo, result);
         }
         return result;
     }
+
 }
