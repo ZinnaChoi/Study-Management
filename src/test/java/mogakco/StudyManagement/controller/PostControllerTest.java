@@ -117,6 +117,32 @@ public class PostControllerTest {
     @Test
     @WithMockUser(username = "admin", authorities = { "ADMIN" })
     @Sql("/post/PostListSetup.sql")
+    public void getPostListSuccessSearchMember() throws Exception {
+
+        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(GET_POSTS_API_URL);
+
+        uriBuilder.queryParam("sendDate", DateUtil.getCurrentDateTime())
+                .queryParam("systemId", "SYS_01")
+                .queryParam("searchKeyWord", "PostUser")
+                .queryParam("searchType", PostSearchType.MEMBER)
+                .queryParam("page", 0)
+                .queryParam("size", 4)
+                .queryParam("sort", "title,desc");
+
+        MvcResult result = TestUtil.performGetRequest(mockMvc, uriBuilder.toUriString(), 200);
+
+        String content = result.getResponse().getContentAsString();
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode rootNode = objectMapper.readTree(content);
+
+        int contentCount = rootNode.path("content").size();
+        assertTrue(contentCount == 4);
+    }
+
+    @Test
+    @WithMockUser(username = "admin", authorities = { "ADMIN" })
+    @Sql("/post/PostListSetup.sql")
     public void getPostListSuccessPage1Size2() throws Exception {
 
         UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(GET_POSTS_API_URL);
