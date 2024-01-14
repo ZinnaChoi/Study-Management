@@ -37,8 +37,9 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public void createPost(PostCreateReq postCreateReq, LoggingService lo) {
-
+        lo.setDBStart();
         Member member = memberRepository.findById(SecurityUtil.getLoginUserId());
+        lo.setDBEnd();
 
         Post post = Post.builder().member(member).title(postCreateReq.getTitle()).content(postCreateReq.getContent())
                 .viewCnt(0).createdAt(DateUtil.getCurrentDateTime()).updatedAt(DateUtil.getCurrentDateTime())

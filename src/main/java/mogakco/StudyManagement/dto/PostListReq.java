@@ -1,5 +1,6 @@
 package mogakco.StudyManagement.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,6 +13,7 @@ import mogakco.StudyManagement.enums.PostSearchType;
 public class PostListReq extends DTOReqCommon {
 
     @NotBlank(message = "한 글자 이상 검색하셔야 합니다")
+    @Schema(example = "관리자")
     private String searchKeyWord;
 
     private PostSearchType searchType;
