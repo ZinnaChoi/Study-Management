@@ -51,7 +51,7 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
         lo.setDBEnd();
 
         if (member == null) {
-            response.setRetMsg("Member");
+            response.setRetMsg(ErrorCode.NOT_FOUND.getMessage("Member"));
             response.setRetCode(ErrorCode.NOT_FOUND.getCode());
             response.setToken("");
             return response;
@@ -61,12 +61,13 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
         String originPwd = member.getPassword();
 
         if (!bCryptPasswordEncoder.matches(targetPwd, originPwd)) {
-            response.setRetMsg("비밀번호가 맞지 않습니다");
+            response.setRetMsg(ErrorCode.BAD_REQUEST.getMessage("비밀번호가 맞지 않습니다"));
             response.setRetCode(ErrorCode.BAD_REQUEST.getCode());
             response.setToken("");
             return response;
         }
 
+        response.setRetMsg(ErrorCode.OK.getMessage());
         response.setRetCode(ErrorCode.OK.getCode());
         response.setToken(jwtUtil.createJwt(member.getId(), member.getRole().toString(), expiredTime));
         return response;
