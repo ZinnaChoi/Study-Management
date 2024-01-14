@@ -45,11 +45,10 @@ public class CalculatorControllerTest {
     // 실패 케이스
     @Test
     @WithMockUser
-    void addShouldNotReturnIncorrectSum() throws Exception {
-        when(calculatorService.add(anyInt(), anyInt())).thenReturn(5);
-
-        mockMvc.perform(MockMvcRequestBuilders.get("/calculator/add/{a}/{b}", 2, 3))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.content().string("6")); 
+    void divideByZeroShouldReturnBadRequest() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get("/calculator/divide/{a}/{b}", 10, 0))
+                .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(MockMvcResultMatchers.content().string("Division by zero is not allowed"));
     }
+
 }

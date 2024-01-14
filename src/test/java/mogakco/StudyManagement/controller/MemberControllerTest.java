@@ -8,6 +8,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
@@ -130,9 +131,7 @@ public class MemberControllerTest {
     // 1. application.properties update -> create(초기화 목적)
     // 2. Springboot run 후 종료(새 스키마 생성)
     // 3. application.properties create -> update 다시 변경
-    // 3. DB에 아래 쿼리문 Insert 후 성공 테스트 실행
-    // insert into schedule(event_name, start_time, end_time) values('AM1',
-    // '202301111710', '202301111710');
+    @Sql("/ScheduleSetup.sql")
     void joinSuccess() throws Exception {
         MemberJoinReq req = new MemberJoinReq();
 
