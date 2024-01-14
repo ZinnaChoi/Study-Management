@@ -24,6 +24,10 @@ public enum ErrorCode {
     private final HttpStatus httpStatus;
     private final String message;
 
+    public HttpStatus getHttpStatus() {
+        return this.httpStatus;
+    }
+
     public String getMessage(Throwable e) {
         return this.getMessage(this.getMessage() + " - " + e.getMessage());
     }
