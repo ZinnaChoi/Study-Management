@@ -1,5 +1,6 @@
 package mogakco.StudyManagement.controller;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
@@ -14,9 +15,9 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import mogakco.StudyManagement.dto.PostCreateReq;
-import mogakco.StudyManagement.dto.PostListReq;
 import mogakco.StudyManagement.enums.PostSearchType;
 import mogakco.StudyManagement.service.common.LoggingService;
 import mogakco.StudyManagement.service.post.PostService;
@@ -86,13 +87,17 @@ public class PostControllerTest {
     @Sql("/post/PostListSetup.sql")
     public void getPostListSuccessPage0Size3() throws Exception {
 
-        PostListReq queryParamsObject = new PostListReq(DateUtil.getCurrentDateTime(), "SYS_01", "1",
-                PostSearchType.TITLE);
-        String queryString = objectMapper.writeValueAsString(queryParamsObject);
+        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(GET_POSTS_API_URL);
 
-        MvcResult result = TestUtil.performGetRequest(mockMvc, GET_POSTS_API_URL
-                + "?sendDate=20240112113804899&systemId=STUDY_0001&searchKeyWord=post&searchType=TITLE&page=0&size=3&sort=title,desc",
-                null, 200);
+        uriBuilder.queryParam("sendDate", DateUtil.getCurrentDateTime())
+                .queryParam("systemId", "SYS_01")
+                .queryParam("searchKeyWord", "post")
+                .queryParam("searchType", PostSearchType.TITLE)
+                .queryParam("page", 0)
+                .queryParam("size", 3)
+                .queryParam("sort", "title,desc");
+
+        MvcResult result = TestUtil.performGetRequest(mockMvc, uriBuilder.toUriString(), 200);
 
         String content = result.getResponse().getContentAsString();
 
@@ -107,6 +112,76 @@ public class PostControllerTest {
             assertTrue(title.startsWith("post4"));
             break;
         }
+    }
+
+    @Test
+    @WithMockUser(username = "admin", authorities = { "ADMIN" })
+    @Sql("/post/PostListSetup.sql")
+    public void getPostListSuccessPage1Size2() throws Exception {
+
+        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(GET_POSTS_API_URL);
+
+        uriBuilder.queryParam("sendDate", DateUtil.getCurrentDateTime())
+                .queryParam("systemId", "SYS_01")
+                .queryParam("searchKeyWord", "post")
+                .queryParam("searchType", PostSearchType.TITLE)
+                .queryParam("page", 1)
+                .queryParam("size", 2)
+                .queryParam("sort", "title,desc");
+
+        MvcResult result = TestUtil.performGetRequest(mockMvc, uriBuilder.toUriString(), 200);
+
+        String content = result.getResponse().getContentAsString();
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode rootNode = objectMapper.readTree(content);
+
+        int contentCount = rootNode.path("content").size();
+        assertTrue(contentCount == 2);
+
+        for (JsonNode element : rootNode.path("content")) {
+            String title = element.path("title").asText();
+            assertTrue(title.startsWith("post2"));
+            break;
+        }
+    }
+
+    @Test
+    @WithMockUser(username = "admin", authorities = { "ADMIN" })
+    @Sql("/post/PostListSetup.sql")
+    public void getPostListFailInvalidSearchType() throws Exception {
+
+        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(GET_POSTS_API_URL);
+
+        uriBuilder.queryParam("sendDate", DateUtil.getCurrentDateTime())
+                .queryParam("systemId", "SYS_01")
+                .queryParam("searchKeyWord", "post")
+                .queryParam("searchType", "INVALID_TYPE") // Invalid SearchType
+                .queryParam("page", 0)
+                .queryParam("size", 3)
+                .queryParam("sort", "title,desc");
+
+        MvcResult result = TestUtil.performGetRequest(mockMvc, uriBuilder.toUriString(), 400);
+        assertEquals(400, result.getResponse().getStatus());
+    }
+
+    @Test
+    @WithMockUser(username = "admin", authorities = { "ADMIN" })
+    @Sql("/post/PostListSetup.sql")
+    public void getPostListFailEmptySearchKeyWord() throws Exception {
+
+        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(GET_POSTS_API_URL);
+
+        uriBuilder.queryParam("sendDate", DateUtil.getCurrentDateTime())
+                .queryParam("systemId", "SYS_01")
+                .queryParam("searchKeyWord", "")
+                .queryParam("searchType", PostSearchType.TITLE)
+                .queryParam("page", 0)
+                .queryParam("size", 3)
+                .queryParam("sort", "title,desc");
+
+        MvcResult result = TestUtil.performGetRequest(mockMvc, uriBuilder.toUriString(), 400);
+        assertEquals(400, result.getResponse().getStatus());
     }
 
 }

@@ -10,7 +10,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.web.util.UriComponentsBuilder;
 
 @Component
 public class TestUtil {
@@ -25,15 +24,8 @@ public class TestUtil {
                 .andExpect(expectedRetCode != null ? jsonPath("$.retCode").value(expectedRetCode) : null);
     }
 
-    public static MvcResult performGetRequest(MockMvc mockMvc, String url, String queryString, int expectedStatus)
-            throws Exception {
-        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(url);
-
-        if (queryString != null && !queryString.isEmpty()) {
-            uriBuilder.queryParam("query", queryString);
-        }
-
-        ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.get(uriBuilder.toUriString())
+    public static MvcResult performGetRequest(MockMvc mockMvc, String url, int expectedStatus) throws Exception {
+        ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.get(url)
                 .contentType(MediaType.APPLICATION_JSON));
 
         if (expectedStatus == 200) {
