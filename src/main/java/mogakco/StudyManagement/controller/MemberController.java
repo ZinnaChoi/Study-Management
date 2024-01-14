@@ -8,6 +8,10 @@ import org.springframework.web.bind.annotation.RestController;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
+import mogakco.StudyManagement.dto.DTOResCommon;
+import mogakco.StudyManagement.dto.MemberIdDuplReq;
+import mogakco.StudyManagement.dto.MemberIdDuplRes;
+import mogakco.StudyManagement.dto.MemberJoinReq;
 import mogakco.StudyManagement.dto.MemberLoginReq;
 import mogakco.StudyManagement.dto.MemberLoginRes;
 import mogakco.StudyManagement.enums.ErrorCode;
@@ -49,6 +53,54 @@ public class MemberController extends CommonController {
             endAPI(request, findErrorCodeByCode(result.getRetCode()), lo, result);
         }
         return result;
+    }
+
+    @Operation(summary = "회원가입", description = "회원가입을 통해 사용자 정보 등록")
+    @PostMapping("/join")
+    public DTOResCommon doJoin(HttpServletRequest request, @RequestBody MemberJoinReq joinInfo) {
+        DTOResCommon result = new DTOResCommon();
+
+        try {
+            startAPI(lo, joinInfo);
+            if (joinInfo.getSendDate() == null) {
+                result = new DTOResCommon(systemId, ErrorCode.NOT_FOUND.getCode(),
+                        ErrorCode.NOT_FOUND.getMessage("sendDate"));
+            } else {
+                result = memberService.join(joinInfo, lo);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            result = new DTOResCommon(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
+                    ErrorCode.INTERNAL_ERROR.getMessage());
+        } finally {
+            endAPI(request, findErrorCodeByCode(result.getRetCode()), lo, result);
+        }
+        return result;
+    }
+
+    @Operation(summary = "중복 아이디 확인", description = "회원가입시 사용자가 입력한 아이디 중복 검증 true: 중복 false: 사용 가능")
+    @PostMapping("/id-duplicated")
+    public MemberIdDuplRes checkIdDuplicated(HttpServletRequest request, @RequestBody MemberIdDuplReq idInfo) {
+        MemberIdDuplRes result = new MemberIdDuplRes();
+
+        try {
+            startAPI(lo, idInfo);
+            if (idInfo.getSendDate() == null) {
+                result = new MemberIdDuplRes(systemId, ErrorCode.NOT_FOUND.getCode(),
+                        ErrorCode.NOT_FOUND.getMessage("sendDate"));
+            } else {
+                boolean isDuplicated = memberService.isIdDuplicated(idInfo, lo);
+                result = new MemberIdDuplRes(systemId, ErrorCode.OK.getCode(), ErrorCode.OK.getMessage());
+                result.setDuplicated(isDuplicated);
+            }
+        } catch (Exception e) {
+            result = new MemberIdDuplRes(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
+                    ErrorCode.INTERNAL_ERROR.getMessage());
+        } finally {
+            endAPI(request, findErrorCodeByCode(result.getRetCode()), lo, result);
+        }
+        return result;
+
     }
 
 }
