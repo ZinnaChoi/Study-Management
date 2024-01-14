@@ -63,15 +63,15 @@ public class MemberController extends CommonController {
         try {
             startAPI(lo, joinInfo);
             if (joinInfo.getSendDate() == null) {
-                result = setCommonResult(ErrorCode.NOT_FOUND, lo, DTOResCommon.class, "sendDate");
+                result = new DTOResCommon(systemId, ErrorCode.NOT_FOUND.getCode(),
+                        ErrorCode.NOT_FOUND.getMessage("sendDate"));
             } else {
-                memberService.join(joinInfo, lo);
-                result = setCommonResult(ErrorCode.OK, lo, DTOResCommon.class);
-                endAPI(request, ErrorCode.OK, lo, result);
+                result = memberService.join(joinInfo, lo);
             }
         } catch (Exception e) {
             e.printStackTrace();
-            result = setCommonResult(ErrorCode.INTERNAL_ERROR, lo, DTOResCommon.class);
+            result = new DTOResCommon(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
+                    ErrorCode.INTERNAL_ERROR.getMessage());
         } finally {
             endAPI(request, findErrorCodeByCode(result.getRetCode()), lo, result);
         }
@@ -86,15 +86,16 @@ public class MemberController extends CommonController {
         try {
             startAPI(lo, idInfo);
             if (idInfo.getSendDate() == null) {
-                result = setCommonResult(ErrorCode.NOT_FOUND, lo, MemberIdDuplRes.class, "sendDate");
+                result = new MemberIdDuplRes(systemId, ErrorCode.NOT_FOUND.getCode(),
+                        ErrorCode.NOT_FOUND.getMessage("sendDate"));
             } else {
                 boolean isDuplicated = memberService.isIdDuplicated(idInfo, lo);
-
-                result = setCommonResult(ErrorCode.OK, lo, MemberIdDuplRes.class);
+                result = new MemberIdDuplRes(systemId, ErrorCode.OK.getCode(), ErrorCode.OK.getMessage());
                 result.setDuplicated(isDuplicated);
             }
         } catch (Exception e) {
-            result = setCommonResult(ErrorCode.INTERNAL_ERROR, lo, MemberIdDuplRes.class);
+            result = new MemberIdDuplRes(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
+                    ErrorCode.INTERNAL_ERROR.getMessage());
         } finally {
             endAPI(request, findErrorCodeByCode(result.getRetCode()), lo, result);
         }

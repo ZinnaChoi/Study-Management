@@ -14,6 +14,7 @@ import mogakco.StudyManagement.domain.Member;
 import mogakco.StudyManagement.domain.MemberSchedule;
 import mogakco.StudyManagement.domain.Schedule;
 import mogakco.StudyManagement.domain.WakeUp;
+import mogakco.StudyManagement.dto.DTOResCommon;
 import mogakco.StudyManagement.dto.MemberDetails;
 import mogakco.StudyManagement.dto.MemberIdDuplReq;
 import mogakco.StudyManagement.dto.MemberJoinReq;
@@ -42,6 +43,9 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
 
     @Value("${jwt.expired.time}")
     private Long expiredTime;
+
+    @Value("${study.systemId}")
+    protected String systemId;
 
     public MemberServiceImpl(MemberRepository memberRepository,
             MemberScheduleRepository memberScheduleRepository,
@@ -98,7 +102,8 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
 
     @Override
     @Transactional
-    public void join(MemberJoinReq joinInfo, LoggingService lo) {
+    public DTOResCommon join(MemberJoinReq joinInfo, LoggingService lo) {
+        DTOResCommon result = new DTOResCommon(systemId, ErrorCode.OK.getCode(), ErrorCode.OK.getMessage());
         Member member = Member.builder()
                 .id(joinInfo.getId())
                 .password(bCryptPasswordEncoder.encode(joinInfo.getPassword()))
@@ -114,18 +119,25 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
                 .build();
 
         Optional<Schedule> optSchedule = scheduleRepository.findById(joinInfo.getEventName());
-        Schedule schedule = optSchedule.get();
-        MemberSchedule memberSchedule = MemberSchedule.builder()
-                .member(member)
-                .event_name(schedule)
-                .createdAt(DateUtil.getCurrentDateTime())
-                .updatedAt(DateUtil.getCurrentDateTime())
-                .build();
-        lo.setDBStart();
-        memberRepository.save(member);
-        wakeUpRepository.save(wakeUp);
-        memberScheduleRepository.save(memberSchedule);
-        lo.setDBEnd();
+        if (optSchedule.isPresent()) {
+            Schedule schedule = optSchedule.get();
+            MemberSchedule memberSchedule = MemberSchedule.builder()
+                    .member(member)
+                    .event_name(schedule)
+                    .createdAt(DateUtil.getCurrentDateTime())
+                    .updatedAt(DateUtil.getCurrentDateTime())
+                    .build();
+            lo.setDBStart();
+            memberRepository.save(member);
+            wakeUpRepository.save(wakeUp);
+            memberScheduleRepository.save(memberSchedule);
+            lo.setDBEnd();
+        } else {
+            result = new DTOResCommon(systemId, ErrorCode.BAD_REQUEST.getCode(),
+                    ErrorCode.BAD_REQUEST.getMessage(joinInfo.getEventName() + " Schedule is Not Regist"));
+        }
+
+        return result;
     }
 
     @Override
