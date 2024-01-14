@@ -18,4 +18,10 @@ public class PostListReq extends DTOReqCommon {
 
     private PostSearchType searchType;
 
+    public PostListReq(String sendDate, String systemId, String searchKeyWord, PostSearchType searchType) {
+        super(sendDate, systemId);
+        this.searchKeyWord = searchKeyWord;
+        this.searchType = searchType;
+    }
+
 }

@@ -1,5 +1,7 @@
 package mogakco.StudyManagement.controller;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -8,15 +10,20 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
 
 import mogakco.StudyManagement.dto.PostCreateReq;
+import mogakco.StudyManagement.dto.PostListReq;
+import mogakco.StudyManagement.enums.PostSearchType;
 import mogakco.StudyManagement.service.common.LoggingService;
 import mogakco.StudyManagement.service.post.PostService;
 import mogakco.StudyManagement.util.DateUtil;
 import mogakco.StudyManagement.util.TestUtil;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @ActiveProfiles("test")
@@ -41,6 +48,7 @@ public class PostControllerTest {
     private MockMvc mockMvc;
 
     private static final String CREATE_POST_API_URL = "/api/v1/posts";
+    private static final String GET_POSTS_API_URL = "/api/v1/posts";
 
     @Test
     @WithMockUser(username = "admin", authorities = { "ADMIN" })
@@ -69,6 +77,36 @@ public class PostControllerTest {
                 "  \"content\": \"chatGPT 5.0 도입\"\n"; // Bad Request (Missing closing brace)
 
         TestUtil.performPostRequest(mockMvc, CREATE_POST_API_URL, invalidJson, 400, 400);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    @Test
+    @WithMockUser(username = "admin", authorities = { "ADMIN" })
+    @Sql("/post/PostListSetup.sql")
+    public void getPostListSuccessPage0Size3() throws Exception {
+
+        PostListReq queryParamsObject = new PostListReq(DateUtil.getCurrentDateTime(), "SYS_01", "1",
+                PostSearchType.TITLE);
+        String queryString = objectMapper.writeValueAsString(queryParamsObject);
+
+        MvcResult result = TestUtil.performGetRequest(mockMvc, GET_POSTS_API_URL
+                + "?sendDate=20240112113804899&systemId=STUDY_0001&searchKeyWord=post&searchType=TITLE&page=0&size=3&sort=title,desc",
+                null, 200);
+
+        String content = result.getResponse().getContentAsString();
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode rootNode = objectMapper.readTree(content);
+
+        int contentCount = rootNode.path("content").size();
+        assertTrue(contentCount == 3);
+
+        for (JsonNode element : rootNode.path("content")) {
+            String title = element.path("title").asText();
+            assertTrue(title.startsWith("post4"));
+            break;
+        }
     }
 
 }
