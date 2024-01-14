@@ -1,5 +1,7 @@
 package mogakco.StudyManagement.repository;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -11,8 +13,8 @@ import mogakco.StudyManagement.domain.Post;
 @Repository
 public interface PostRepository extends JpaRepository<Post, Long> {
 
-    Page<Post> findByTitle(String title, Pageable pageable);
+    Page<Post> findByTitleContaining(String title, Pageable pageable);
 
-    Page<Post> findByMember(Member member, Pageable pageable);
+    Page<Post> findByMemberIn(List<Member> members, Pageable pageable);
 
 }

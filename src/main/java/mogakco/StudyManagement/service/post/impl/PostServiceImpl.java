@@ -52,11 +52,17 @@ public class PostServiceImpl implements PostService {
     @Override
     public PostListRes getPostList(PostListReq postListReq, LoggingService lo, Pageable pageable) {
 
-        Member member = memberRepository.findByName(postListReq.getSearchKeyWord());
+        Page<Post> posts;
+        String searchKeyWord = postListReq.getSearchKeyWord().trim();
 
-        Page<Post> posts = (postListReq.getSerachType() == PostSearchType.TITLE)
-                ? postRepository.findByTitle(postListReq.getSearchKeyWord(), pageable)
-                : postRepository.findByMember(member, pageable);
+        lo.setDBStart();
+        if (postListReq.getSearchType() == PostSearchType.TITLE) {
+            posts = postRepository.findByTitleContaining(searchKeyWord, pageable);
+        } else {
+            List<Member> members = memberRepository.findByNameContaining(searchKeyWord);
+            posts = postRepository.findByMemberIn(members, pageable);
+        }
+        lo.setDBEnd();
 
         List<PostList> postLists = posts.getContent().stream()
                 .map(PostList::new)
