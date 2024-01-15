@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import mogakco.StudyManagement.dto.DTOResCommon;
 import mogakco.StudyManagement.dto.MemberIdDuplReq;
 import mogakco.StudyManagement.dto.MemberIdDuplRes;
@@ -57,7 +58,7 @@ public class MemberController extends CommonController {
 
     @Operation(summary = "회원가입", description = "회원가입을 통해 사용자 정보 등록")
     @PostMapping("/join")
-    public DTOResCommon doJoin(HttpServletRequest request, @RequestBody MemberJoinReq joinInfo) {
+    public DTOResCommon doJoin(HttpServletRequest request, @Valid @RequestBody MemberJoinReq joinInfo) {
         DTOResCommon result = new DTOResCommon();
 
         try {

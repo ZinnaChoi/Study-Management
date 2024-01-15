@@ -137,7 +137,7 @@ public class MemberControllerTest {
         req.setSendDate("string");
         req.setSystemId("string");
         req.setId("user1");
-        req.setPassword("pwd");
+        req.setPassword("password123!");
         req.setName("HongGilDong");
         req.setContact("01011112222");
         req.setStudyName("모각코 스터디");
@@ -160,7 +160,7 @@ public class MemberControllerTest {
         req.setSendDate(null);
         req.setSystemId("string");
         req.setId("user1");
-        req.setPassword("pwd");
+        req.setPassword("password123!");
         req.setName("HongGilDong");
         req.setContact("01011112222");
         req.setStudyName("모각코 스터디");
@@ -172,6 +172,54 @@ public class MemberControllerTest {
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(jsonPath("$.retCode").value(404));
+    }
+
+    @Test
+    @WithMockUser(authorities = "ADMIN")
+    @DisplayName("회원가입 API 실패_invaild ID")
+    void joinFail_InvalidId() throws Exception {
+        MemberJoinReq req = new MemberJoinReq();
+        String invaildId = "";
+
+        req.setSendDate(null);
+        req.setSystemId("string");
+        req.setId(invaildId);
+        req.setPassword("password123!");
+        req.setName("HongGilDong");
+        req.setContact("01011112222");
+        req.setStudyName("모각코 스터디");
+        req.setEventName("AM1");
+        req.setWakeupTime("1530");
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/join")
+                .content(objectMapper.writeValueAsString(req))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(jsonPath("$.retCode").value(400));
+    }
+
+    @Test
+    @WithMockUser(authorities = "ADMIN")
+    @DisplayName("회원가입 API 실패_invaild PWD")
+    void joinFail_InvalidPwd() throws Exception {
+        MemberJoinReq req = new MemberJoinReq();
+        String invaildPwd = "pwd";
+
+        req.setSendDate(null);
+        req.setSystemId("string");
+        req.setId("user99199");
+        req.setPassword(invaildPwd);
+        req.setName("HongGilDong");
+        req.setContact("01011112222");
+        req.setStudyName("모각코 스터디");
+        req.setEventName("AM1");
+        req.setWakeupTime("1530");
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/join")
+                .content(objectMapper.writeValueAsString(req))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(jsonPath("$.retCode").value(400));
     }
 
     /////////////////////////////////////////////////////////////////
