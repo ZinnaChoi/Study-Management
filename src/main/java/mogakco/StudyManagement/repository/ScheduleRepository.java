@@ -6,4 +6,6 @@ import mogakco.StudyManagement.domain.Schedule;
 
 public interface ScheduleRepository extends JpaRepository<Schedule, String> {
 
+    Boolean existsByEventName(String evnetName);
+
 }
