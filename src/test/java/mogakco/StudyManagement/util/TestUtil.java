@@ -35,4 +35,32 @@ public class TestUtil {
         return resultActions.andReturn();
     }
 
+    public static MvcResult performPatchRequest(MockMvc mockMvc, String url, String requestBodyJson, int expectedStatus)
+            throws Exception {
+        ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.patch(url)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestBodyJson));
+
+        if (expectedStatus == 200) {
+            resultActions.andExpect(status().isOk());
+        } else {
+            resultActions.andExpect(status().is(expectedStatus));
+        }
+
+        return resultActions.andReturn();
+    }
+
+    public static MvcResult performDeleteRequest(MockMvc mockMvc, String url, int expectedStatus) throws Exception {
+        ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.delete(url)
+                .contentType(MediaType.APPLICATION_JSON));
+
+        if (expectedStatus == 200) {
+            resultActions.andExpect(status().isOk());
+        } else {
+            resultActions.andExpect(status().is(expectedStatus));
+        }
+
+        return resultActions.andReturn();
+    }
+
 }

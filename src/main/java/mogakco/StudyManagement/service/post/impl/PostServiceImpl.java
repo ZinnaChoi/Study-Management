@@ -122,13 +122,21 @@ public class PostServiceImpl implements PostService {
         if (!optionalPost.isPresent()) {
             return new DTOResCommon(null, ErrorCode.NOT_FOUND.getCode(),
                     ErrorCode.NOT_FOUND.getMessage("게시글"));
-        } else {
-            lo.setDBStart();
-            postRepository.delete(optionalPost.get());
-            lo.setDBEnd();
-            return new DTOResCommon(null, ErrorCode.DELETED.getCode(),
-                    ErrorCode.DELETED.getMessage("게시글"));
         }
+        Post post = optionalPost.get();
+        lo.setDBStart();
+        Member loginMember = memberRepository.findById(SecurityUtil.getLoginUserId());
+        lo.setDBEnd();
+        if (!post.getMember().equals(loginMember)) {
+            return new DTOResCommon(null, ErrorCode.BAD_REQUEST.getCode(),
+                    ErrorCode.BAD_REQUEST.getMessage("작성하지 않은 게시글은 삭제 수 없습니다."));
+        }
+        lo.setDBStart();
+        postRepository.delete(post);
+        lo.setDBEnd();
+        return new DTOResCommon(null, ErrorCode.DELETED.getCode(),
+                ErrorCode.DELETED.getMessage("게시글"));
+
     }
 
 }
