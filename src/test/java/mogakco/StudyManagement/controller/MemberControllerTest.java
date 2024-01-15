@@ -1,5 +1,7 @@
 package mogakco.StudyManagement.controller;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -9,7 +11,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -52,6 +56,7 @@ public class MemberControllerTest {
     private static final String LOGIN_URL = "/api/v1/login";
     private static final String JOIN_URL = "/api/v1/join";
     private static final String ID_DUPLICATED_CHECK_URL = "/api/v1/id-duplicated";
+    private static final String GET_MEMBER_INFO_URL = "/api/v1/member";
 
     @Test
     @WithMockUser(authorities = "ADMIN")
@@ -190,6 +195,32 @@ public class MemberControllerTest {
         String requestBodyJson = objectMapper.writeValueAsString(req);
 
         TestUtil.performPostRequest(mockMvc, ID_DUPLICATED_CHECK_URL, requestBodyJson, 200, 404);
+    }
+
+    /////////////////////////////////////////////////////////////////
+
+    @Test
+    @WithMockUser(username = "admin", authorities = { "ADMIN" })
+    @DisplayName("단일 회원정보 조회 성공")
+    public void getMemberInfo_Success() throws Exception {
+
+        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(GET_MEMBER_INFO_URL);
+
+        uriBuilder.queryParam("sendDate", DateUtil.getCurrentDateTime())
+                .queryParam("systemId", "SYS_01");
+
+        MvcResult result = TestUtil.performGetRequest(mockMvc, uriBuilder.toUriString(), 200);
+        System.out.println(result.getResponse().getContentAsString());
+        assertEquals(200, result.getResponse().getStatus());
+    }
+
+    @Test
+    @WithMockUser(username = "admin", authorities = { "ADMIN" })
+    @DisplayName("단일 회원정보 조회 성공_not include sendDate")
+    public void getMemberInfo_NotIncludeSendDate() throws Exception {
+
+        MvcResult result = TestUtil.performGetRequest(mockMvc, GET_MEMBER_INFO_URL, 200);
+        assertEquals(200, result.getResponse().getStatus());
     }
 
 }
