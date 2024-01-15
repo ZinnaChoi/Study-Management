@@ -6,6 +6,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 public class TestUtil {
 
@@ -17,6 +20,19 @@ public class TestUtil {
                 .content(requestBodyJson))
                 .andExpect(status().is(expectedStatus))
                 .andExpect(expectedRetCode != null ? jsonPath("$.retCode").value(expectedRetCode) : null);
+    }
+
+    public static MvcResult performGetRequest(MockMvc mockMvc, String url, int expectedStatus) throws Exception {
+        ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.get(url)
+                .contentType(MediaType.APPLICATION_JSON));
+
+        if (expectedStatus == 200) {
+            resultActions.andExpect(status().isOk());
+        } else {
+            resultActions.andExpect(status().is(expectedStatus));
+        }
+
+        return resultActions.andReturn();
     }
 
 }
