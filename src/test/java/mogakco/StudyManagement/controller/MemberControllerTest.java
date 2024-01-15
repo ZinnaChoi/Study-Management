@@ -17,6 +17,7 @@ import mogakco.StudyManagement.dto.MemberIdDuplReq;
 import mogakco.StudyManagement.dto.MemberJoinReq;
 import mogakco.StudyManagement.dto.MemberLoginReq;
 import mogakco.StudyManagement.service.member.impl.MemberServiceImpl;
+import mogakco.StudyManagement.util.DateUtil;
 import mogakco.StudyManagement.util.TestUtil;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,13 +57,7 @@ public class MemberControllerTest {
     @WithMockUser(authorities = "ADMIN")
     @DisplayName("로그인 API 성공")
     void loginSuccess() throws Exception {
-        MemberLoginReq req = new MemberLoginReq();
-
-        req.setSendDate("string");
-        req.setSystemId("string");
-        req.setId(adminId);
-        req.setPassword(password);
-
+        MemberLoginReq req = new MemberLoginReq(DateUtil.getCurrentDateTime(), "SYS_01", adminId, password);
         String requestBodyJson = objectMapper.writeValueAsString(req);
 
         TestUtil.performPostRequest(mockMvc, LOGIN_URL, requestBodyJson, 200, 200);
@@ -72,13 +67,7 @@ public class MemberControllerTest {
     @WithMockUser(authorities = "ADMIN")
     @DisplayName("로그인 API 실패_not include sendDate")
     void loginFail_NotIncludeSendDate() throws Exception {
-        MemberLoginReq req = new MemberLoginReq();
-
-        req.setSendDate(null);
-        req.setSystemId("string");
-        req.setId(adminId);
-        req.setPassword(password);
-
+        MemberLoginReq req = new MemberLoginReq(null, "SYS_01", adminId, password);
         String requestBodyJson = objectMapper.writeValueAsString(req);
 
         TestUtil.performPostRequest(mockMvc, LOGIN_URL, requestBodyJson, 200, 404);
@@ -88,14 +77,8 @@ public class MemberControllerTest {
     @WithMockUser(authorities = "ADMIN")
     @DisplayName("로그인 API 실패_incorrect ID")
     void loginFail_IncorrectId() throws Exception {
-        MemberLoginReq req = new MemberLoginReq();
-
         String wrongId = "asdkawqwrjajsd12312";
-        req.setSendDate("string");
-        req.setSystemId("string");
-        req.setId(wrongId);
-        req.setPassword(password);
-
+        MemberLoginReq req = new MemberLoginReq(DateUtil.getCurrentDateTime(), "SYS_01", wrongId, password);
         String requestBodyJson = objectMapper.writeValueAsString(req);
 
         TestUtil.performPostRequest(mockMvc, LOGIN_URL, requestBodyJson, 200, 404);
@@ -105,14 +88,8 @@ public class MemberControllerTest {
     @WithMockUser(authorities = "ADMIN")
     @DisplayName("로그인 API 실패_incorrect PWD")
     void loginFail_IncorrectPwd() throws Exception {
-        MemberLoginReq req = new MemberLoginReq();
-
         String wrongPwd = "asdkawqwrjajsd12312";
-        req.setSendDate("string");
-        req.setSystemId("string");
-        req.setId(adminId);
-        req.setPassword(wrongPwd);
-
+        MemberLoginReq req = new MemberLoginReq(DateUtil.getCurrentDateTime(), "SYS_01", adminId, wrongPwd);
         String requestBodyJson = objectMapper.writeValueAsString(req);
 
         TestUtil.performPostRequest(mockMvc, LOGIN_URL, requestBodyJson, 200, 400);
@@ -125,18 +102,10 @@ public class MemberControllerTest {
     @DisplayName("회원가입 API 성공")
     @Sql("/ScheduleSetup.sql")
     void joinSuccess() throws Exception {
-        MemberJoinReq req = new MemberJoinReq();
-
-        req.setSendDate("string");
-        req.setSystemId("string");
-        req.setId("user1");
-        req.setPassword("password123!");
-        req.setName("HongGilDong");
-        req.setContact("01011112222");
-        req.setStudyName("모각코 스터디");
-        req.setEventName("AM1");
-        req.setWakeupTime("1530");
-
+        MemberJoinReq req = new MemberJoinReq("user1", "password123!", "HongGilDong", "01011112222", "모각코 스터디", "AM1",
+                "1530");
+        req.setSendDate(DateUtil.getCurrentDateTime());
+        req.setSystemId("SYS_01");
         String requestBodyJson = objectMapper.writeValueAsString(req);
 
         TestUtil.performPostRequest(mockMvc, JOIN_URL, requestBodyJson, 200, 200);
@@ -146,18 +115,10 @@ public class MemberControllerTest {
     @WithMockUser(authorities = "ADMIN")
     @DisplayName("회원가입 API 실패_not include sendDate")
     void joinFail_NotIncludeSendDate() throws Exception {
-        MemberJoinReq req = new MemberJoinReq();
-
+        MemberJoinReq req = new MemberJoinReq("user1", "password123!", "HongGilDong", "01011112222", "모각코 스터디", "AM1",
+                "1530");
         req.setSendDate(null);
-        req.setSystemId("string");
-        req.setId("user1");
-        req.setPassword("password123!");
-        req.setName("HongGilDong");
-        req.setContact("01011112222");
-        req.setStudyName("모각코 스터디");
-        req.setEventName("AM1");
-        req.setWakeupTime("1530");
-
+        req.setSystemId("SYS_01");
         String requestBodyJson = objectMapper.writeValueAsString(req);
 
         TestUtil.performPostRequest(mockMvc, JOIN_URL, requestBodyJson, 200, 404);
@@ -167,19 +128,11 @@ public class MemberControllerTest {
     @WithMockUser(authorities = "ADMIN")
     @DisplayName("회원가입 API 실패_invaild ID")
     void joinFail_InvalidId() throws Exception {
-        MemberJoinReq req = new MemberJoinReq();
         String invaildId = "";
-
-        req.setSendDate(null);
-        req.setSystemId("string");
-        req.setId(invaildId);
-        req.setPassword("password123!");
-        req.setName("HongGilDong");
-        req.setContact("01011112222");
-        req.setStudyName("모각코 스터디");
-        req.setEventName("AM1");
-        req.setWakeupTime("1530");
-
+        MemberJoinReq req = new MemberJoinReq(invaildId, "password123!", "HongGilDong", "01011112222", "모각코 스터디", "AM1",
+                "1530");
+        req.setSendDate(DateUtil.getCurrentDateTime());
+        req.setSystemId("SYS_01");
         String requestBodyJson = objectMapper.writeValueAsString(req);
 
         TestUtil.performPostRequest(mockMvc, JOIN_URL, requestBodyJson, 400, 400);
@@ -189,19 +142,11 @@ public class MemberControllerTest {
     @WithMockUser(authorities = "ADMIN")
     @DisplayName("회원가입 API 실패_invaild PWD")
     void joinFail_InvalidPwd() throws Exception {
-        MemberJoinReq req = new MemberJoinReq();
         String invaildPwd = "pwd";
-
-        req.setSendDate(null);
-        req.setSystemId("string");
-        req.setId("user99199");
-        req.setPassword(invaildPwd);
-        req.setName("HongGilDong");
-        req.setContact("01011112222");
-        req.setStudyName("모각코 스터디");
-        req.setEventName("AM1");
-        req.setWakeupTime("1530");
-
+        MemberJoinReq req = new MemberJoinReq("user1", invaildPwd, "HongGilDong", "01011112222", "모각코 스터디", "AM1",
+                "1530");
+        req.setSendDate(DateUtil.getCurrentDateTime());
+        req.setSystemId("SYS_01");
         String requestBodyJson = objectMapper.writeValueAsString(req);
 
         TestUtil.performPostRequest(mockMvc, JOIN_URL, requestBodyJson, 400, 400);
@@ -212,13 +157,12 @@ public class MemberControllerTest {
     @WithMockUser(authorities = "ADMIN")
     @DisplayName("아이디 중복 API 성공_중복")
     void idDuplicatedSuccess_dupl() throws Exception {
-        MemberIdDuplReq req = new MemberIdDuplReq();
-        req.setSendDate("string");
-        req.setSystemId("string");
-        req.setId(adminId);
-
+        MemberIdDuplReq req = new MemberIdDuplReq(adminId);
+        req.setSendDate(DateUtil.getCurrentDateTime());
+        req.setSystemId("SYS_01");
         String requestBodyJson = objectMapper.writeValueAsString(req);
         String expression = "duplicated";
+
         TestUtil.performPostRequest(mockMvc, ID_DUPLICATED_CHECK_URL, requestBodyJson, 200, true, expression);
     }
 
@@ -226,15 +170,13 @@ public class MemberControllerTest {
     @WithMockUser(authorities = "ADMIN")
     @DisplayName("아이디 중복 API 성공_미중복")
     void idDuplicatedSuccess_notDupl() throws Exception {
-        MemberIdDuplReq req = new MemberIdDuplReq();
-
         String wrongId = "aawadowajdqjdqwdas";
-        req.setSendDate("string");
-        req.setSystemId("string");
-        req.setId(wrongId);
-
+        MemberIdDuplReq req = new MemberIdDuplReq(wrongId);
+        req.setSendDate(DateUtil.getCurrentDateTime());
+        req.setSystemId("SYS_01");
         String requestBodyJson = objectMapper.writeValueAsString(req);
         String expression = "duplicated";
+
         TestUtil.performPostRequest(mockMvc, ID_DUPLICATED_CHECK_URL, requestBodyJson, 200, false, expression);
     }
 
@@ -242,13 +184,11 @@ public class MemberControllerTest {
     @WithMockUser(authorities = "ADMIN")
     @DisplayName("아이디 중복 API 실패_not include sendDate")
     void idDuplicatedFail_NotIncludeSendDate() throws Exception {
-        MemberIdDuplReq req = new MemberIdDuplReq();
-
+        MemberIdDuplReq req = new MemberIdDuplReq(adminId);
         req.setSendDate(null);
-        req.setSystemId("string");
-        req.setId(adminId);
-
+        req.setSystemId("SYS_01");
         String requestBodyJson = objectMapper.writeValueAsString(req);
+
         TestUtil.performPostRequest(mockMvc, ID_DUPLICATED_CHECK_URL, requestBodyJson, 200, 404);
     }
 
