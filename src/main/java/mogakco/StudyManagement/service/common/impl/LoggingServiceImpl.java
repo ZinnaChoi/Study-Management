@@ -40,8 +40,13 @@ public class LoggingServiceImpl implements LoggingService {
     @Override
     public void setAPIEnd(HttpServletRequest request, ErrorCode errorCode, String systemId) {
         timeAPI = System.currentTimeMillis() - timeAPI;
+
+        StringBuffer requestURL = request.getRequestURL();
+        if (request.getQueryString() != null) {
+            requestURL.append("?").append(request.getQueryString());
+        }
         logger.info("Req: {} {} {}, Res: {}, Duration API: {} ms DB: {} ms", systemId,
-                request.getMethod(), request.getRequestURI(), errorCode, timeAPI, timeDB);
+                request.getMethod(), requestURL.toString(), errorCode, timeAPI, timeDB);
         resetDurations();
     }
 
