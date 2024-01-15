@@ -1,16 +1,22 @@
 package mogakco.StudyManagement.controller;
 
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
+import mogakco.StudyManagement.dto.DTOReqCommon;
 import mogakco.StudyManagement.dto.DTOResCommon;
 import mogakco.StudyManagement.dto.MemberIdDuplReq;
 import mogakco.StudyManagement.dto.MemberIdDuplRes;
+import mogakco.StudyManagement.dto.MemberInfoRes;
 import mogakco.StudyManagement.dto.MemberJoinReq;
 import mogakco.StudyManagement.dto.MemberLoginReq;
 import mogakco.StudyManagement.dto.MemberLoginRes;
@@ -57,7 +63,7 @@ public class MemberController extends CommonController {
 
     @Operation(summary = "회원가입", description = "회원가입을 통해 사용자 정보 등록")
     @PostMapping("/join")
-    public DTOResCommon doJoin(HttpServletRequest request, @RequestBody MemberJoinReq joinInfo) {
+    public DTOResCommon doJoin(HttpServletRequest request, @Valid @RequestBody MemberJoinReq joinInfo) {
         DTOResCommon result = new DTOResCommon();
 
         try {
@@ -96,6 +102,31 @@ public class MemberController extends CommonController {
         } catch (Exception e) {
             result = new MemberIdDuplRes(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
                     ErrorCode.INTERNAL_ERROR.getMessage());
+        } finally {
+            endAPI(request, findErrorCodeByCode(result.getRetCode()), lo, result);
+        }
+        return result;
+
+    }
+
+    @Operation(summary = "MyPage 회원 정보 조회", description = "로그인 된 회원 정보 조회")
+    @SecurityRequirement(name = "bearer-key")
+    @GetMapping("/member")
+    public MemberInfoRes getMemberInfo(HttpServletRequest request, @ModelAttribute DTOReqCommon info) {
+        MemberInfoRes result = new MemberInfoRes();
+
+        try {
+            startAPI(lo, info);
+            if (info.getSendDate() == null) {
+                result = new MemberInfoRes(systemId, ErrorCode.NOT_FOUND.getCode(),
+                        ErrorCode.NOT_FOUND.getMessage("sendDate"), null, null, null, null, null, null, null);
+            } else {
+                result = memberService.getMemberInfo(lo);
+                result.setSendDate(DateUtil.getCurrentDateTime());
+            }
+        } catch (Exception e) {
+            result = new MemberInfoRes(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
+                    ErrorCode.INTERNAL_ERROR.getMessage(), null, null, null, null, null, null, null);
         } finally {
             endAPI(request, findErrorCodeByCode(result.getRetCode()), lo, result);
         }
