@@ -113,4 +113,22 @@ public class PostServiceImpl implements PostService {
         return new DTOResCommon(null, ErrorCode.OK.getCode(), ErrorCode.OK.getMessage());
     }
 
+    @Override
+    public DTOResCommon deletePost(Long postId, LoggingService lo) {
+        lo.setDBStart();
+        Optional<Post> optionalPost = postRepository.findByPostId(postId);
+        lo.setDBEnd();
+
+        if (!optionalPost.isPresent()) {
+            return new DTOResCommon(null, ErrorCode.NOT_FOUND.getCode(),
+                    ErrorCode.NOT_FOUND.getMessage("게시글"));
+        } else {
+            lo.setDBStart();
+            postRepository.delete(optionalPost.get());
+            lo.setDBEnd();
+            return new DTOResCommon(null, ErrorCode.DELETED.getCode(),
+                    ErrorCode.DELETED.getMessage("게시글"));
+        }
+    }
+
 }

@@ -54,7 +54,7 @@ public class PostController extends CommonController {
             result = new DTOResCommon(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
                     ErrorCode.INTERNAL_ERROR.getMessage());
         } finally {
-            endAPI(request, ErrorCode.OK, lo, result);
+            endAPI(request, findErrorCodeByCode(result.getRetCode()), lo, result);
         }
         return result;
     }
@@ -75,7 +75,7 @@ public class PostController extends CommonController {
             result = new PostListRes(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
                     ErrorCode.INTERNAL_ERROR.getMessage(), null, null);
         } finally {
-            endAPI(request, ErrorCode.OK, lo, result);
+            endAPI(request, findErrorCodeByCode(result.getRetCode()), lo, result);
         }
 
         return result;
@@ -103,7 +103,7 @@ public class PostController extends CommonController {
             result = new DTOResCommon(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
                     ErrorCode.INTERNAL_ERROR.getMessage());
         } finally {
-            endAPI(request, ErrorCode.OK, lo, result);
+            endAPI(request, findErrorCodeByCode(result.getRetCode()), lo, result);
         }
         return result;
 
@@ -111,7 +111,22 @@ public class PostController extends CommonController {
 
     @Operation(summary = "게시글 삭제", description = "특정 게시글 삭제. 게시글 작성자만 삭제 가능")
     @DeleteMapping("/posts/{postId}")
-    public void deletePost() {
+    public DTOResCommon deletePost(HttpServletRequest request,
+            @PathVariable(name = "postId", required = true) Long postId) {
+        DTOResCommon result = new DTOResCommon();
+        try {
+            startAPI(lo, null);
+            result = postService.deletePost(postId, lo);
+            result.setSendDate(DateUtil.getCurrentDateTime());
+            result.setSystemId(systemId);
+        } catch (Exception e) {
+            result = new DTOResCommon(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
+                    ErrorCode.INTERNAL_ERROR.getMessage());
+        } finally {
+            endAPI(request, findErrorCodeByCode(result.getRetCode()), lo, result);
+        }
+
+        return result;
     }
 
 }

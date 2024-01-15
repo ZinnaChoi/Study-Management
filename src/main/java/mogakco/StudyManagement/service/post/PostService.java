@@ -14,4 +14,6 @@ public interface PostService {
     PostListRes getPostList(PostListReq postListReq, LoggingService lo, Pageable pageable);
 
     DTOResCommon updatePost(Long postId, PostReq postUpdateReq, LoggingService lo);
+
+    DTOResCommon deletePost(Long postId, LoggingService lo);
 }
