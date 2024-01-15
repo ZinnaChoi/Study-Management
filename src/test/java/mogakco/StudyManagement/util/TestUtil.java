@@ -13,13 +13,35 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 public class TestUtil {
 
     public static void performPostRequest(MockMvc mockMvc, String url, String requestBodyJson, int expectedStatus,
-            Integer expectedRetCode)
+            Integer expected)
             throws Exception {
         mockMvc.perform(post(url)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(requestBodyJson))
                 .andExpect(status().is(expectedStatus))
-                .andExpect(expectedRetCode != null ? jsonPath("$.retCode").value(expectedRetCode) : null);
+                .andExpect(expected != null ? jsonPath("$.retCode").value(expected) : null);
+    }
+
+    // Method OverLoading
+    public static void performPostRequest(MockMvc mockMvc, String url, String requestBodyJson, int expectedStatus,
+            Boolean expected, String expression)
+            throws Exception {
+        mockMvc.perform(post(url)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestBodyJson))
+                .andExpect(status().is(expectedStatus))
+                .andExpect(expected != null ? jsonPath("$." + expression).value(expected) : null);
+    }
+
+    // Method OverLoading
+    public static void performPostRequest(MockMvc mockMvc, String url, String requestBodyJson, int expectedStatus,
+            String expected, String expression)
+            throws Exception {
+        mockMvc.perform(post(url)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestBodyJson))
+                .andExpect(status().is(expectedStatus))
+                .andExpect(expected != null ? jsonPath("$." + expression).value(expected) : null);
     }
 
     public static MvcResult performGetRequest(MockMvc mockMvc, String url, int expectedStatus) throws Exception {

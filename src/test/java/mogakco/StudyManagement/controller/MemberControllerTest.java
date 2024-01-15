@@ -6,15 +6,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.transaction.annotation.Transactional;
-
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -22,6 +17,7 @@ import mogakco.StudyManagement.dto.MemberIdDuplReq;
 import mogakco.StudyManagement.dto.MemberJoinReq;
 import mogakco.StudyManagement.dto.MemberLoginReq;
 import mogakco.StudyManagement.service.member.impl.MemberServiceImpl;
+import mogakco.StudyManagement.util.TestUtil;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -52,6 +48,10 @@ public class MemberControllerTest {
     @Value("${account.admin.password}")
     private String password;
 
+    private static final String LOGIN_URL = "/api/v1/login";
+    private static final String JOIN_URL = "/api/v1/join";
+    private static final String ID_DUPLICATED_CHECK_URL = "/api/v1/id-duplicated";
+
     @Test
     @WithMockUser(authorities = "ADMIN")
     @DisplayName("로그인 API 성공")
@@ -63,10 +63,9 @@ public class MemberControllerTest {
         req.setId(adminId);
         req.setPassword(password);
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/login")
-                .content(objectMapper.writeValueAsString(req))
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isOk());
+        String requestBodyJson = objectMapper.writeValueAsString(req);
+
+        TestUtil.performPostRequest(mockMvc, LOGIN_URL, requestBodyJson, 200, 200);
     }
 
     @Test
@@ -80,11 +79,9 @@ public class MemberControllerTest {
         req.setId(adminId);
         req.setPassword(password);
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/login")
-                .content(objectMapper.writeValueAsString(req))
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(jsonPath("$.retCode").value(404));
+        String requestBodyJson = objectMapper.writeValueAsString(req);
+
+        TestUtil.performPostRequest(mockMvc, LOGIN_URL, requestBodyJson, 200, 404);
     }
 
     @Test
@@ -99,11 +96,9 @@ public class MemberControllerTest {
         req.setId(wrongId);
         req.setPassword(password);
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/login")
-                .content(objectMapper.writeValueAsString(req))
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(jsonPath("$.retCode").value(404));
+        String requestBodyJson = objectMapper.writeValueAsString(req);
+
+        TestUtil.performPostRequest(mockMvc, LOGIN_URL, requestBodyJson, 200, 404);
     }
 
     @Test
@@ -118,11 +113,9 @@ public class MemberControllerTest {
         req.setId(adminId);
         req.setPassword(wrongPwd);
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/login")
-                .content(objectMapper.writeValueAsString(req))
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(jsonPath("$.retCode").value(400));
+        String requestBodyJson = objectMapper.writeValueAsString(req);
+
+        TestUtil.performPostRequest(mockMvc, LOGIN_URL, requestBodyJson, 200, 400);
     }
 
     /////////////////////////////////////////////////////////////////
@@ -144,11 +137,9 @@ public class MemberControllerTest {
         req.setEventName("AM1");
         req.setWakeupTime("1530");
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/join")
-                .content(objectMapper.writeValueAsString(req))
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(jsonPath("$.retCode").value(200));
+        String requestBodyJson = objectMapper.writeValueAsString(req);
+
+        TestUtil.performPostRequest(mockMvc, JOIN_URL, requestBodyJson, 200, 200);
     }
 
     @Test
@@ -167,11 +158,9 @@ public class MemberControllerTest {
         req.setEventName("AM1");
         req.setWakeupTime("1530");
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/join")
-                .content(objectMapper.writeValueAsString(req))
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(jsonPath("$.retCode").value(404));
+        String requestBodyJson = objectMapper.writeValueAsString(req);
+
+        TestUtil.performPostRequest(mockMvc, JOIN_URL, requestBodyJson, 200, 404);
     }
 
     @Test
@@ -191,11 +180,9 @@ public class MemberControllerTest {
         req.setEventName("AM1");
         req.setWakeupTime("1530");
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/join")
-                .content(objectMapper.writeValueAsString(req))
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isBadRequest())
-                .andExpect(jsonPath("$.retCode").value(400));
+        String requestBodyJson = objectMapper.writeValueAsString(req);
+
+        TestUtil.performPostRequest(mockMvc, JOIN_URL, requestBodyJson, 400, 400);
     }
 
     @Test
@@ -215,11 +202,9 @@ public class MemberControllerTest {
         req.setEventName("AM1");
         req.setWakeupTime("1530");
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/join")
-                .content(objectMapper.writeValueAsString(req))
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isBadRequest())
-                .andExpect(jsonPath("$.retCode").value(400));
+        String requestBodyJson = objectMapper.writeValueAsString(req);
+
+        TestUtil.performPostRequest(mockMvc, JOIN_URL, requestBodyJson, 400, 400);
     }
 
     /////////////////////////////////////////////////////////////////
@@ -232,11 +217,9 @@ public class MemberControllerTest {
         req.setSystemId("string");
         req.setId(adminId);
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/id-duplicated")
-                .content(objectMapper.writeValueAsString(req))
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(jsonPath("$.duplicated").value(true));
+        String requestBodyJson = objectMapper.writeValueAsString(req);
+        String expression = "duplicated";
+        TestUtil.performPostRequest(mockMvc, ID_DUPLICATED_CHECK_URL, requestBodyJson, 200, true, expression);
     }
 
     @Test
@@ -250,11 +233,9 @@ public class MemberControllerTest {
         req.setSystemId("string");
         req.setId(wrongId);
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/id-duplicated")
-                .content(objectMapper.writeValueAsString(req))
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(jsonPath("$.duplicated").value(false));
+        String requestBodyJson = objectMapper.writeValueAsString(req);
+        String expression = "duplicated";
+        TestUtil.performPostRequest(mockMvc, ID_DUPLICATED_CHECK_URL, requestBodyJson, 200, false, expression);
     }
 
     @Test
@@ -267,11 +248,8 @@ public class MemberControllerTest {
         req.setSystemId("string");
         req.setId(adminId);
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/id-duplicated")
-                .content(objectMapper.writeValueAsString(req))
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(jsonPath("$.retCode").value(404));
+        String requestBodyJson = objectMapper.writeValueAsString(req);
+        TestUtil.performPostRequest(mockMvc, ID_DUPLICATED_CHECK_URL, requestBodyJson, 200, 404);
     }
 
 }
