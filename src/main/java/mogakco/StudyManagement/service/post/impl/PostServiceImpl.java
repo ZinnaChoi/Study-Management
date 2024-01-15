@@ -9,12 +9,14 @@ import org.springframework.stereotype.Service;
 
 import mogakco.StudyManagement.domain.Member;
 import mogakco.StudyManagement.domain.Post;
-import mogakco.StudyManagement.dto.PostCreateReq;
+import mogakco.StudyManagement.dto.PostReq;
+import mogakco.StudyManagement.dto.DTOResCommon;
 import mogakco.StudyManagement.dto.PostList;
 import mogakco.StudyManagement.dto.PostListReq;
 import mogakco.StudyManagement.dto.PostListRes;
 import mogakco.StudyManagement.dto.SimplePageable;
 import mogakco.StudyManagement.enums.ErrorCode;
+import java.util.Optional;
 import mogakco.StudyManagement.enums.PostSearchType;
 import mogakco.StudyManagement.repository.MemberRepository;
 import mogakco.StudyManagement.repository.PostRepository;
@@ -36,7 +38,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public void createPost(PostCreateReq postCreateReq, LoggingService lo) {
+    public void createPost(PostReq postCreateReq, LoggingService lo) {
         lo.setDBStart();
         Member member = memberRepository.findById(SecurityUtil.getLoginUserId());
         lo.setDBEnd();
@@ -75,6 +77,39 @@ public class PostServiceImpl implements PostService {
                 simplePageable);
 
         return result;
+    }
+
+    @Override
+    public DTOResCommon updatePost(Long postId, PostReq postUpdateReq, LoggingService lo) {
+
+        lo.setDBStart();
+        Optional<Post> post = postRepository.findByPostId(postId);
+        lo.setDBEnd();
+        if (!post.isPresent()) {
+            return new DTOResCommon(null, ErrorCode.NOT_FOUND.getCode(),
+                    ErrorCode.NOT_FOUND.getMessage("게시글"));
+        }
+
+        lo.setDBStart();
+        Member member = memberRepository.findById(SecurityUtil.getLoginUserId());
+        Post postByLoginMember = postRepository.findByPostIdAndMember(postId, member);
+        lo.setDBEnd();
+        if (postByLoginMember == null) {
+            return new DTOResCommon(null, ErrorCode.BAD_REQUEST.getCode(),
+                    ErrorCode.BAD_REQUEST.getMessage("작성하지 않은 게시글은 수정할 수 없습니다"));
+        }
+
+        if (postByLoginMember.isPostChanged(postUpdateReq)) {
+            postByLoginMember.updateTitle(postUpdateReq.getTitle());
+            postByLoginMember.updateContent(postUpdateReq.getContent());
+            lo.setDBStart();
+            postRepository.save(postByLoginMember);
+            lo.setDBEnd();
+        } else {
+            return new DTOResCommon(null, ErrorCode.UNCHANGED.getCode(), ErrorCode.UNCHANGED.getMessage("게시글"));
+        }
+
+        return new DTOResCommon(null, ErrorCode.OK.getCode(), ErrorCode.OK.getMessage());
     }
 
 }
