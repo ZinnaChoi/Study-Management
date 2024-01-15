@@ -83,27 +83,28 @@ public class PostServiceImpl implements PostService {
     public DTOResCommon updatePost(Long postId, PostReq postUpdateReq, LoggingService lo) {
 
         lo.setDBStart();
-        Optional<Post> post = postRepository.findByPostId(postId);
+        Optional<Post> optionalPost = postRepository.findByPostId(postId);
         lo.setDBEnd();
-        if (!post.isPresent()) {
+
+        if (!optionalPost.isPresent()) {
             return new DTOResCommon(null, ErrorCode.NOT_FOUND.getCode(),
                     ErrorCode.NOT_FOUND.getMessage("게시글"));
         }
 
+        Post post = optionalPost.get();
         lo.setDBStart();
-        Member member = memberRepository.findById(SecurityUtil.getLoginUserId());
-        Post postByLoginMember = postRepository.findByPostIdAndMember(postId, member);
+        Member loginMember = memberRepository.findById(SecurityUtil.getLoginUserId());
         lo.setDBEnd();
-        if (postByLoginMember == null) {
+        if (!post.getMember().equals(loginMember)) {
             return new DTOResCommon(null, ErrorCode.BAD_REQUEST.getCode(),
-                    ErrorCode.BAD_REQUEST.getMessage("작성하지 않은 게시글은 수정할 수 없습니다"));
+                    ErrorCode.BAD_REQUEST.getMessage("작성하지 않은 게시글은 수정할 수 없습니다."));
         }
 
-        if (postByLoginMember.isPostChanged(postUpdateReq)) {
-            postByLoginMember.updateTitle(postUpdateReq.getTitle());
-            postByLoginMember.updateContent(postUpdateReq.getContent());
+        if (post.isPostChanged(postUpdateReq)) {
+            post.updateTitle(postUpdateReq.getTitle());
+            post.updateContent(postUpdateReq.getContent());
             lo.setDBStart();
-            postRepository.save(postByLoginMember);
+            postRepository.save(post);
             lo.setDBEnd();
         } else {
             return new DTOResCommon(null, ErrorCode.UNCHANGED.getCode(), ErrorCode.UNCHANGED.getMessage("게시글"));
