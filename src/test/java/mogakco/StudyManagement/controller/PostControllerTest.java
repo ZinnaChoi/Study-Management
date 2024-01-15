@@ -15,7 +15,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -62,7 +61,7 @@ public class PostControllerTest {
         String requestBodyJson = objectMapper
                 .writeValueAsString(new PostReq(DateUtil.getCurrentDateTime(), "SYS_01", "2024 2월 개발 뉴스 공유드립니다",
                         "chatGPT 5.0 도입"));
-        TestUtil.performPostRequest(mockMvc, POST_API_URL, requestBodyJson, 200, 200);
+        TestUtil.performRequest(mockMvc, POST_API_URL, requestBodyJson, "POST", 200, 200);
     }
 
     @Test
@@ -71,7 +70,7 @@ public class PostControllerTest {
     public void createPostFailEmptyTitle() throws Exception {
         String requestBodyJson = objectMapper
                 .writeValueAsString(new PostReq(DateUtil.getCurrentDateTime(), "SYS_01", null, "chatGPT 5.0 도입"));
-        TestUtil.performPostRequest(mockMvc, POST_API_URL, requestBodyJson, 400, 400);
+        TestUtil.performRequest(mockMvc, POST_API_URL, requestBodyJson, "POST", 400, 400);
     }
 
     @Test
@@ -84,7 +83,7 @@ public class PostControllerTest {
                 "  \"title\": \"2024 2월 개발 뉴스 공유드립니다\",\n" +
                 "  \"content\": \"chatGPT 5.0 도입\"\n"; // Bad Request (Missing closing brace)
 
-        TestUtil.performPostRequest(mockMvc, POST_API_URL, invalidJson, 400, 400);
+        TestUtil.performRequest(mockMvc, POST_API_URL, invalidJson, "POST", 400, 400);
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -104,7 +103,7 @@ public class PostControllerTest {
                 .queryParam("size", 3)
                 .queryParam("sort", "title,desc");
 
-        MvcResult result = TestUtil.performGetRequest(mockMvc, uriBuilder.toUriString(), 200);
+        MvcResult result = TestUtil.performRequest(mockMvc, uriBuilder.toUriString(), null, "GET", 200, 200);
 
         String content = result.getResponse().getContentAsString();
 
@@ -136,7 +135,8 @@ public class PostControllerTest {
                 .queryParam("size", 4)
                 .queryParam("sort", "title,desc");
 
-        MvcResult result = TestUtil.performGetRequest(mockMvc, uriBuilder.toUriString(), 200);
+        MvcResult result = TestUtil.performRequest(mockMvc, uriBuilder.toUriString(), null, "GET", 200, 200);
+
         String content = result.getResponse().getContentAsString();
 
         ObjectMapper objectMapper = new ObjectMapper();
@@ -161,7 +161,7 @@ public class PostControllerTest {
                 .queryParam("size", 2)
                 .queryParam("sort", "title,desc");
 
-        MvcResult result = TestUtil.performGetRequest(mockMvc, uriBuilder.toUriString(), 200);
+        MvcResult result = TestUtil.performRequest(mockMvc, uriBuilder.toUriString(), null, "GET", 200, 200);
         JsonNode responseBody = objectMapper.readTree(result.getResponse().getContentAsString());
 
         int contentCount = responseBody.path("content").size();
@@ -189,8 +189,7 @@ public class PostControllerTest {
                 .queryParam("size", 3)
                 .queryParam("sort", "title,desc");
 
-        MvcResult result = TestUtil.performGetRequest(mockMvc, uriBuilder.toUriString(), 400);
-        assertEquals(400, result.getResponse().getStatus());
+        TestUtil.performRequest(mockMvc, uriBuilder.toUriString(), null, "GET", 400, 400);
     }
 
     @Test
@@ -208,8 +207,7 @@ public class PostControllerTest {
                 .queryParam("size", 3)
                 .queryParam("sort", "title,desc");
 
-        MvcResult result = TestUtil.performGetRequest(mockMvc, uriBuilder.toUriString(), 400);
-        assertEquals(400, result.getResponse().getStatus());
+        TestUtil.performRequest(mockMvc, uriBuilder.toUriString(), null, "GET", 400, 400);
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -222,10 +220,8 @@ public class PostControllerTest {
         String requestBodyJson = objectMapper.writeValueAsString(
                 new PostReq(DateUtil.getCurrentDateTime(), "SYS_01", "Updated Title", "Updated Content"));
 
-        MvcResult result = TestUtil.performPatchRequest(mockMvc,
-                POST_API_URL + "/" + getLatestPostIdByMemberId("PostUser"), requestBodyJson,
-                200);
-
+        MvcResult result = TestUtil.performRequest(mockMvc,
+                POST_API_URL + "/" + getLatestPostIdByMemberId("PostUser"), requestBodyJson, "PATCH", 200, 200);
         JsonNode responseBody = objectMapper.readTree(result.getResponse().getContentAsString());
 
         for (JsonNode element : responseBody.path("content")) {
@@ -243,17 +239,8 @@ public class PostControllerTest {
                 new PostReq(DateUtil.getCurrentDateTime(), "SYS_01", "Updated Title", "Updated Content"));
 
         // Not Exist postId -1
-        MvcResult result = TestUtil.performPatchRequest(mockMvc,
-                POST_API_URL + "/" + -1, requestBodyJson,
-                200);
-
-        JsonNode responseBody = objectMapper.readTree(result.getResponse().getContentAsString());
-
-        for (JsonNode element : responseBody.path("retCode")) {
-            String retCode = element.path("retCode").asText();
-            assertEquals(404, retCode);
-            break;
-        }
+        TestUtil.performRequest(mockMvc,
+                POST_API_URL + "/" + -1, requestBodyJson, "PATCH", 200, 404);
     }
 
     @Test
@@ -264,17 +251,8 @@ public class PostControllerTest {
         String requestBodyJson = objectMapper.writeValueAsString(
                 new PostReq(DateUtil.getCurrentDateTime(), "SYS_01", "Updated Title", "Updated Content"));
 
-        MvcResult result = TestUtil.performPatchRequest(mockMvc,
-                POST_API_URL + "/" + getLatestPostIdByMemberId("PostUser"), requestBodyJson,
-                200);
-
-        JsonNode responseBody = objectMapper.readTree(result.getResponse().getContentAsString());
-
-        for (JsonNode element : responseBody.path("retCode")) {
-            String retCode = element.path("retCode").asText();
-            assertEquals(400, retCode);
-            break;
-        }
+        TestUtil.performRequest(mockMvc,
+                POST_API_URL + "/" + getLatestPostIdByMemberId("PostUser"), requestBodyJson, "PATCH", 200, 400);
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -284,45 +262,24 @@ public class PostControllerTest {
     @WithMockUser(username = "PostUser", authorities = { "USER" })
     public void deletePostSuccess() throws Exception {
 
-        MvcResult result = TestUtil.performDeleteRequest(mockMvc,
-                POST_API_URL + "/" + getLatestPostIdByMemberId("PostUser"), 200);
-
-        JsonNode responseBody = objectMapper.readTree(result.getResponse().getContentAsString());
-        for (JsonNode element : responseBody.path("retCode")) {
-            String retCode = element.path("retCode").asText();
-            assertEquals(204, retCode);
-            break;
-        }
+        TestUtil.performRequest(mockMvc,
+                POST_API_URL + "/" + getLatestPostIdByMemberId("PostUser"), null, "DELETE", 200, 204);
     }
 
     @Test
     @Sql("/post/PostListSetup.sql")
     @WithMockUser(username = "PostUser", authorities = { "USER" })
     public void deletePostFailNotFound() throws Exception {
-        MvcResult result = TestUtil.performDeleteRequest(mockMvc,
-                POST_API_URL + "/" + -1, 200); // Not Exist PostId
-
-        JsonNode responseBody = objectMapper.readTree(result.getResponse().getContentAsString());
-        for (JsonNode element : responseBody.path("retCode")) {
-            String retCode = element.path("retCode").asText();
-            assertEquals(404, retCode);
-            break;
-        }
+        TestUtil.performRequest(mockMvc,
+                POST_API_URL + "/" + -1, null, "DELETE", 200, 404); // Not Exist PostId
     }
 
     @Test
     @Sql("/post/PostListSetup.sql")
     @WithMockUser(username = "PostUser2", authorities = { "USER" }) // Differnet Member
     public void deletePostFailDiffMember() throws Exception {
-        MvcResult result = TestUtil.performDeleteRequest(mockMvc,
-                POST_API_URL + "/" + getLatestPostIdByMemberId("PostUser"), 200);
-
-        JsonNode responseBody = objectMapper.readTree(result.getResponse().getContentAsString());
-        for (JsonNode element : responseBody.path("retCode")) {
-            String retCode = element.path("retCode").asText();
-            assertEquals(400, retCode);
-            break;
-        }
+        TestUtil.performRequest(mockMvc,
+                POST_API_URL + "/" + getLatestPostIdByMemberId("PostUser"), null, "DELETE", 200, 400);
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
