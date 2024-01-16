@@ -17,8 +17,9 @@ import mogakco.StudyManagement.dto.PostListReq;
 import mogakco.StudyManagement.dto.PostListRes;
 import mogakco.StudyManagement.dto.SimplePageable;
 import mogakco.StudyManagement.enums.ErrorCode;
-import java.util.Optional;
 import mogakco.StudyManagement.enums.PostSearchType;
+import mogakco.StudyManagement.exception.NotFoundException;
+import mogakco.StudyManagement.exception.UnauthorizedAccessException;
 import mogakco.StudyManagement.repository.MemberRepository;
 import mogakco.StudyManagement.repository.PostRepository;
 import mogakco.StudyManagement.service.common.LoggingService;
@@ -74,90 +75,84 @@ public class PostServiceImpl implements PostService {
 
         SimplePageable simplePageable = PageUtil.createSimplePageable(posts);
 
-        PostListRes result = new PostListRes(null, ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), postLists,
-                simplePageable);
-
-        return result;
+        return new PostListRes(null, ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), postLists, simplePageable);
     }
 
     @Override
     public PostDetailRes getPostDetail(Long postId, LoggingService lo) {
 
-        lo.setDBStart();
-        Optional<Post> optionalPost = postRepository.findByPostId(postId);
-        lo.setDBEnd();
+        try {
+            lo.setDBStart();
+            Post post = postRepository.findByPostId(postId)
+                    .orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND.getMessage("게시글")));
+            lo.setDBEnd();
 
-        if (!optionalPost.isPresent()) {
-            return new PostDetailRes(null, ErrorCode.NOT_FOUND.getCode(),
-                    ErrorCode.NOT_FOUND.getMessage("게시글"), null);
+            return new PostDetailRes(null, ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), new PostList(post));
+        } catch (NotFoundException e) {
+            return new PostDetailRes(null, ErrorCode.NOT_FOUND.getCode(), e.getMessage(), null);
         }
-        Post post = optionalPost.get();
-        lo.setDBStart();
-        return new PostDetailRes(null, ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), new PostList(post));
     }
 
     @Override
     public DTOResCommon updatePost(Long postId, PostReq postUpdateReq, LoggingService lo) {
-
-        lo.setDBStart();
-        Optional<Post> optionalPost = postRepository.findByPostId(postId);
-        lo.setDBEnd();
-
-        if (!optionalPost.isPresent()) {
-            return new DTOResCommon(null, ErrorCode.NOT_FOUND.getCode(),
-                    ErrorCode.NOT_FOUND.getMessage("게시글"));
-        }
-
-        Post post = optionalPost.get();
-        lo.setDBStart();
-        Member loginMember = memberRepository.findById(SecurityUtil.getLoginUserId());
-        lo.setDBEnd();
-        if (!post.getMember().equals(loginMember)) {
-            return new DTOResCommon(null, ErrorCode.BAD_REQUEST.getCode(),
-                    ErrorCode.BAD_REQUEST.getMessage("작성하지 않은 게시글은 수정할 수 없습니다."));
-        }
-
-        if (post.isPostChanged(postUpdateReq)) {
-            post.updateTitle(postUpdateReq.getTitle());
-            post.updateContent(postUpdateReq.getContent());
-            post.updateUpdatedAt(DateUtil.getCurrentDateTime());
+        try {
+            DTOResCommon result = new DTOResCommon();
             lo.setDBStart();
-            postRepository.save(post);
-            lo.setDBEnd();
-        } else {
-            return new DTOResCommon(null, ErrorCode.UNCHANGED.getCode(), ErrorCode.UNCHANGED.getMessage("게시글"));
-        }
+            Post post = postRepository.findByPostId(postId)
+                    .orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND.getMessage("게시글")));
 
-        return new DTOResCommon(null, ErrorCode.OK.getCode(), ErrorCode.OK.getMessage());
+            Member loginMember = memberRepository.findById(SecurityUtil.getLoginUserId());
+            lo.setDBEnd();
+            if (!post.getMember().equals(loginMember)) {
+                throw new UnauthorizedAccessException(
+                        ErrorCode.BAD_REQUEST.getMessage("작성하지 않은 게시글은 수정할 수 없습니다."));
+            }
+            if (post.isPostChanged(postUpdateReq)) {
+                post.updateTitle(postUpdateReq.getTitle());
+                post.updateContent(postUpdateReq.getContent());
+                post.updateUpdatedAt(DateUtil.getCurrentDateTime());
+                lo.setDBStart();
+                postRepository.save(post);
+                lo.setDBEnd();
+                result.setRetCode(ErrorCode.OK.getCode());
+                result.setRetMsg(ErrorCode.OK.getMessage("게시글"));
+            } else {
+                result.setRetCode(ErrorCode.UNCHANGED.getCode());
+                result.setRetMsg(ErrorCode.UNCHANGED.getMessage("게시글"));
+            }
+            return result;
+
+        } catch (NotFoundException e) {
+            return new DTOResCommon(null, ErrorCode.NOT_FOUND.getCode(), e.getMessage());
+        } catch (UnauthorizedAccessException e) {
+            return new DTOResCommon(null, ErrorCode.BAD_REQUEST.getCode(), e.getMessage());
+        }
     }
 
     @Override
     public DTOResCommon deletePost(Long postId, LoggingService lo) {
+        try {
+            lo.setDBStart();
+            Post post = postRepository.findByPostId(postId)
+                    .orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND.getMessage("게시글")));
 
-        lo.setDBStart();
-        Optional<Post> optionalPost = postRepository.findByPostId(postId);
-        lo.setDBEnd();
+            Member loginMember = memberRepository.findById(SecurityUtil.getLoginUserId());
+            lo.setDBEnd();
 
-        if (!optionalPost.isPresent()) {
-            return new DTOResCommon(null, ErrorCode.NOT_FOUND.getCode(),
-                    ErrorCode.NOT_FOUND.getMessage("게시글"));
+            if (!post.getMember().equals(loginMember)) {
+                throw new UnauthorizedAccessException(
+                        ErrorCode.BAD_REQUEST.getMessage("작성하지 않은 게시글은 삭제할 수 없습니다."));
+            }
+            lo.setDBStart();
+            postRepository.delete(post);
+            lo.setDBEnd();
+
+            return new DTOResCommon(null, ErrorCode.DELETED.getCode(),
+                    ErrorCode.DELETED.getMessage("게시글"));
+        } catch (NotFoundException e) {
+            return new DTOResCommon(null, ErrorCode.NOT_FOUND.getCode(), e.getMessage());
+        } catch (UnauthorizedAccessException e) {
+            return new DTOResCommon(null, ErrorCode.BAD_REQUEST.getCode(), e.getMessage());
         }
-        Post post = optionalPost.get();
-        lo.setDBStart();
-
-        lo.setDBStart();
-        Member loginMember = memberRepository.findById(SecurityUtil.getLoginUserId());
-        lo.setDBEnd();
-        if (!post.getMember().equals(loginMember)) {
-            return new DTOResCommon(null, ErrorCode.BAD_REQUEST.getCode(),
-                    ErrorCode.BAD_REQUEST.getMessage("작성하지 않은 게시글은 삭제 수 없습니다."));
-        }
-        lo.setDBStart();
-        postRepository.delete(post);
-        lo.setDBEnd();
-        return new DTOResCommon(null, ErrorCode.DELETED.getCode(),
-                ErrorCode.DELETED.getMessage("게시글"));
-
     }
-
 }
