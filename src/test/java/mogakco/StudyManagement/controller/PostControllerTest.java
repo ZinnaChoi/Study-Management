@@ -220,6 +220,32 @@ public class PostControllerTest {
     @Test
     @Sql("/post/PostListSetup.sql")
     @WithMockUser(username = "PostUser", authorities = { "USER" })
+    @DisplayName("게시글 상세 정보 조회 성공")
+    public void getPostDetailSuccess() throws Exception {
+
+        MvcResult result = TestUtil.performRequest(mockMvc, POST_API_URL + "/" + getLatestPostIdByMemberId("PostUser"),
+                null, "GET", 200, 200);
+
+        JsonNode responseBody = objectMapper.readTree(result.getResponse().getContentAsString());
+        String title = responseBody.path("postList").path("title").asText();
+        assertTrue(title.startsWith("post"));
+    }
+
+    @Test
+    @Sql("/post/PostListSetup.sql")
+    @WithMockUser(username = "PostUser", authorities = { "USER" })
+    @DisplayName("게시글 상세 정보 조회 실패 - 잘못된 게시글 번호")
+    public void getPostDetailFailPostNotFound() throws Exception {
+
+        TestUtil.performRequest(mockMvc, POST_API_URL + "/" + -1,
+                null, "GET", 200, 404);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    @Test
+    @Sql("/post/PostListSetup.sql")
+    @WithMockUser(username = "PostUser", authorities = { "USER" })
     @DisplayName("게시글 수정 성공")
     public void updatePostSuccess() throws Exception {
 

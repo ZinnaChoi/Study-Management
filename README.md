@@ -11,12 +11,12 @@ Google Meet를 활용한 개인 공부 스터디에서 참여율을 높이고 �
 
 ### (2) 팀원 및 역할
 
-| 작업자 | 담당 기능              | 추가 역할                                        | git 주소                          |
-| ------ | ---------------------- | ------------------------------------------------ | --------------------------------- |
-| 이다연 | 통계, 알림             | Readme 작성, 프로젝트 init                       | https://github.com/dayeon-dayeon  |
-| 이찬혁 | 회원가입, 화면 전체 틀 | 프로젝트 일정 관리                               | https://github.com/MeMyself-And-I |
-| 정주환 | 부재 일정              | 배포                                             | https://github.com/jeong-joohwan  |
-| 최예희 | 게시판                 | 프로젝트 기획, Docker 환경 설정, JPA entity 생성 | https://github.com/ZinnaChoi      |
+| 작업자 | 담당 기능                 | 담당 역할     | 추가 역할                                        | git 주소                          |
+| ------ | ------------------------- | ------------- | ------------------------------------------------ | --------------------------------- |
+| 최예희 | 부재일정 관리, 게시판     | 설계, API, UI | 프로젝트 기획, Docker 환경 설정, JPA entity 생성 | https://github.com/ZinnaChoi      |
+| 이다연 | 통계, 알림                | 설계, API, UI | Readme 작성, 프로젝트 init, 배포                 | https://github.com/dayeon-dayeon  |
+| 이찬혁 | 계정 및 권한, 스터디 관리 | 설계, API, UI | 프로젝트 일정 관리, UI Layout                    | https://github.com/MeMyself-And-I |
+| 정주환 | 부재 일정 관리            | 설계          | -                                                | https://github.com/jeong-joohwan  |
 
 ### (3) 배포 URL
 
