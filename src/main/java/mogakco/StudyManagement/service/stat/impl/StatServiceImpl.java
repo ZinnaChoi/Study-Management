@@ -40,10 +40,6 @@ public class StatServiceImpl implements StatService {
 
         SimplePageable simplePageable = PageUtil.createSimplePageable(dailyLogs);
 
-        StatGetRes result = new StatGetRes(null, ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), dailyLogLists,
-                simplePageable);
-
-        return result;
+        return new StatGetRes(null, ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), dailyLogLists, simplePageable);
     }
-
 }

@@ -17,7 +17,6 @@ import mogakco.StudyManagement.enums.ErrorCode;
 import mogakco.StudyManagement.enums.LogType;
 import mogakco.StudyManagement.service.common.LoggingService;
 import mogakco.StudyManagement.service.stat.StatService;
-import mogakco.StudyManagement.util.DateUtil;
 
 @Tag(name = "통계", description = "통계 관련 API 분류")
 @SecurityRequirement(name = "bearer-key")
@@ -42,8 +41,6 @@ public class StatController extends CommonController {
 
         try {
             startAPI(lo, type);
-            result.setSystemId(systemId);
-            result.setSendDate(DateUtil.getCurrentDateTime());
             result = statService.getStat(type, lo, pageable);
 
             if (result == null || result.getContent() == null || result.getContent().isEmpty()) {
