@@ -5,6 +5,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import mogakco.StudyManagement.dto.DTOResCommon;
 import mogakco.StudyManagement.dto.MemberIdDuplReq;
+import mogakco.StudyManagement.dto.MemberInfoRes;
 import mogakco.StudyManagement.dto.MemberJoinReq;
 import mogakco.StudyManagement.dto.MemberLoginReq;
 import mogakco.StudyManagement.dto.MemberLoginRes;
@@ -18,4 +19,6 @@ public interface MemberService {
     DTOResCommon join(MemberJoinReq joinInfo, LoggingService lo);
 
     boolean isIdDuplicated(MemberIdDuplReq idInfo, LoggingService lo);
+
+    MemberInfoRes getMemberInfo(LoggingService lo);
 }
