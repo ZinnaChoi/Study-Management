@@ -1,6 +1,8 @@
 package mogakco.StudyManagement.service.member.impl;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -13,10 +15,12 @@ import jakarta.transaction.Transactional;
 import mogakco.StudyManagement.domain.Member;
 import mogakco.StudyManagement.domain.MemberSchedule;
 import mogakco.StudyManagement.domain.Schedule;
+import mogakco.StudyManagement.domain.StudyInfo;
 import mogakco.StudyManagement.domain.WakeUp;
 import mogakco.StudyManagement.dto.DTOResCommon;
 import mogakco.StudyManagement.dto.MemberDetails;
 import mogakco.StudyManagement.dto.MemberIdDuplReq;
+import mogakco.StudyManagement.dto.MemberInfoRes;
 import mogakco.StudyManagement.dto.MemberJoinReq;
 import mogakco.StudyManagement.dto.MemberLoginReq;
 import mogakco.StudyManagement.dto.MemberLoginRes;
@@ -25,11 +29,13 @@ import mogakco.StudyManagement.enums.MemberRole;
 import mogakco.StudyManagement.repository.MemberRepository;
 import mogakco.StudyManagement.repository.MemberScheduleRepository;
 import mogakco.StudyManagement.repository.ScheduleRepository;
+import mogakco.StudyManagement.repository.StudyInfoRepository;
 import mogakco.StudyManagement.repository.WakeUpRepository;
 import mogakco.StudyManagement.service.common.LoggingService;
 import mogakco.StudyManagement.service.member.MemberService;
 import mogakco.StudyManagement.util.DateUtil;
 import mogakco.StudyManagement.util.JWTUtil;
+import mogakco.StudyManagement.util.SecurityUtil;
 
 @Service
 public class MemberServiceImpl implements MemberService, UserDetailsService {
@@ -38,6 +44,7 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
     private final MemberScheduleRepository memberScheduleRepository;
     private final WakeUpRepository wakeUpRepository;
     private final ScheduleRepository scheduleRepository;
+    private final StudyInfoRepository studyInfoRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final JWTUtil jwtUtil;
 
@@ -51,12 +58,14 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
             MemberScheduleRepository memberScheduleRepository,
             WakeUpRepository wakeUpRepository,
             ScheduleRepository scheduleRepository,
+            StudyInfoRepository studyInfoRepository,
             BCryptPasswordEncoder bCryptPasswordEncoder,
             JWTUtil jwtUtil) {
         this.memberRepository = memberRepository;
         this.memberScheduleRepository = memberScheduleRepository;
         this.wakeUpRepository = wakeUpRepository;
         this.scheduleRepository = scheduleRepository;
+        this.studyInfoRepository = studyInfoRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.jwtUtil = jwtUtil;
     }
@@ -148,4 +157,39 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
 
         return isExist;
     }
+
+    @Override
+    @Transactional
+    public MemberInfoRes getMemberInfo(LoggingService lo) {
+        MemberInfoRes result = new MemberInfoRes();
+
+        result.setSystemId(systemId);
+        result.setRetCode(ErrorCode.OK.getCode());
+        result.setRetMsg(ErrorCode.OK.getMessage());
+        Member member = memberRepository.findById(SecurityUtil.getLoginUserId());
+        result.setId(member.getId());
+        result.setName(member.getName());
+        result.setContact(member.getContact());
+        result.setRole(member.getRole());
+
+        List<StudyInfo> studyInfos = studyInfoRepository.findAll();
+        // DB별 하나의 study 밖에 없으므로 0번 인덱스에서 조회
+        result.setStudyName(studyInfos.size() == 0 ? null : studyInfos.get(0).getStudyName());
+
+        List<MemberSchedule> memberSchedules = memberScheduleRepository.findAllByMember(member);
+        List<Schedule> schedules = memberSchedules.stream()
+                .map(MemberSchedule::getEvent_name)
+                .collect(Collectors.toList());
+        List<String> eventNames = schedules.stream()
+                .map(Schedule::getEventName)
+                .collect(Collectors.toList());
+
+        result.setEventName(eventNames);
+        WakeUp wakeUp = wakeUpRepository.findByMember(member);
+        result.setWakeupTime(wakeUp == null ? null : wakeUp.getWakeupTime());
+
+        return result;
+
+    }
+
 }
