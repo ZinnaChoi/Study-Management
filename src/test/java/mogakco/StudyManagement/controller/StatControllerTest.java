@@ -75,7 +75,7 @@ public class StatControllerTest {
 
     @Test
     @Sql("/stat/StatListSetup.sql")
-    @WithMockUser(username = "admin", authorities = { "ADMIN" })
+    @WithMockUser(username = "statUser", authorities = { "USER" })
     @DisplayName("통계 목록 조회 실패 - content가 존재하지 않음")
     public void getStatListFailPage0Size1() throws Exception {
 
