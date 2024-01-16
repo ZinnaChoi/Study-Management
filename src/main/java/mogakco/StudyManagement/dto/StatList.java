@@ -8,7 +8,7 @@ import mogakco.StudyManagement.domain.DailyLog;
 @Setter
 public class StatList {
 
-    private String member;
+    private String memberName;
 
     private String createdAt;
 
@@ -18,7 +18,7 @@ public class StatList {
 
     public StatList(DailyLog dailyLog) {
 
-        this.member = dailyLog.getMember().getName();
+        this.memberName = dailyLog.getMember().getName();
         this.score = dailyLog.getScore();
         this.createdAt = dailyLog.getCreatedAt();
         this.date = dailyLog.getDate();
