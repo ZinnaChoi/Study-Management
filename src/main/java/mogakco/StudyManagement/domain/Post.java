@@ -13,6 +13,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import mogakco.StudyManagement.dto.PostReq;
+import java.util.Objects;
 
 @Entity
 @Builder
@@ -44,4 +46,17 @@ public class Post {
 
     @Column(nullable = false)
     private String updatedAt;
+
+    public void updateTitle(String title) {
+        this.title = title;
+    }
+
+    public void updateContent(String content) {
+        this.content = content;
+    }
+
+    public boolean isPostChanged(PostReq postReq) {
+        return (!Objects.equals(title, postReq.getTitle()) || !Objects.equals(content, postReq.getContent()));
+    }
+
 }
