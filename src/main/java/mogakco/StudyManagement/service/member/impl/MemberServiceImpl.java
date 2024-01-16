@@ -132,7 +132,7 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
             Schedule schedule = optSchedule.get();
             MemberSchedule memberSchedule = MemberSchedule.builder()
                     .member(member)
-                    .event_name(schedule)
+                    .eventName(schedule)
                     .createdAt(DateUtil.getCurrentDateTime())
                     .updatedAt(DateUtil.getCurrentDateTime())
                     .build();
@@ -178,7 +178,7 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
 
         List<MemberSchedule> memberSchedules = memberScheduleRepository.findAllByMember(member);
         List<Schedule> schedules = memberSchedules.stream()
-                .map(MemberSchedule::getEvent_name)
+                .map(MemberSchedule::getEventName)
                 .collect(Collectors.toList());
         List<String> eventNames = schedules.stream()
                 .map(Schedule::getEventName)
