@@ -1,13 +1,21 @@
 package mogakco.StudyManagement.service.study.impl;
 
+import java.io.IOException;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import mogakco.StudyManagement.domain.Schedule;
 import mogakco.StudyManagement.domain.StudyInfo;
+import mogakco.StudyManagement.dto.DTOResCommon;
 import mogakco.StudyManagement.dto.ScheduleCreateReq;
 import mogakco.StudyManagement.dto.StudyCreateReq;
+import mogakco.StudyManagement.enums.ErrorCode;
 import mogakco.StudyManagement.repository.ScheduleRepository;
 import mogakco.StudyManagement.repository.StudyInfoRepository;
 import mogakco.StudyManagement.service.common.LoggingService;
@@ -36,45 +44,50 @@ public class StudyServiceImpl implements StudyService {
     @Value("${spring.datasource.password}")
     private String dbPassword;
 
-    // protected byte[] getStudyLogoBytes(MultipartFile studyLogo) throws
-    // java.io.IOException {
-    // if (studyLogo == null) {
-    // return null;
-    // }
-    // try {
-    // return studyLogo.getBytes();
-    // } catch (IOException e) {
-    // throw new RuntimeException("Failed to process study logo file", e);
-    // }
-    // }
+    @Value("${study.systemId}")
+    protected String systemId;
 
     @Override
-    public void createStudy(StudyCreateReq studyCreateReq, LoggingService lo) {
-
+    @Transactional
+    public DTOResCommon createStudy(StudyCreateReq studyCreateReq, MultipartFile imageFile, LoggingService lo)
+            throws IOException {
+        DTOResCommon result = new DTOResCommon(systemId, ErrorCode.OK.getCode(), ErrorCode.OK.getMessage());
         if (studyInfoRepository.existsByStudyName(studyCreateReq.getStudyName())) {
-            throw new IllegalArgumentException("스터디이름이 이미 존재합니다.");
+            return new DTOResCommon(systemId, ErrorCode.BAD_REQUEST.getCode(),
+                    ErrorCode.BAD_REQUEST.getMessage(studyCreateReq.getStudyName() + "스터디 이름이 이미 존재합니다."));
         }
-        byte[] studyLogoBytes = studyCreateReq.getStudyLogo();
+        List<ScheduleCreateReq> schedules = studyCreateReq.getSchedules();
+        List<String> eventNames = schedules.stream()
+                .map(ScheduleCreateReq::getEventName)
+                .collect(Collectors.toList());
+
+        List<Schedule> existSchedules = scheduleRepository.findByEventNameIn(eventNames);
+        if (existSchedules.size() != 0) {
+            List<String> existEventNames = existSchedules.stream()
+                    .map(Schedule::getEventName)
+                    .collect(Collectors.toList());
+            return new DTOResCommon(systemId, ErrorCode.BAD_REQUEST.getCode(),
+                    ErrorCode.BAD_REQUEST.getMessage(existEventNames.toString() + " event_name이 이미 존재합니다."));
+        }
+        byte[] studyLogoBytes = imageFile == null ? null : imageFile.getBytes();
         StudyInfo studyInfo = StudyInfo.builder().studyName(studyCreateReq.getStudyName())
                 .studyLogo(studyLogoBytes)
                 .db_url(dbUrl).db_user(dbUser).db_password(bCryptPasswordEncoder.encode(dbPassword))
                 .build();
         lo.setDBStart();
         studyInfoRepository.save(studyInfo);
-        for (ScheduleCreateReq scheduleCreateReq : studyCreateReq.getSchedules()) {
+        lo.setDBEnd();
 
-            if (scheduleRepository.existsByEventName(scheduleCreateReq.getEventName())) {
-                throw new IllegalArgumentException("event_name이 이미 존재합니다.");
-            }
+        for (ScheduleCreateReq scheduleCreateReq : studyCreateReq.getSchedules()) {
             Schedule schedule = Schedule.builder().eventName(scheduleCreateReq.getEventName())
                     .startTime(scheduleCreateReq.getStartTime())
                     .endTime(scheduleCreateReq.getEndTime())
                     .build();
 
+            lo.setDBStart();
             scheduleRepository.save(schedule);
-
             lo.setDBEnd();
-
         }
+        return result;
     }
 }
