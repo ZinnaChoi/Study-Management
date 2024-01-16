@@ -12,8 +12,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.validation.Valid;
-import mogakco.StudyManagement.dto.DTOReqCommon;
 import mogakco.StudyManagement.dto.StatGetRes;
 import mogakco.StudyManagement.enums.ErrorCode;
 import mogakco.StudyManagement.enums.LogType;
@@ -37,7 +35,7 @@ public class StatController extends CommonController {
     @Operation(summary = "통계 조회", description = "출석률 통계 조회, 기상률 조회")
     @GetMapping("/stat")
     public StatGetRes getStat(
-            HttpServletRequest request, @Valid DTOReqCommon dtoReqCommon, @RequestParam("type") LogType type,
+            HttpServletRequest request, @RequestParam("type") LogType type,
             @PageableDefault(size = 10, page = 0, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
 
         StatGetRes result = new StatGetRes();
@@ -46,7 +44,7 @@ public class StatController extends CommonController {
             startAPI(lo, type);
             result.setSystemId(systemId);
             result.setSendDate(DateUtil.getCurrentDateTime());
-            result = statService.getStat(dtoReqCommon, type, lo, pageable);
+            result = statService.getStat(type, lo, pageable);
 
             if (result == null || result.getContent() == null || result.getContent().isEmpty()) {
                 result = new StatGetRes(systemId, ErrorCode.NOT_FOUND.getCode(),

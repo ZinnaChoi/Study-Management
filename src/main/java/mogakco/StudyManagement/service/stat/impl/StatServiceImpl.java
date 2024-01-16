@@ -8,7 +8,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import mogakco.StudyManagement.domain.DailyLog;
-import mogakco.StudyManagement.dto.DTOReqCommon;
 import mogakco.StudyManagement.dto.SimplePageable;
 import mogakco.StudyManagement.dto.StatGetRes;
 import mogakco.StudyManagement.dto.StatList;
@@ -29,7 +28,7 @@ public class StatServiceImpl implements StatService {
     }
 
     @Override
-    public StatGetRes getStat(DTOReqCommon dtoReqCommon, LogType type, LoggingService lo, Pageable pageable) {
+    public StatGetRes getStat(LogType type, LoggingService lo, Pageable pageable) {
 
         Page<DailyLog> dailyLogs;
 
