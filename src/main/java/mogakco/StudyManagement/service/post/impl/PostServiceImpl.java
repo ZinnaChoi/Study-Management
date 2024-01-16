@@ -11,6 +11,7 @@ import mogakco.StudyManagement.domain.Member;
 import mogakco.StudyManagement.domain.Post;
 import mogakco.StudyManagement.dto.PostReq;
 import mogakco.StudyManagement.dto.DTOResCommon;
+import mogakco.StudyManagement.dto.PostDetailRes;
 import mogakco.StudyManagement.dto.PostList;
 import mogakco.StudyManagement.dto.PostListReq;
 import mogakco.StudyManagement.dto.PostListRes;
@@ -80,6 +81,22 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
+    public PostDetailRes getPostDetail(Long postId, LoggingService lo) {
+
+        lo.setDBStart();
+        Optional<Post> optionalPost = postRepository.findByPostId(postId);
+        lo.setDBEnd();
+
+        if (!optionalPost.isPresent()) {
+            return new PostDetailRes(null, ErrorCode.NOT_FOUND.getCode(),
+                    ErrorCode.NOT_FOUND.getMessage("게시글"), null);
+        }
+        Post post = optionalPost.get();
+        lo.setDBStart();
+        return new PostDetailRes(null, ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), new PostList(post));
+    }
+
+    @Override
     public DTOResCommon updatePost(Long postId, PostReq postUpdateReq, LoggingService lo) {
 
         lo.setDBStart();
@@ -103,6 +120,7 @@ public class PostServiceImpl implements PostService {
         if (post.isPostChanged(postUpdateReq)) {
             post.updateTitle(postUpdateReq.getTitle());
             post.updateContent(postUpdateReq.getContent());
+            post.updateUpdatedAt(DateUtil.getCurrentDateTime());
             lo.setDBStart();
             postRepository.save(post);
             lo.setDBEnd();
@@ -115,6 +133,7 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public DTOResCommon deletePost(Long postId, LoggingService lo) {
+
         lo.setDBStart();
         Optional<Post> optionalPost = postRepository.findByPostId(postId);
         lo.setDBEnd();
@@ -124,6 +143,8 @@ public class PostServiceImpl implements PostService {
                     ErrorCode.NOT_FOUND.getMessage("게시글"));
         }
         Post post = optionalPost.get();
+        lo.setDBStart();
+
         lo.setDBStart();
         Member loginMember = memberRepository.findById(SecurityUtil.getLoginUserId());
         lo.setDBEnd();

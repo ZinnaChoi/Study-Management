@@ -19,6 +19,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import mogakco.StudyManagement.dto.DTOResCommon;
+import mogakco.StudyManagement.dto.PostDetailRes;
 import mogakco.StudyManagement.dto.PostListReq;
 import mogakco.StudyManagement.dto.PostListRes;
 import mogakco.StudyManagement.dto.PostReq;
@@ -82,10 +83,26 @@ public class PostController extends CommonController {
 
     }
 
-    // TODO: 구현 필요
     @Operation(summary = "게시글 상세 정보 조회", description = "특정 게시글의 상세 정보 조회")
     @GetMapping("/posts/{postId}")
-    public void getPostDetail() {
+    public PostDetailRes getPostDetail(HttpServletRequest request,
+            @PathVariable(name = "postId", required = true) Long postId) {
+
+        PostDetailRes result = new PostDetailRes();
+
+        try {
+            startAPI(lo, null);
+            result = postService.getPostDetail(postId, lo);
+            result.setSendDate(DateUtil.getCurrentDateTime());
+            result.setSystemId(systemId);
+        } catch (Exception e) {
+            result = new PostDetailRes(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
+                    ErrorCode.INTERNAL_ERROR.getMessage(), null);
+        } finally {
+            endAPI(request, findErrorCodeByCode(result.getRetCode()), lo, result);
+        }
+        return result;
+
     }
 
     @Operation(summary = "게시글 수정", description = "특정 게시글 수정. 게시글 작성자만 수정 가능")
