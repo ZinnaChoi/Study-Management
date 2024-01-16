@@ -18,6 +18,7 @@ public enum ErrorCode {
     BAD_REQUEST(400, HttpStatus.BAD_REQUEST, "잘못된 요청: {0}"),
     UNAUTHORIZED(401, HttpStatus.UNAUTHORIZED, "사용자 권한이 없습니다"),
     NOT_FOUND(404, HttpStatus.NOT_FOUND, "{0}을(를) 찾을 수 없습니다"),
+    CONFLICT(409, HttpStatus.CONFLICT, "{0}이(가) 이미 존재합니다."),
     INTERNAL_ERROR(500, HttpStatus.INTERNAL_SERVER_ERROR, "내부 오류 발생");
 
     private final Integer code;
