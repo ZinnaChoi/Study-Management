@@ -55,6 +55,10 @@ public class Post {
         this.content = content;
     }
 
+    public void updateUpdatedAt(String updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
     public boolean isPostChanged(PostReq postReq) {
         return (!Objects.equals(title, postReq.getTitle()) || !Objects.equals(content, postReq.getContent()));
     }
