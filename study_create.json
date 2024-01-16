@@ -1,0 +1,17 @@
+{
+  "sendDate": "20240112113804899",
+  "systemId": "STUDY_0001",
+  "studyName": "모각코 스터디",
+  "schedules": [
+    {
+      "eventName": "AM2",
+      "startTime": "13:00",
+      "endTime": "14:00"
+    },
+    {
+      "eventName": "AM3",
+      "startTime": "15:00",
+      "endTime": "16:00"
+    }
+  ]
+}
