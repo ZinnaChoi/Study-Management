@@ -12,6 +12,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import mogakco.StudyManagement.enums.MemberRole;
 
 @Entity
@@ -19,6 +20,7 @@ import mogakco.StudyManagement.enums.MemberRole;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
+@Setter
 @Table(name = "member")
 public class Member {
 

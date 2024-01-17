@@ -2,6 +2,7 @@ package mogakco.StudyManagement.controller;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,6 +18,7 @@ import mogakco.StudyManagement.dto.DTOResCommon;
 import mogakco.StudyManagement.dto.MemberIdDuplReq;
 import mogakco.StudyManagement.dto.MemberIdDuplRes;
 import mogakco.StudyManagement.dto.MemberInfoRes;
+import mogakco.StudyManagement.dto.MemberInfoUpdateReq;
 import mogakco.StudyManagement.dto.MemberJoinReq;
 import mogakco.StudyManagement.dto.MemberLoginReq;
 import mogakco.StudyManagement.dto.MemberLoginRes;
@@ -132,6 +134,30 @@ public class MemberController extends CommonController {
         }
         return result;
 
+    }
+
+    @Operation(summary = "MyPage 회원 정보변경", description = "로그인된 회원 정보 변경(이름 or 스터디 시간 or 기상 시간 or 비밀번호)")
+    @SecurityRequirement(name = "bearer-key")
+    @PatchMapping("/member")
+    public DTOResCommon setMemberInfo(HttpServletRequest request, @Valid @RequestBody MemberInfoUpdateReq updateInfo) {
+        DTOResCommon result = new DTOResCommon();
+
+        try {
+            startAPI(lo, updateInfo);
+            if (updateInfo.getSendDate() == null) {
+                result = new DTOResCommon(systemId, ErrorCode.NOT_FOUND.getCode(),
+                        ErrorCode.NOT_FOUND.getMessage("sendDate"));
+            } else {
+                result = memberService.setMemberInfo(updateInfo, lo);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            result = new DTOResCommon(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
+                    ErrorCode.INTERNAL_ERROR.getMessage());
+        } finally {
+            endAPI(request, findErrorCodeByCode(result.getRetCode()), lo, result);
+        }
+        return result;
     }
 
 }

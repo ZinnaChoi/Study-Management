@@ -1,7 +1,9 @@
 package mogakco.StudyManagement.service.member.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -21,6 +23,7 @@ import mogakco.StudyManagement.dto.DTOResCommon;
 import mogakco.StudyManagement.dto.MemberDetails;
 import mogakco.StudyManagement.dto.MemberIdDuplReq;
 import mogakco.StudyManagement.dto.MemberInfoRes;
+import mogakco.StudyManagement.dto.MemberInfoUpdateReq;
 import mogakco.StudyManagement.dto.MemberJoinReq;
 import mogakco.StudyManagement.dto.MemberLoginReq;
 import mogakco.StudyManagement.dto.MemberLoginRes;
@@ -187,6 +190,105 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
         result.setEventName(eventNames);
         WakeUp wakeUp = wakeUpRepository.findByMember(member);
         result.setWakeupTime(wakeUp == null ? null : wakeUp.getWakeupTime());
+
+        return result;
+
+    }
+
+    @Override
+    @Transactional
+    public DTOResCommon setMemberInfo(MemberInfoUpdateReq updateInfo, LoggingService lo) {
+        DTOResCommon result = new DTOResCommon(systemId, ErrorCode.OK.getCode(), ErrorCode.OK.getMessage());
+
+        Member member = memberRepository.findById(SecurityUtil.getLoginUserId());
+        switch (updateInfo.getType()) {
+            case NAME:
+                // member 테이블 업데이트
+                String changedName = updateInfo.getName();
+                if (changedName == null || changedName.isBlank()) {
+                    return new DTOResCommon(systemId, ErrorCode.BAD_REQUEST.getCode(),
+                            ErrorCode.BAD_REQUEST.getMessage("변경할 이름을 입력해주세요"));
+                }
+                member.setName(changedName);
+                lo.setDBStart();
+                memberRepository.save(member);
+                lo.setDBEnd();
+                break;
+            case EVENT_NAMES:
+                // member_schedule 테이블 업데이트
+                List<String> userEventNames = updateInfo.getEventName();
+                if (userEventNames == null || userEventNames.size() == 0) {
+                    return new DTOResCommon(systemId, ErrorCode.BAD_REQUEST.getCode(),
+                            ErrorCode.BAD_REQUEST.getMessage("참여 스터디 이벤트를 선택해주세요"));
+                }
+                List<MemberSchedule> mSchedules = memberScheduleRepository.findAllByMember(member);
+                List<Schedule> userSchedules = scheduleRepository.findByEventNameIn(userEventNames);
+
+                List<String> dbEventNames = mSchedules.stream().map(m -> m.getEvent_name().getEventName())
+                        .collect(Collectors.toList());
+
+                List<Schedule> insertCandidates = userSchedules.stream()
+                        .filter(u -> !dbEventNames.contains(u.getEventName()))
+                        .collect(Collectors.toList());
+                List<Schedule> updateCandidates = userSchedules.stream()
+                        .filter(u -> dbEventNames.contains(u.getEventName()))
+                        .collect(Collectors.toList());
+
+                List<String> eventNamesToUpdate = updateCandidates.stream()
+                        .map(u -> u.getEventName())
+                        .collect(Collectors.toList());
+
+                List<MemberSchedule> updateObj = mSchedules.stream()
+                        .filter(schedule -> eventNamesToUpdate.contains(schedule.getEvent_name().getEventName()))
+                        .map(schedule -> {
+                            schedule.setUpdatedAt(DateUtil.getCurrentDateTime());
+                            return schedule;
+                        })
+                        .collect(Collectors.toList());
+                List<MemberSchedule> deleteObj = mSchedules.stream()
+                        .filter(d -> !userEventNames.contains(d.getEvent_name().getEventName()))
+                        .collect(Collectors.toList());
+                List<MemberSchedule> insertObj = new ArrayList<>();
+                for (Schedule iCdd : insertCandidates) {
+                    insertObj.add(MemberSchedule.builder().member(member).event_name(iCdd)
+                            .createdAt(DateUtil.getCurrentDateTime()).updatedAt(DateUtil.getCurrentDateTime()).build());
+                }
+                lo.setDBStart();
+                memberScheduleRepository.deleteAll(deleteObj);
+                memberScheduleRepository.saveAll(insertObj);
+                memberScheduleRepository.saveAll(updateObj);
+                lo.setDBEnd();
+                break;
+            case WAKEUP:
+                // wakeup 테이블 업데이트
+                String changedWakeupTime = updateInfo.getWakeupTime();
+                if (changedWakeupTime == null || changedWakeupTime.isBlank()) {
+                    return new DTOResCommon(systemId, ErrorCode.BAD_REQUEST.getCode(),
+                            ErrorCode.BAD_REQUEST.getMessage("변경할 기상 시간을 선택해주세요"));
+                }
+                WakeUp wakeUp = WakeUp.builder().member(member).wakeupTime(changedWakeupTime).build();
+                lo.setDBStart();
+                wakeUpRepository.save(wakeUp);
+                lo.setDBEnd();
+                break;
+            case PASSWORD:
+                // member 테이블 업데이트
+                String changedPassword = updateInfo.getPassword();
+                String originPassword = member.getPassword();
+                // 비밀번호 현재 비밀번호랑 일치 여부 확인
+                if (bCryptPasswordEncoder.matches(changedPassword, originPassword)) {
+                    return new DTOResCommon(systemId, ErrorCode.BAD_REQUEST.getCode(),
+                            ErrorCode.BAD_REQUEST.getMessage("현재 비밀번호와 동일합니다."));
+                }
+                // 비밀번호 암호화
+                member.setPassword(bCryptPasswordEncoder.encode(changedPassword));
+                lo.setDBStart();
+                memberRepository.save(member);
+                lo.setDBEnd();
+                break;
+            default:
+                break;
+        }
 
         return result;
 
