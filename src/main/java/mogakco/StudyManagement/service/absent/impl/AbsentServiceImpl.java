@@ -23,6 +23,7 @@ import mogakco.StudyManagement.exception.NotFoundException;
 import mogakco.StudyManagement.service.absent.AbsentService;
 import mogakco.StudyManagement.service.common.LoggingService;
 import mogakco.StudyManagement.util.DateUtil;
+import mogakco.StudyManagement.util.ExceptionUtil;
 import mogakco.StudyManagement.util.SecurityUtil;
 
 @Service
@@ -56,7 +57,6 @@ public class AbsentServiceImpl implements AbsentService {
             for (Schedule schedule : scheduleList) {
                 eventNameSet.add(schedule.getEventName());
             }
-
             for (String eventName : absentRgstReq.getEventNameList()) {
                 if (!eventNameSet.contains(eventName)) {
                     throw new NotFoundException(ErrorCode.NOT_FOUND.getMessage("스터디 타임 " + eventName));
@@ -69,7 +69,6 @@ public class AbsentServiceImpl implements AbsentService {
             for (MemberSchedule ms : memeberScheduleList) {
                 eventTimeSet.add(ms.getEventName().getEventName());
             }
-
             for (String eventTime : absentRgstReq.getEventNameList()) {
                 if (!eventTimeSet.contains(eventTime)) {
                     throw new InvalidRequestException(ErrorCode.BAD_REQUEST.getMessage("참여하지 않는 타임의 부재 신청은 할 수 없습니다"));
@@ -98,12 +97,8 @@ public class AbsentServiceImpl implements AbsentService {
                 lo.setDBEnd();
             }
             return new DTOResCommon(null, ErrorCode.OK.getCode(), ErrorCode.OK.getMessage());
-        } catch (NotFoundException e) {
-            return new DTOResCommon(null, ErrorCode.NOT_FOUND.getCode(), e.getMessage());
-        } catch (InvalidRequestException e) {
-            return new DTOResCommon(null, ErrorCode.BAD_REQUEST.getCode(), e.getMessage());
-        } catch (ConflictException e) {
-            return new DTOResCommon(null, ErrorCode.CONFLICT.getCode(), e.getMessage());
+        } catch (NotFoundException | InvalidRequestException | ConflictException e) {
+            return ExceptionUtil.handleException(e);
         }
 
     }

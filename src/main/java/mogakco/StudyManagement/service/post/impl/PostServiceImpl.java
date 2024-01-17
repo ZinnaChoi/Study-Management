@@ -25,6 +25,7 @@ import mogakco.StudyManagement.repository.PostRepository;
 import mogakco.StudyManagement.service.common.LoggingService;
 import mogakco.StudyManagement.service.post.PostService;
 import mogakco.StudyManagement.util.DateUtil;
+import mogakco.StudyManagement.util.ExceptionUtil;
 import mogakco.StudyManagement.util.PageUtil;
 import mogakco.StudyManagement.util.SecurityUtil;
 
@@ -122,10 +123,8 @@ public class PostServiceImpl implements PostService {
             }
             return result;
 
-        } catch (NotFoundException e) {
-            return new DTOResCommon(null, ErrorCode.NOT_FOUND.getCode(), e.getMessage());
-        } catch (UnauthorizedAccessException e) {
-            return new DTOResCommon(null, ErrorCode.BAD_REQUEST.getCode(), e.getMessage());
+        } catch (NotFoundException | UnauthorizedAccessException e) {
+            return ExceptionUtil.handleException(e);
         }
     }
 
@@ -149,10 +148,8 @@ public class PostServiceImpl implements PostService {
 
             return new DTOResCommon(null, ErrorCode.DELETED.getCode(),
                     ErrorCode.DELETED.getMessage("게시글"));
-        } catch (NotFoundException e) {
-            return new DTOResCommon(null, ErrorCode.NOT_FOUND.getCode(), e.getMessage());
-        } catch (UnauthorizedAccessException e) {
-            return new DTOResCommon(null, ErrorCode.BAD_REQUEST.getCode(), e.getMessage());
+        } catch (NotFoundException | UnauthorizedAccessException e) {
+            return ExceptionUtil.handleException(e);
         }
     }
 }

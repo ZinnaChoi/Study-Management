@@ -47,9 +47,7 @@ public class AbsentController extends CommonController {
         } finally {
             endAPI(request, findErrorCodeByCode(result.getRetCode()), lo, result);
         }
-
         return result;
-
     }
 
 }
