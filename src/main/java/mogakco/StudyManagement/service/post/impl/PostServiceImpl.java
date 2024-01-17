@@ -5,6 +5,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import mogakco.StudyManagement.domain.Member;
@@ -22,6 +23,7 @@ import mogakco.StudyManagement.exception.NotFoundException;
 import mogakco.StudyManagement.exception.UnauthorizedAccessException;
 import mogakco.StudyManagement.repository.MemberRepository;
 import mogakco.StudyManagement.repository.PostRepository;
+import mogakco.StudyManagement.repository.PostSpecification;
 import mogakco.StudyManagement.service.common.LoggingService;
 import mogakco.StudyManagement.service.post.PostService;
 import mogakco.StudyManagement.util.DateUtil;
@@ -60,14 +62,16 @@ public class PostServiceImpl implements PostService {
 
         Page<Post> posts;
         String searchKeyWord = postListReq.getSearchKeyWord().trim();
+        Specification<Post> spec;
 
         lo.setDBStart();
         if (postListReq.getSearchType() == PostSearchType.TITLE) {
-            posts = postRepository.findByTitleContaining(searchKeyWord, pageable);
+            spec = PostSpecification.titleContains(searchKeyWord);
         } else {
             List<Member> members = memberRepository.findByNameContaining(searchKeyWord);
-            posts = postRepository.findByMemberIn(members, pageable);
+            spec = PostSpecification.memberIn(members);
         }
+        posts = postRepository.findAll(spec, pageable);
         lo.setDBEnd();
 
         List<PostList> postLists = posts.getContent().stream()
