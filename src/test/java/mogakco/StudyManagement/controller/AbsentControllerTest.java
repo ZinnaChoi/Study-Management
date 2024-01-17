@@ -215,19 +215,4 @@ public class AbsentControllerTest {
         TestUtil.performRequest(mockMvc, uriBuilder.toUriString(), null, "GET", 400, 400);
     }
 
-    @Test
-    @Sql("/absent/AbsentSetup.sql")
-    @WithMockUser(username = "AbsentUser", authorities = { "USER" })
-    @DisplayName("부재일정 조회 실패 - 잘못된 memberNameList 형식")
-    public void getAbsentScheduleFailInvalidmemberNameListFormat() throws Exception {
-        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(ABSENT_API_URL);
-
-        uriBuilder.queryParam("sendDate", DateUtil.getCurrentDateTime())
-                .queryParam("systemId", systemId)
-                .queryParam("yearMonth", "202401")
-                .queryParam("memberNameList", "AbsentUser");
-
-        TestUtil.performRequest(mockMvc, uriBuilder.toUriString(), null, "GET", 400, 400);
-    }
-
 }

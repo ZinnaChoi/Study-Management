@@ -120,8 +120,6 @@ public class AbsentServiceImpl implements AbsentService {
         try {
             Specification<AbsentSchedule> spec = AbsentScheduleSpecification.hasYearMonth(absentListReq.getYearMonth());
 
-            long cnt = absentScheduleRepository.count(spec);
-
             List<Member> members = new ArrayList<>();
             if (absentListReq.getMemberNameList() == null || absentListReq.getMemberNameList().isEmpty()) {
                 lo.setDBStart();
