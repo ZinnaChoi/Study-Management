@@ -22,10 +22,15 @@ public class MemberInfoUpdateReq extends DTOReqCommon {
     @Schema(example = "아무개")
     private String name;
 
+    @Schema(example = "010-1111-1111")
+    @Pattern(regexp = "^[\\d]{2,3}-[\\d]{3,4}-[\\d]{4}+$", message = "전화번호 형식이 맞지 않습니다(***-****-****)")
+    private String contact;
+
     @Schema(example = "[\"AM1\", \"AM2\"]")
     private List<String> eventName;
 
-    @Schema(example = "15:30")
+    @Schema(example = "1530")
+    @Pattern(regexp = "(0[0-9]|1[0-9]|2[0-3])([0-5][0-9])", message = "올바른 시, 분 형식을 입력하세요(HHMI)")
     private String wakeupTime;
 
     @Schema(example = "password123!")

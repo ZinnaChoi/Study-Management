@@ -238,8 +238,8 @@ public class MemberControllerTest {
     @Sql("/member/MemberInfoUpdateSetup.sql")
     @DisplayName("MyPage 회원 정보변경 성공")
     void setMemberInfo_Success() throws Exception {
-        MemberInfoUpdateReq req = new MemberInfoUpdateReq(MemberUpdateType.EVENT_NAMES, "아무개",
-                Arrays.asList("AM1", "AM2", "AM3", "AM4"), "19:30", "password123!");
+        MemberInfoUpdateReq req = new MemberInfoUpdateReq(MemberUpdateType.EVENT_NAMES, "아무개", "010-1111-1111",
+                Arrays.asList("AM1", "AM2", "AM3", "AM4"), "1930", "password123!");
         req.setSendDate(DateUtil.getCurrentDateTime());
         req.setSystemId("SYS_01");
         String requestBodyJson = objectMapper.writeValueAsString(req);
@@ -253,13 +253,28 @@ public class MemberControllerTest {
     @DisplayName("MyPage 회원 정보변경 실패_이름 빈 값")
     // 이름, 이벤트 이름, 비밀번호, 기상 시간 빈 값등은 다 똑같은 실패 케이스로 케이스마다 테스트 코드 추가하지는 않았음
     void setMemberInfo_EmptyName() throws Exception {
-        MemberInfoUpdateReq req = new MemberInfoUpdateReq(MemberUpdateType.NAME, "",
-                Arrays.asList("AM1", "AM2", "AM3", "AM4"), "19:30", "password123!");
+        MemberInfoUpdateReq req = new MemberInfoUpdateReq(MemberUpdateType.NAME, "", "010-1111-1111",
+                Arrays.asList("AM1", "AM2", "AM3", "AM4"), "1930", "password123!");
         req.setSendDate(DateUtil.getCurrentDateTime());
         req.setSystemId("SYS_01");
         String requestBodyJson = objectMapper.writeValueAsString(req);
 
         TestUtil.performRequest(mockMvc, MEMBER_INFO_URL, requestBodyJson, "PATCH", 200, 400);
+    }
+
+    @Test
+    @WithMockUser(username = "user1", authorities = { "USER" })
+    @Sql("/member/MemberInfoUpdateSetup.sql")
+    @DisplayName("MyPage 회원 정보변경 실패_잘못된 비밀번호 형식")
+    void setMemberInfo_WrongPwd() throws Exception {
+        String wrongPwd = "p1";
+        MemberInfoUpdateReq req = new MemberInfoUpdateReq(MemberUpdateType.PASSWORD, "", "010-1111-1111",
+                Arrays.asList("AM1"), "1930", wrongPwd);
+        req.setSendDate(DateUtil.getCurrentDateTime());
+        req.setSystemId("SYS_01");
+        String requestBodyJson = objectMapper.writeValueAsString(req);
+
+        TestUtil.performRequest(mockMvc, MEMBER_INFO_URL, requestBodyJson, "PATCH", 400, 400);
     }
 
 }

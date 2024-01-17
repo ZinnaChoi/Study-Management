@@ -20,7 +20,6 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
-@Setter
 @Table(name = "wakeup")
 public class WakeUp {
 
@@ -34,4 +33,8 @@ public class WakeUp {
 
     @Column(nullable = false)
     private String wakeupTime;
+
+    public void updateWakeupTime(String wakeupTime) {
+        this.wakeupTime = wakeupTime;
+    }
 }

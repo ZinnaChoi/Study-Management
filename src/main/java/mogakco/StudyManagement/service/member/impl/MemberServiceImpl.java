@@ -13,6 +13,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import mogakco.StudyManagement.exception.InvalidRequestException;
 import jakarta.transaction.Transactional;
 import mogakco.StudyManagement.domain.Member;
 import mogakco.StudyManagement.domain.MemberSchedule;
@@ -29,6 +30,7 @@ import mogakco.StudyManagement.dto.MemberLoginReq;
 import mogakco.StudyManagement.dto.MemberLoginRes;
 import mogakco.StudyManagement.enums.ErrorCode;
 import mogakco.StudyManagement.enums.MemberRole;
+import mogakco.StudyManagement.exception.InvalidRequestException;
 import mogakco.StudyManagement.repository.MemberRepository;
 import mogakco.StudyManagement.repository.MemberScheduleRepository;
 import mogakco.StudyManagement.repository.ScheduleRepository;
@@ -37,6 +39,7 @@ import mogakco.StudyManagement.repository.WakeUpRepository;
 import mogakco.StudyManagement.service.common.LoggingService;
 import mogakco.StudyManagement.service.member.MemberService;
 import mogakco.StudyManagement.util.DateUtil;
+import mogakco.StudyManagement.util.ExceptionUtil;
 import mogakco.StudyManagement.util.JWTUtil;
 import mogakco.StudyManagement.util.SecurityUtil;
 
@@ -208,10 +211,9 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
                 // member 테이블 업데이트
                 String changedName = updateInfo.getName();
                 if (changedName == null || changedName.isBlank()) {
-                    return new DTOResCommon(systemId, ErrorCode.BAD_REQUEST.getCode(),
-                            ErrorCode.BAD_REQUEST.getMessage("변경할 이름을 입력해주세요"));
+                    return ExceptionUtil.handleException(new InvalidRequestException("변경할 이름을 입력해주세요"));
                 }
-                member.setName(changedName);
+                member.updateName(changedName);
                 lo.setDBStart();
                 memberRepository.save(member);
                 lo.setDBEnd();
@@ -220,58 +222,44 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
                 // member_schedule 테이블 업데이트
                 List<String> userEventNames = updateInfo.getEventName();
                 if (userEventNames == null || userEventNames.size() == 0) {
-                    return new DTOResCommon(systemId, ErrorCode.BAD_REQUEST.getCode(),
-                            ErrorCode.BAD_REQUEST.getMessage("참여 스터디 이벤트를 선택해주세요"));
+                    return ExceptionUtil.handleException(new InvalidRequestException("참여 스터디 이벤트를 선택해주세요"));
                 }
+                lo.setDBStart();
                 List<MemberSchedule> mSchedules = memberScheduleRepository.findAllByMember(member);
                 List<Schedule> userSchedules = scheduleRepository.findByEventNameIn(userEventNames);
+                lo.setDBEnd();
 
                 List<String> dbEventNames = mSchedules.stream().map(m -> m.getEventName().getEventName())
                         .collect(Collectors.toList());
 
-                List<Schedule> insertCandidates = userSchedules.stream()
-                        .filter(u -> !dbEventNames.contains(u.getEventName()))
-                        .collect(Collectors.toList());
-                List<Schedule> updateCandidates = userSchedules.stream()
-                        .filter(u -> dbEventNames.contains(u.getEventName()))
-                        .collect(Collectors.toList());
-
-                List<String> eventNamesToUpdate = updateCandidates.stream()
-                        .map(u -> u.getEventName())
-                        .collect(Collectors.toList());
-
-                List<MemberSchedule> updateObj = mSchedules.stream()
-                        .filter(schedule -> eventNamesToUpdate.contains(schedule.getEventName().getEventName()))
-                        .map(schedule -> {
-                            schedule.setUpdatedAt(DateUtil.getCurrentDateTime());
-                            return schedule;
-                        })
-                        .collect(Collectors.toList());
-                List<MemberSchedule> deleteObj = mSchedules.stream()
-                        .filter(d -> !userEventNames.contains(d.getEventName().getEventName()))
-                        .collect(Collectors.toList());
-                List<MemberSchedule> insertObj = new ArrayList<>();
-                for (Schedule iCdd : insertCandidates) {
-                    insertObj.add(MemberSchedule.builder().member(member).eventName(iCdd)
-                            .createdAt(DateUtil.getCurrentDateTime()).updatedAt(DateUtil.getCurrentDateTime()).build());
-                }
+                List<MemberSchedule> toInsert = calculateInserts(userSchedules, dbEventNames, member);
+                List<MemberSchedule> toUpdate = calculateUpdates(userSchedules, dbEventNames, mSchedules);
+                List<MemberSchedule> toDelete = calculateDeletes(userEventNames, mSchedules);
                 lo.setDBStart();
-                memberScheduleRepository.deleteAll(deleteObj);
-                memberScheduleRepository.saveAll(insertObj);
-                memberScheduleRepository.saveAll(updateObj);
+                memberScheduleRepository.deleteAll(toDelete);
+                memberScheduleRepository.saveAll(toInsert);
+                memberScheduleRepository.saveAll(toUpdate);
                 lo.setDBEnd();
                 break;
             case WAKEUP:
                 // wakeup 테이블 업데이트
                 String changedWakeupTime = updateInfo.getWakeupTime();
                 if (changedWakeupTime == null || changedWakeupTime.isBlank()) {
-                    return new DTOResCommon(systemId, ErrorCode.BAD_REQUEST.getCode(),
-                            ErrorCode.BAD_REQUEST.getMessage("변경할 기상 시간을 선택해주세요"));
+                    return ExceptionUtil.handleException(new InvalidRequestException("변경할 기상 시간을 선택해주세요"));
                 }
                 WakeUp wakeUp = wakeUpRepository.findByMember(member);
-                wakeUp.setWakeupTime(changedWakeupTime);
+                wakeUp.updateWakeupTime(changedWakeupTime);
                 lo.setDBStart();
                 wakeUpRepository.save(wakeUp);
+                lo.setDBEnd();
+                break;
+
+            case CONTACT:
+                // member 테이블 업데이트
+                String changedContact = updateInfo.getContact();
+                member.updateContact(changedContact);
+                lo.setDBStart();
+                memberRepository.save(member);
                 lo.setDBEnd();
                 break;
             case PASSWORD:
@@ -280,11 +268,10 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
                 String originPassword = member.getPassword();
                 // 비밀번호 현재 비밀번호랑 일치 여부 확인
                 if (bCryptPasswordEncoder.matches(changedPassword, originPassword)) {
-                    return new DTOResCommon(systemId, ErrorCode.BAD_REQUEST.getCode(),
-                            ErrorCode.BAD_REQUEST.getMessage("현재 비밀번호와 동일합니다."));
+                    return ExceptionUtil.handleException(new InvalidRequestException("현재 비밀번호와 동일합니다."));
                 }
                 // 비밀번호 암호화
-                member.setPassword(bCryptPasswordEncoder.encode(changedPassword));
+                member.updatePassword(bCryptPasswordEncoder.encode(changedPassword));
                 lo.setDBStart();
                 memberRepository.save(member);
                 lo.setDBEnd();
@@ -295,6 +282,47 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
 
         return result;
 
+    }
+
+    private List<MemberSchedule> calculateInserts(List<Schedule> userSchedules, List<String> dbEventNames,
+            Member member) {
+        List<Schedule> insertCandidates = userSchedules.stream()
+                .filter(u -> !dbEventNames.contains(u.getEventName()))
+                .collect(Collectors.toList());
+
+        List<MemberSchedule> insertObj = new ArrayList<>();
+        for (Schedule iCdd : insertCandidates) {
+            insertObj.add(MemberSchedule.builder().member(member).eventName(iCdd)
+                    .createdAt(DateUtil.getCurrentDateTime()).updatedAt(DateUtil.getCurrentDateTime()).build());
+        }
+        return insertObj;
+    }
+
+    private List<MemberSchedule> calculateUpdates(List<Schedule> userSchedules, List<String> dbEventNames,
+            List<MemberSchedule> mSchedules) {
+        List<Schedule> updateCandidates = userSchedules.stream()
+                .filter(u -> dbEventNames.contains(u.getEventName()))
+                .collect(Collectors.toList());
+        List<String> eventNamesToUpdate = updateCandidates.stream()
+                .map(u -> u.getEventName())
+                .collect(Collectors.toList());
+
+        List<MemberSchedule> updateObj = mSchedules.stream()
+                .filter(schedule -> eventNamesToUpdate.contains(schedule.getEventName().getEventName()))
+                .map(schedule -> {
+                    schedule.updateUpdatedAt(DateUtil.getCurrentDateTime());
+                    return schedule;
+                })
+                .collect(Collectors.toList());
+
+        return updateObj;
+    }
+
+    private List<MemberSchedule> calculateDeletes(List<String> userEventNames, List<MemberSchedule> mSchedules) {
+        List<MemberSchedule> deleteObj = mSchedules.stream()
+                .filter(d -> !userEventNames.contains(d.getEventName().getEventName()))
+                .collect(Collectors.toList());
+        return deleteObj;
     }
 
 }

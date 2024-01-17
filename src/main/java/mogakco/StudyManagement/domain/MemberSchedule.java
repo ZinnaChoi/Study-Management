@@ -20,7 +20,6 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
-@Setter
 @Table(name = "member_schedule")
 public class MemberSchedule {
 
@@ -41,4 +40,8 @@ public class MemberSchedule {
 
     @Column(nullable = false)
     private String updatedAt;
+
+    public void updateUpdatedAt(String updatedAt) {
+        this.updatedAt = updatedAt;
+    }
 }

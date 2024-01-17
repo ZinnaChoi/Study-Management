@@ -20,7 +20,6 @@ import mogakco.StudyManagement.enums.MemberRole;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
-@Setter
 @Table(name = "member")
 public class Member {
 
@@ -51,4 +50,16 @@ public class Member {
   private String updatedAt;
 
   private String expiredAt;
+
+  public void updateName(String name) {
+    this.name = name;
+  }
+
+  public void updatePassword(String password) {
+    this.password = password;
+  }
+
+  public void updateContact(String contact) {
+    this.contact = contact;
+  }
 }
