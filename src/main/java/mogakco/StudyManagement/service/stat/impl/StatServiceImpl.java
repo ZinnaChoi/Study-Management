@@ -29,17 +29,25 @@ public class StatServiceImpl implements StatService {
 
     @Override
     public StatGetRes getStat(LogType type, LoggingService lo, Pageable pageable) {
+        try {
 
-        Page<DailyLog> dailyLogs;
+            Page<DailyLog> dailyLogs;
 
-        lo.setDBStart();
-        dailyLogs = statRepository.findByType(type, pageable);
-        lo.setDBEnd();
+            lo.setDBStart();
+            dailyLogs = statRepository.findByType(type, pageable);
+            lo.setDBEnd();
 
-        List<StatList> dailyLogLists = dailyLogs.getContent().stream().map(StatList::new).collect(Collectors.toList());
+            List<StatList> dailyLogLists = dailyLogs.getContent().stream().map(StatList::new)
+                    .collect(Collectors.toList());
 
-        SimplePageable simplePageable = PageUtil.createSimplePageable(dailyLogs);
+            SimplePageable simplePageable = PageUtil.createSimplePageable(dailyLogs);
 
-        return new StatGetRes(null, ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), dailyLogLists, simplePageable);
+            return new StatGetRes(null, ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), dailyLogLists,
+                    simplePageable);
+        } catch (Exception e) {
+            return new StatGetRes(null, ErrorCode.INTERNAL_ERROR.getCode(),
+                    ErrorCode.INTERNAL_ERROR.getMessage(), null, null);
+        }
+
     }
 }
