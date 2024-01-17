@@ -13,6 +13,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Builder
@@ -32,4 +33,8 @@ public class WakeUp {
 
     @Column(nullable = false)
     private String wakeupTime;
+
+    public void updateWakeupTime(String wakeupTime) {
+        this.wakeupTime = wakeupTime;
+    }
 }

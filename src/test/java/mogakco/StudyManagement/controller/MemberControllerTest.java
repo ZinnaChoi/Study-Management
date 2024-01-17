@@ -2,6 +2,8 @@ package mogakco.StudyManagement.controller;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.util.Arrays;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -18,8 +20,10 @@ import org.springframework.web.util.UriComponentsBuilder;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import mogakco.StudyManagement.dto.MemberIdDuplReq;
+import mogakco.StudyManagement.dto.MemberInfoUpdateReq;
 import mogakco.StudyManagement.dto.MemberJoinReq;
 import mogakco.StudyManagement.dto.MemberLoginReq;
+import mogakco.StudyManagement.enums.MemberUpdateType;
 import mogakco.StudyManagement.service.member.impl.MemberServiceImpl;
 import mogakco.StudyManagement.util.DateUtil;
 import mogakco.StudyManagement.util.TestUtil;
@@ -56,7 +60,7 @@ public class MemberControllerTest {
     private static final String LOGIN_URL = "/api/v1/login";
     private static final String JOIN_URL = "/api/v1/join";
     private static final String ID_DUPLICATED_CHECK_URL = "/api/v1/id-duplicated";
-    private static final String GET_MEMBER_INFO_URL = "/api/v1/member";
+    private static final String MEMBER_INFO_URL = "/api/v1/member";
 
     @Test
     @WithMockUser(authorities = "ADMIN")
@@ -105,9 +109,10 @@ public class MemberControllerTest {
     @Test
     @WithMockUser(authorities = "ADMIN")
     @DisplayName("회원가입 API 성공")
-    @Sql("/ScheduleSetup.sql")
+    @Sql("/member/ScheduleSetup.sql")
     void joinSuccess() throws Exception {
-        MemberJoinReq req = new MemberJoinReq("user1", "password123!", "HongGilDong", "01011112222", "모각코 스터디", "AM1",
+        MemberJoinReq req = new MemberJoinReq("user1", "password123!", "HongGilDong", "01011112222", "모각코 스터디",
+                Arrays.asList("AM1", "AM2"),
                 "1530");
         req.setSendDate(DateUtil.getCurrentDateTime());
         req.setSystemId("SYS_01");
@@ -120,7 +125,8 @@ public class MemberControllerTest {
     @WithMockUser(authorities = "ADMIN")
     @DisplayName("회원가입 API 실패_not include sendDate")
     void joinFail_NotIncludeSendDate() throws Exception {
-        MemberJoinReq req = new MemberJoinReq("user1", "password123!", "HongGilDong", "01011112222", "모각코 스터디", "AM1",
+        MemberJoinReq req = new MemberJoinReq("user1", "password123!", "HongGilDong", "01011112222", "모각코 스터디",
+                Arrays.asList("AM1", "AM2"),
                 "1530");
         req.setSendDate(null);
         req.setSystemId("SYS_01");
@@ -134,7 +140,8 @@ public class MemberControllerTest {
     @DisplayName("회원가입 API 실패_invaild ID")
     void joinFail_InvalidId() throws Exception {
         String invaildId = "";
-        MemberJoinReq req = new MemberJoinReq(invaildId, "password123!", "HongGilDong", "01011112222", "모각코 스터디", "AM1",
+        MemberJoinReq req = new MemberJoinReq(invaildId, "password123!", "HongGilDong", "01011112222", "모각코 스터디",
+                Arrays.asList("AM1", "AM2"),
                 "1530");
         req.setSendDate(DateUtil.getCurrentDateTime());
         req.setSystemId("SYS_01");
@@ -148,7 +155,8 @@ public class MemberControllerTest {
     @DisplayName("회원가입 API 실패_invaild PWD")
     void joinFail_InvalidPwd() throws Exception {
         String invaildPwd = "pwd";
-        MemberJoinReq req = new MemberJoinReq("user1", invaildPwd, "HongGilDong", "01011112222", "모각코 스터디", "AM1",
+        MemberJoinReq req = new MemberJoinReq("user1", invaildPwd, "HongGilDong", "01011112222", "모각코 스터디",
+                Arrays.asList("AM1", "AM2"),
                 "1530");
         req.setSendDate(DateUtil.getCurrentDateTime());
         req.setSystemId("SYS_01");
@@ -204,7 +212,7 @@ public class MemberControllerTest {
     @DisplayName("단일 회원정보 조회 성공")
     public void getMemberInfo_Success() throws Exception {
 
-        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(GET_MEMBER_INFO_URL);
+        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(MEMBER_INFO_URL);
 
         uriBuilder.queryParam("sendDate", DateUtil.getCurrentDateTime())
                 .queryParam("systemId", "SYS_01");
@@ -219,8 +227,54 @@ public class MemberControllerTest {
     @DisplayName("단일 회원정보 조회 성공_not include sendDate")
     public void getMemberInfo_NotIncludeSendDate() throws Exception {
 
-        MvcResult result = TestUtil.performGetRequest(mockMvc, GET_MEMBER_INFO_URL, 200);
+        MvcResult result = TestUtil.performGetRequest(mockMvc, MEMBER_INFO_URL, 200);
         assertEquals(200, result.getResponse().getStatus());
+    }
+
+    /////////////////////////////////////////////////////////////////
+
+    @Test
+    @WithMockUser(username = "user1", authorities = { "USER" })
+    @Sql("/member/MemberInfoUpdateSetup.sql")
+    @DisplayName("MyPage 회원 정보변경 성공")
+    void setMemberInfo_Success() throws Exception {
+        MemberInfoUpdateReq req = new MemberInfoUpdateReq(MemberUpdateType.EVENT_NAMES, "아무개", "010-1111-1111",
+                Arrays.asList("AM1", "AM2", "AM3", "AM4"), "1930", "password123!");
+        req.setSendDate(DateUtil.getCurrentDateTime());
+        req.setSystemId("SYS_01");
+        String requestBodyJson = objectMapper.writeValueAsString(req);
+
+        TestUtil.performRequest(mockMvc, MEMBER_INFO_URL, requestBodyJson, "PATCH", 200, 200);
+    }
+
+    @Test
+    @WithMockUser(username = "user1", authorities = { "USER" })
+    @Sql("/member/MemberInfoUpdateSetup.sql")
+    @DisplayName("MyPage 회원 정보변경 실패_이름 빈 값")
+    // 이름, 이벤트 이름, 비밀번호, 기상 시간 빈 값등은 다 똑같은 실패 케이스로 케이스마다 테스트 코드 추가하지는 않았음
+    void setMemberInfo_EmptyName() throws Exception {
+        MemberInfoUpdateReq req = new MemberInfoUpdateReq(MemberUpdateType.NAME, "", "010-1111-1111",
+                Arrays.asList("AM1", "AM2", "AM3", "AM4"), "1930", "password123!");
+        req.setSendDate(DateUtil.getCurrentDateTime());
+        req.setSystemId("SYS_01");
+        String requestBodyJson = objectMapper.writeValueAsString(req);
+
+        TestUtil.performRequest(mockMvc, MEMBER_INFO_URL, requestBodyJson, "PATCH", 200, 400);
+    }
+
+    @Test
+    @WithMockUser(username = "user1", authorities = { "USER" })
+    @Sql("/member/MemberInfoUpdateSetup.sql")
+    @DisplayName("MyPage 회원 정보변경 실패_잘못된 비밀번호 형식")
+    void setMemberInfo_WrongPwd() throws Exception {
+        String wrongPwd = "p1";
+        MemberInfoUpdateReq req = new MemberInfoUpdateReq(MemberUpdateType.PASSWORD, "", "010-1111-1111",
+                Arrays.asList("AM1"), "1930", wrongPwd);
+        req.setSendDate(DateUtil.getCurrentDateTime());
+        req.setSystemId("SYS_01");
+        String requestBodyJson = objectMapper.writeValueAsString(req);
+
+        TestUtil.performRequest(mockMvc, MEMBER_INFO_URL, requestBodyJson, "PATCH", 400, 400);
     }
 
 }

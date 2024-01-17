@@ -12,6 +12,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import mogakco.StudyManagement.enums.MemberRole;
 
 @Entity
@@ -49,4 +50,16 @@ public class Member {
   private String updatedAt;
 
   private String expiredAt;
+
+  public void updateName(String name) {
+    this.name = name;
+  }
+
+  public void updatePassword(String password) {
+    this.password = password;
+  }
+
+  public void updateContact(String contact) {
+    this.contact = contact;
+  }
 }
