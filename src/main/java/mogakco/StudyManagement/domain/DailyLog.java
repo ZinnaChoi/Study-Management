@@ -47,4 +47,13 @@ public class DailyLog {
 
     @Column(nullable = false)
     private String createdAt;
+
+    public DailyLog(DailyLog dailyLog) {
+        this.member = dailyLog.getMember();
+        this.date = dailyLog.getDate();
+        this.type = dailyLog.getType();
+        this.score = dailyLog.getScore();
+        this.createdAt = dailyLog.getCreatedAt();
+    }
+
 }
