@@ -109,9 +109,10 @@ public class MemberControllerTest {
     @Test
     @WithMockUser(authorities = "ADMIN")
     @DisplayName("회원가입 API 성공")
-    @Sql("member/ScheduleSetup.sql")
+    @Sql("/member/ScheduleSetup.sql")
     void joinSuccess() throws Exception {
-        MemberJoinReq req = new MemberJoinReq("user1", "password123!", "HongGilDong", "01011112222", "모각코 스터디", "AM1",
+        MemberJoinReq req = new MemberJoinReq("user1", "password123!", "HongGilDong", "01011112222", "모각코 스터디",
+                Arrays.asList("AM1", "AM2"),
                 "1530");
         req.setSendDate(DateUtil.getCurrentDateTime());
         req.setSystemId("SYS_01");
@@ -124,7 +125,8 @@ public class MemberControllerTest {
     @WithMockUser(authorities = "ADMIN")
     @DisplayName("회원가입 API 실패_not include sendDate")
     void joinFail_NotIncludeSendDate() throws Exception {
-        MemberJoinReq req = new MemberJoinReq("user1", "password123!", "HongGilDong", "01011112222", "모각코 스터디", "AM1",
+        MemberJoinReq req = new MemberJoinReq("user1", "password123!", "HongGilDong", "01011112222", "모각코 스터디",
+                Arrays.asList("AM1", "AM2"),
                 "1530");
         req.setSendDate(null);
         req.setSystemId("SYS_01");
@@ -138,7 +140,8 @@ public class MemberControllerTest {
     @DisplayName("회원가입 API 실패_invaild ID")
     void joinFail_InvalidId() throws Exception {
         String invaildId = "";
-        MemberJoinReq req = new MemberJoinReq(invaildId, "password123!", "HongGilDong", "01011112222", "모각코 스터디", "AM1",
+        MemberJoinReq req = new MemberJoinReq(invaildId, "password123!", "HongGilDong", "01011112222", "모각코 스터디",
+                Arrays.asList("AM1", "AM2"),
                 "1530");
         req.setSendDate(DateUtil.getCurrentDateTime());
         req.setSystemId("SYS_01");
@@ -152,7 +155,8 @@ public class MemberControllerTest {
     @DisplayName("회원가입 API 실패_invaild PWD")
     void joinFail_InvalidPwd() throws Exception {
         String invaildPwd = "pwd";
-        MemberJoinReq req = new MemberJoinReq("user1", invaildPwd, "HongGilDong", "01011112222", "모각코 스터디", "AM1",
+        MemberJoinReq req = new MemberJoinReq("user1", invaildPwd, "HongGilDong", "01011112222", "모각코 스터디",
+                Arrays.asList("AM1", "AM2"),
                 "1530");
         req.setSendDate(DateUtil.getCurrentDateTime());
         req.setSystemId("SYS_01");

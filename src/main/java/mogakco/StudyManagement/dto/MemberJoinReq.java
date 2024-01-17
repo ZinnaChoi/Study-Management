@@ -1,5 +1,7 @@
 package mogakco.StudyManagement.dto;
 
+import java.util.List;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -32,8 +34,8 @@ public class MemberJoinReq extends DTOReqCommon {
     @Schema(example = "모각코 스터디")
     private String studyName;
 
-    @Schema(example = "AM1")
-    private String eventName;
+    @Schema(example = "[\"AM1\", \"AM2\"]")
+    private List<String> eventNames;
 
     @Schema(example = "1530")
     private String wakeupTime;

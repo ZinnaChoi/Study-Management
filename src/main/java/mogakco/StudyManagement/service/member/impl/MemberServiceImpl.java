@@ -130,23 +130,25 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
                 .wakeupTime(joinInfo.getWakeupTime())
                 .build();
 
-        Optional<Schedule> optSchedule = scheduleRepository.findById(joinInfo.getEventName());
-        if (optSchedule.isPresent()) {
-            Schedule schedule = optSchedule.get();
-            MemberSchedule memberSchedule = MemberSchedule.builder()
-                    .member(member)
-                    .eventName(schedule)
-                    .createdAt(DateUtil.getCurrentDateTime())
-                    .updatedAt(DateUtil.getCurrentDateTime())
-                    .build();
+        List<MemberSchedule> mSchedules = new ArrayList<>();
+        List<Schedule> schedules = scheduleRepository.findAllById(joinInfo.getEventNames());
+        if (schedules.size() != 0) {
+            for (Schedule s : schedules) {
+                mSchedules.add(MemberSchedule.builder()
+                        .member(member)
+                        .eventName(s)
+                        .createdAt(DateUtil.getCurrentDateTime())
+                        .updatedAt(DateUtil.getCurrentDateTime())
+                        .build());
+            }
             lo.setDBStart();
             memberRepository.save(member);
             wakeUpRepository.save(wakeUp);
-            memberScheduleRepository.save(memberSchedule);
+            memberScheduleRepository.saveAll(mSchedules);
             lo.setDBEnd();
         } else {
             result = new DTOResCommon(systemId, ErrorCode.BAD_REQUEST.getCode(),
-                    ErrorCode.BAD_REQUEST.getMessage(joinInfo.getEventName() + " Schedule is Not Regist"));
+                    ErrorCode.BAD_REQUEST.getMessage(joinInfo.getEventNames() + " Schedule is Not Regist"));
         }
 
         return result;
