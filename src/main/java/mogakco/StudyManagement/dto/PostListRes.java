@@ -13,7 +13,8 @@ public class PostListRes extends DTOResCommon {
     private List<PostList> content;
     private SimplePageable pageable;
 
-    public PostListRes(String systemId, int retCode, String retMsg, List<PostList> content, SimplePageable pageable) {
+    public PostListRes(String systemId, Integer retCode, String retMsg, List<PostList> content,
+            SimplePageable pageable) {
         super(systemId, retCode, retMsg);
         this.content = content;
         this.pageable = pageable;

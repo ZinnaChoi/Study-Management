@@ -60,7 +60,7 @@ public class PostControllerTest {
     private static final String POST_API_URL = "/api/v1/posts";
 
     @Test
-    @Sql("/post/PostListSetup.sql")
+    @Sql("/post/PostSetup.sql")
     @WithMockUser(username = "PostUser", authorities = { "USER" })
     @DisplayName("게시글 등록 성공")
     public void createPostSuccess() throws Exception {
@@ -71,7 +71,7 @@ public class PostControllerTest {
     }
 
     @Test
-    @Sql("/post/PostListSetup.sql")
+    @Sql("/post/PostSetup.sql")
     @WithMockUser(username = "PostUser", authorities = { "USER" })
     @DisplayName("게시글 등록 실패 - 빈 제목")
     public void createPostFailEmptyTitle() throws Exception {
@@ -81,7 +81,7 @@ public class PostControllerTest {
     }
 
     @Test
-    @Sql("/post/PostListSetup.sql")
+    @Sql("/post/PostSetup.sql")
     @WithMockUser(username = "PostUser", authorities = { "USER" })
     @DisplayName("게시글 등록 실패 - 잘못된 요청 JSON 형식")
     public void createPostFailInvalidJson() throws Exception {
@@ -97,7 +97,7 @@ public class PostControllerTest {
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     @Test
-    @Sql("/post/PostListSetup.sql")
+    @Sql("/post/PostSetup.sql")
     @WithMockUser(username = "PostUser", authorities = { "USER" })
     @DisplayName("게시글 목록 조회 성공 - Page 0 Size 3")
     public void getPostListSuccessPage0Size3() throws Exception {
@@ -126,7 +126,7 @@ public class PostControllerTest {
     }
 
     @Test
-    @Sql("/post/PostListSetup.sql")
+    @Sql("/post/PostSetup.sql")
     @WithMockUser(username = "PostUser", authorities = { "USER" })
     @DisplayName("게시글 목록 조회 성공 - 작성자 이름으로 조회")
     public void getPostListSuccessSearchMember() throws Exception {
@@ -149,7 +149,7 @@ public class PostControllerTest {
     }
 
     @Test
-    @Sql("/post/PostListSetup.sql")
+    @Sql("/post/PostSetup.sql")
     @WithMockUser(username = "PostUser", authorities = { "USER" })
     @DisplayName("게시글 목록 조회 성공 - Page 1 Size 2")
     public void getPostListSuccessPage1Size2() throws Exception {
@@ -178,7 +178,7 @@ public class PostControllerTest {
     }
 
     @Test
-    @Sql("/post/PostListSetup.sql")
+    @Sql("/post/PostSetup.sql")
     @WithMockUser(username = "PostUser", authorities = { "USER" })
     @DisplayName("게시글 목록 조회 실패 - 잘못된 검색 타입")
     public void getPostListFailInvalidSearchType() throws Exception {
@@ -197,7 +197,7 @@ public class PostControllerTest {
     }
 
     @Test
-    @Sql("/post/PostListSetup.sql")
+    @Sql("/post/PostSetup.sql")
     @WithMockUser(username = "PostUser", authorities = { "USER" })
     @DisplayName("게시글 목록 조회 실패 - 빈 검색어")
     public void getPostListFailEmptySearchKeyWord() throws Exception {
@@ -218,7 +218,7 @@ public class PostControllerTest {
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     @Test
-    @Sql("/post/PostListSetup.sql")
+    @Sql("/post/PostSetup.sql")
     @WithMockUser(username = "PostUser", authorities = { "USER" })
     @DisplayName("게시글 상세 정보 조회 성공")
     public void getPostDetailSuccess() throws Exception {
@@ -232,7 +232,7 @@ public class PostControllerTest {
     }
 
     @Test
-    @Sql("/post/PostListSetup.sql")
+    @Sql("/post/PostSetup.sql")
     @WithMockUser(username = "PostUser", authorities = { "USER" })
     @DisplayName("게시글 상세 정보 조회 실패 - 잘못된 게시글 번호")
     public void getPostDetailFailPostNotFound() throws Exception {
@@ -244,7 +244,7 @@ public class PostControllerTest {
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     @Test
-    @Sql("/post/PostListSetup.sql")
+    @Sql("/post/PostSetup.sql")
     @WithMockUser(username = "PostUser", authorities = { "USER" })
     @DisplayName("게시글 수정 성공")
     public void updatePostSuccess() throws Exception {
@@ -264,7 +264,7 @@ public class PostControllerTest {
     }
 
     @Test
-    @Sql("/post/PostListSetup.sql")
+    @Sql("/post/PostSetup.sql")
     @WithMockUser(username = "PostUser", authorities = { "USER" })
     @DisplayName("게시글 수정 실패 - 잘못된 게시글 번호")
     public void updatePostFailPostNotFound() throws Exception {
@@ -277,7 +277,7 @@ public class PostControllerTest {
     }
 
     @Test
-    @Sql("/post/PostListSetup.sql")
+    @Sql("/post/PostSetup.sql")
     @WithMockUser(username = "PostUser2", authorities = { "USER" })
     @DisplayName("게시글 수정 실패 - 잘못된 사용자")
     public void updatePostFailPostDiffMember() throws Exception {
@@ -292,7 +292,7 @@ public class PostControllerTest {
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     @Test
-    @Sql("/post/PostListSetup.sql")
+    @Sql("/post/PostSetup.sql")
     @WithMockUser(username = "PostUser", authorities = { "USER" })
     @DisplayName("게시글 삭제 성공")
     public void deletePostSuccess() throws Exception {
@@ -302,7 +302,7 @@ public class PostControllerTest {
     }
 
     @Test
-    @Sql("/post/PostListSetup.sql")
+    @Sql("/post/PostSetup.sql")
     @WithMockUser(username = "PostUser", authorities = { "USER" })
     @DisplayName("게시글 삭제 실패 - 잘못된 게시글 번호")
     public void deletePostFailNotFound() throws Exception {
@@ -311,7 +311,7 @@ public class PostControllerTest {
     }
 
     @Test
-    @Sql("/post/PostListSetup.sql")
+    @Sql("/post/PostSetup.sql")
     @WithMockUser(username = "PostUser2", authorities = { "USER" })
     @DisplayName("게시글 삭제 실패 - 잘못된 사용자")
     public void deletePostFailDiffMember() throws Exception {
