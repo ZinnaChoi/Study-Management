@@ -17,11 +17,19 @@ public class AbsentRgstReq extends DTOReqCommon {
     @Schema(example = "20240116")
     private String absentDate;
 
-    @Pattern(regexp = "^.{1,50}$", message = "부재 사유는 50자 이하여야 합니다")
+    @Pattern(regexp = "^.{0,50}$", message = "부재 사유는 50자 이하여야 합니다")
     @Schema(example = "가족 여행")
     private String description;
 
     @Schema(example = "[\"PM1\",\"PM2\"]")
     private List<String> eventNameList;
+
+    public AbsentRgstReq(String sendDate, String systemId, String absentDate, String description,
+            List<String> eventNameList) {
+        super(sendDate, systemId);
+        this.absentDate = absentDate;
+        this.description = description;
+        this.eventNameList = eventNameList;
+    }
 
 }
