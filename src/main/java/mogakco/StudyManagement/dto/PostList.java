@@ -14,7 +14,7 @@ public class PostList {
 
     private String title;
 
-    private String member;
+    private String memberName;
 
     private Integer commentCnt;
 
@@ -25,7 +25,7 @@ public class PostList {
     public PostList(Post post) {
         this.title = post.getTitle();
         this.viewCnt = post.getViewCnt();
-        this.member = post.getMember().getName();
+        this.memberName = post.getMember().getName();
         this.createdAt = post.getCreatedAt();
         this.updatedAt = post.getUpdatedAt();
         this.likes = 0;

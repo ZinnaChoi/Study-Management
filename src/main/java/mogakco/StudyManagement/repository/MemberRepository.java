@@ -14,5 +14,7 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     List<Member> findByNameContaining(String name);
 
+    Member findByName(String name);
+
     Boolean existsById(String id);
 }
