@@ -266,7 +266,8 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
                     return new DTOResCommon(systemId, ErrorCode.BAD_REQUEST.getCode(),
                             ErrorCode.BAD_REQUEST.getMessage("변경할 기상 시간을 선택해주세요"));
                 }
-                WakeUp wakeUp = WakeUp.builder().member(member).wakeupTime(changedWakeupTime).build();
+                WakeUp wakeUp = wakeUpRepository.findByMember(member);
+                wakeUp.setWakeupTime(changedWakeupTime);
                 lo.setDBStart();
                 wakeUpRepository.save(wakeUp);
                 lo.setDBEnd();
