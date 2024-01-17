@@ -33,20 +33,17 @@ public class JWTConfig extends OncePerRequestFilter {
 
         // Authorization 헤더 검증(널이거나 RFC 7235 정의에 맞지 않는 양식이면)
         if (authorization == null || !authorization.startsWith("Bearer ")) {
-            System.out.println("token null");
             // 다음 필터 실행
             filterChain.doFilter(request, response);
             // 조건이 해당되면 메소드 종료
             return;
         }
 
-        System.out.println("authorization now");
         // Bearer 부분 제거 후 순수 토큰만 획득
         String token = authorization.split(" ")[1];
 
         // 토큰 소멸 시간 검증
         if (jwtUtil.isExpired(token)) {
-            System.out.println("token expired");
             // 다음 필터 실행
             filterChain.doFilter(request, response);
             // 조건이 해당되면 메소드 종료
