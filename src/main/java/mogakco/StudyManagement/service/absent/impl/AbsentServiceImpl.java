@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -58,6 +59,11 @@ public class AbsentServiceImpl implements AbsentService {
             List<MemberSchedule> memeberScheduleList = memberScheduleRepository.findAllByMember(member);
             lo.setDBEnd();
 
+            // Check if the Event Name List is Empty
+            if (absentRgstReq.getEventNameList().isEmpty()) {
+                throw new InvalidRequestException("하나 이상의 부재 일정을 등록해야 합니다");
+            }
+
             // Check if the Event Name exists
             Set<String> eventNameSet = new HashSet<>();
             for (Schedule schedule : scheduleList) {
@@ -103,9 +109,7 @@ public class AbsentServiceImpl implements AbsentService {
                 lo.setDBEnd();
             }
             return new DTOResCommon(null, ErrorCode.OK.getCode(), ErrorCode.OK.getMessage());
-        } catch (NotFoundException | InvalidRequestException |
-
-                ConflictException e) {
+        } catch (NotFoundException | InvalidRequestException | ConflictException e) {
             return ExceptionUtil.handleException(e);
         }
 
@@ -116,31 +120,32 @@ public class AbsentServiceImpl implements AbsentService {
         try {
             Specification<AbsentSchedule> spec = AbsentScheduleSpecification.hasYearMonth(absentListReq.getYearMonth());
 
-            List<Member> members = new ArrayList<>();
-            for (String name : absentListReq.getMemberNameList()) {
-                lo.setDBStart();
-                Member member = memberRepository.findByName(name);
-                lo.setDBEnd();
-                if (member == null)
-                    throw new NotFoundException(ErrorCode.NOT_FOUND.getMessage("스터디원 " + name));
-                members.add(member);
-            }
+            long cnt = absentScheduleRepository.count(spec);
 
-            if (!members.isEmpty()) {
-                spec = spec.and(AbsentScheduleSpecification.hasMemberIn(members));
+            List<Member> members = new ArrayList<>();
+            if (absentListReq.getMemberNameList() == null || absentListReq.getMemberNameList().isEmpty()) {
+                lo.setDBStart();
+                members = memberRepository.findAll();
+                lo.setDBEnd();
+            } else {
+                for (String name : absentListReq.getMemberNameList()) {
+                    lo.setDBStart();
+                    Member member = memberRepository.findByName(name);
+                    lo.setDBEnd();
+                    if (member == null)
+                        throw new NotFoundException(ErrorCode.NOT_FOUND.getMessage("스터디원 " + name));
+                    members.add(member);
+                }
             }
+            spec = spec.and(AbsentScheduleSpecification.hasMemberIn(members));
 
             lo.setDBStart();
             List<AbsentSchedule> absentSchedules = absentScheduleRepository.findAll(spec);
             lo.setDBEnd();
-            List<AbsentList> result = new ArrayList<>();
 
-            for (AbsentSchedule as : absentSchedules) {
-                result.add(new AbsentList(as));
-            }
-
-            return new AbsentListRes(null, ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(),
-                    result);
+            return new AbsentListRes(null, ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), absentSchedules.stream()
+                    .map(AbsentList::new)
+                    .collect(Collectors.toList()));
 
         } catch (NotFoundException e) {
             DTOResCommon res = ExceptionUtil.handleException(e);

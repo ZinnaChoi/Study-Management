@@ -20,4 +20,10 @@ public class AbsentListReq extends DTOReqCommon {
     @Schema(example = "[\"지나\",\"엠마\",\"딘\"]")
     private List<String> memberNameList;
 
+    public AbsentListReq(String sendDate, String systemId, String yearMonth, List<String> memberNameList) {
+        super(sendDate, systemId);
+        this.yearMonth = yearMonth;
+        this.memberNameList = memberNameList;
+    }
+
 }
