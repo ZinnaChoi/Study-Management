@@ -90,7 +90,8 @@ public class PostServiceImpl implements PostService {
 
             return new PostDetailRes(null, ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), new PostList(post));
         } catch (NotFoundException e) {
-            return new PostDetailRes(null, ErrorCode.NOT_FOUND.getCode(), e.getMessage(), null);
+            DTOResCommon res = ExceptionUtil.handleException(e);
+            return new PostDetailRes(res.getSystemId(), res.getRetCode(), res.getRetMsg(), null);
         }
     }
 
