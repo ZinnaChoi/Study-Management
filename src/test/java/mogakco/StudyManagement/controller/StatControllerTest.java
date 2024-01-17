@@ -52,8 +52,8 @@ public class StatControllerTest {
 
     @Test
     @Sql("/stat/StatListSetup.sql")
-    @WithMockUser(username = "admin", authorities = { "ADMIN" })
-    @DisplayName("통계 목록 조회 성공 - Page 0 Size 3")
+    @WithMockUser(username = "statUser1", authorities = { "USER" })
+    @DisplayName("통계 목록 조회 성공 - Page 0 Size 1")
     public void getStatListSuccessPage0Size1() throws Exception {
 
         UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(GET_STAT_API_URL);
@@ -63,7 +63,7 @@ public class StatControllerTest {
                 .queryParam("type", LogType.WAKEUP)
                 .queryParam("page", 0)
                 .queryParam("size", 1)
-                .queryParam("sort", "createdAt");
+                .queryParam("sort", "member");
 
         MvcResult result = TestUtil.performRequest(mockMvc, uriBuilder.toUriString(), null, "GET", 200, 200);
         JsonNode responseBody = objectMapper.readTree(result.getResponse().getContentAsString());
@@ -75,18 +75,41 @@ public class StatControllerTest {
 
     @Test
     @Sql("/stat/StatListSetup.sql")
-    @WithMockUser(username = "statUser", authorities = { "USER" })
+    @WithMockUser(username = "statUser2", authorities = { "USER" })
+    @DisplayName("통계 목록 조회 성공 - Page 1 Size 2")
+    public void getStatListSuccessPage1Size2() throws Exception {
+
+        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(GET_STAT_API_URL);
+
+        uriBuilder.queryParam("sendDate", DateUtil.getCurrentDateTime())
+                .queryParam("systemId", "SYS_02")
+                .queryParam("type", LogType.WAKEUP)
+                .queryParam("page", 1)
+                .queryParam("size", 2)
+                .queryParam("sort", "member");
+
+        MvcResult result = TestUtil.performRequest(mockMvc, uriBuilder.toUriString(), null, "GET", 200, 200);
+        JsonNode responseBody = objectMapper.readTree(result.getResponse().getContentAsString());
+
+        int contentCount = responseBody.path("content").size();
+        assertTrue(contentCount == 2);
+
+    }
+
+    @Test
+    @Sql("/stat/StatListSetup.sql")
+    @WithMockUser(username = "statUser3", authorities = { "USER" })
     @DisplayName("통계 목록 조회 실패 - content가 존재하지 않음")
     public void getStatListFailPage0Size1() throws Exception {
 
         UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(GET_STAT_API_URL);
 
         uriBuilder.queryParam("sendDate", DateUtil.getCurrentDateTime())
-                .queryParam("systemId", "SYS_02")
+                .queryParam("systemId", "SYS_03")
                 .queryParam("type", LogType.ABSENT)
-                .queryParam("page", 10)
+                .queryParam("page", 0)
                 .queryParam("size", 1)
-                .queryParam("sort", "createdAt");
+                .queryParam("sort", "member");
 
         MvcResult result = TestUtil.performRequest(mockMvc, uriBuilder.toUriString(), null, "GET", 200, 404);
         JsonNode responseBody = objectMapper.readTree(result.getResponse().getContentAsString());
