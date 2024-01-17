@@ -135,7 +135,7 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
             Schedule schedule = optSchedule.get();
             MemberSchedule memberSchedule = MemberSchedule.builder()
                     .member(member)
-                    .event_name(schedule)
+                    .eventName(schedule)
                     .createdAt(DateUtil.getCurrentDateTime())
                     .updatedAt(DateUtil.getCurrentDateTime())
                     .build();
@@ -181,7 +181,7 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
 
         List<MemberSchedule> memberSchedules = memberScheduleRepository.findAllByMember(member);
         List<Schedule> schedules = memberSchedules.stream()
-                .map(MemberSchedule::getEvent_name)
+                .map(MemberSchedule::getEventName)
                 .collect(Collectors.toList());
         List<String> eventNames = schedules.stream()
                 .map(Schedule::getEventName)
@@ -224,7 +224,7 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
                 List<MemberSchedule> mSchedules = memberScheduleRepository.findAllByMember(member);
                 List<Schedule> userSchedules = scheduleRepository.findByEventNameIn(userEventNames);
 
-                List<String> dbEventNames = mSchedules.stream().map(m -> m.getEvent_name().getEventName())
+                List<String> dbEventNames = mSchedules.stream().map(m -> m.getEventName().getEventName())
                         .collect(Collectors.toList());
 
                 List<Schedule> insertCandidates = userSchedules.stream()
@@ -239,18 +239,18 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
                         .collect(Collectors.toList());
 
                 List<MemberSchedule> updateObj = mSchedules.stream()
-                        .filter(schedule -> eventNamesToUpdate.contains(schedule.getEvent_name().getEventName()))
+                        .filter(schedule -> eventNamesToUpdate.contains(schedule.getEventName().getEventName()))
                         .map(schedule -> {
                             schedule.setUpdatedAt(DateUtil.getCurrentDateTime());
                             return schedule;
                         })
                         .collect(Collectors.toList());
                 List<MemberSchedule> deleteObj = mSchedules.stream()
-                        .filter(d -> !userEventNames.contains(d.getEvent_name().getEventName()))
+                        .filter(d -> !userEventNames.contains(d.getEventName().getEventName()))
                         .collect(Collectors.toList());
                 List<MemberSchedule> insertObj = new ArrayList<>();
                 for (Schedule iCdd : insertCandidates) {
-                    insertObj.add(MemberSchedule.builder().member(member).event_name(iCdd)
+                    insertObj.add(MemberSchedule.builder().member(member).eventName(iCdd)
                             .createdAt(DateUtil.getCurrentDateTime()).updatedAt(DateUtil.getCurrentDateTime()).build());
                 }
                 lo.setDBStart();
