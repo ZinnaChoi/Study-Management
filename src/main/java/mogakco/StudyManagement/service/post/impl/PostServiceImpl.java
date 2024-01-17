@@ -68,8 +68,10 @@ public class PostServiceImpl implements PostService {
         if (postListReq.getSearchType() == PostSearchType.TITLE) {
             spec = PostSpecification.titleContains(searchKeyWord);
         } else {
+            lo.setDBStart();
             List<Member> members = memberRepository.findByNameContaining(searchKeyWord);
             spec = PostSpecification.memberIn(members);
+            lo.setDBEnd();
         }
         posts = postRepository.findAll(spec, pageable);
         lo.setDBEnd();

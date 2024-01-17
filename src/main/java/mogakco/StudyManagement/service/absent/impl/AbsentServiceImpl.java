@@ -92,7 +92,10 @@ public class AbsentServiceImpl implements AbsentService {
                 Specification<AbsentSchedule> spec = AbsentScheduleSpecification.dateAndScheduleAndMember(
                         absentRgstReq.getAbsentDate(), schedule, member);
 
-                if (absentScheduleRepository.count(spec) > 0) {
+                lo.setDBStart();
+                long absentScheduleCnt = absentScheduleRepository.count(spec);
+                lo.setDBEnd();
+                if (absentScheduleCnt > 0) {
                     throw new ConflictException(ErrorCode.CONFLICT.getMessage("부재 일정: " +
                             absentRgstReq.getAbsentDate() + " " + schedule.getEventName()));
                 }
