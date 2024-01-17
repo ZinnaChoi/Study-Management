@@ -11,7 +11,7 @@ public class PostDetailRes extends DTOResCommon {
 
     private PostList postList;
 
-    public PostDetailRes(String systemId, int retCode, String retMsg, PostList postList) {
+    public PostDetailRes(String systemId, Integer retCode, String retMsg, PostList postList) {
 
         super(systemId, retCode, retMsg);
         this.postList = postList;

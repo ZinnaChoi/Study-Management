@@ -78,9 +78,7 @@ public class PostController extends CommonController {
         } finally {
             endAPI(request, findErrorCodeByCode(result.getRetCode()), lo, result);
         }
-
         return result;
-
     }
 
     @Operation(summary = "게시글 상세 정보 조회", description = "특정 게시글의 상세 정보 조회")

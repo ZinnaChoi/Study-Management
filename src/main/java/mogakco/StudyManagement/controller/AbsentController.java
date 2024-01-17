@@ -1,5 +1,7 @@
 package mogakco.StudyManagement.controller;
 
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -10,6 +12,8 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import mogakco.StudyManagement.dto.AbsentListReq;
+import mogakco.StudyManagement.dto.AbsentListRes;
 import mogakco.StudyManagement.dto.AbsentRgstReq;
 import mogakco.StudyManagement.dto.DTOResCommon;
 import mogakco.StudyManagement.enums.ErrorCode;
@@ -44,6 +48,26 @@ public class AbsentController extends CommonController {
         } catch (Exception e) {
             result = new DTOResCommon(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
                     ErrorCode.INTERNAL_ERROR.getMessage());
+        } finally {
+            endAPI(request, findErrorCodeByCode(result.getRetCode()), lo, result);
+        }
+        return result;
+    }
+
+    @Operation(summary = "부재일정 조회", description = "부재일정 조회")
+    @GetMapping("/absent")
+    public AbsentListRes getAbsentSchedule(HttpServletRequest request,
+            @ModelAttribute @Valid AbsentListReq absentListReq) {
+
+        AbsentListRes result = new AbsentListRes();
+        try {
+            startAPI(lo, absentListReq);
+            result = absentService.getAbsentSchedule(absentListReq, lo);
+            result.setSendDate(DateUtil.getCurrentDateTime());
+            result.setSystemId(systemId);
+        } catch (Exception e) {
+            result = new AbsentListRes(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
+                    ErrorCode.INTERNAL_ERROR.getMessage(), null);
         } finally {
             endAPI(request, findErrorCodeByCode(result.getRetCode()), lo, result);
         }

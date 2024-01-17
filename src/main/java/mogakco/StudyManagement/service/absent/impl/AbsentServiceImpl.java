@@ -1,19 +1,25 @@
 package mogakco.StudyManagement.service.absent.impl;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import mogakco.StudyManagement.domain.AbsentSchedule;
 import mogakco.StudyManagement.domain.Member;
 import mogakco.StudyManagement.domain.MemberSchedule;
 import mogakco.StudyManagement.domain.Schedule;
+import mogakco.StudyManagement.dto.AbsentList;
+import mogakco.StudyManagement.dto.AbsentListReq;
+import mogakco.StudyManagement.dto.AbsentListRes;
 import mogakco.StudyManagement.dto.AbsentRgstReq;
 import mogakco.StudyManagement.dto.DTOResCommon;
 import mogakco.StudyManagement.enums.ErrorCode;
 import mogakco.StudyManagement.repository.AbsentScheduleRepository;
+import mogakco.StudyManagement.repository.AbsentScheduleSpecification;
 import mogakco.StudyManagement.repository.MemberRepository;
 import mogakco.StudyManagement.repository.MemberScheduleRepository;
 import mogakco.StudyManagement.repository.ScheduleRepository;
@@ -77,19 +83,19 @@ public class AbsentServiceImpl implements AbsentService {
 
             // Check if the absent schedule already exists
             for (Schedule schedule : scheduleList) {
-                int alreadyExistAbsentScheduleCnt = absentScheduleRepository.countByAbsentDateAndEventNameAndMember(
-                        absentRgstReq.getAbsentDate(),
-                        schedule, member);
-                if (alreadyExistAbsentScheduleCnt > 0) {
-                    throw new ConflictException(ErrorCode.CONFLICT
-                            .getMessage("부재 일정: " + absentRgstReq.getAbsentDate() + " " + schedule.getEventName()));
+                Specification<AbsentSchedule> spec = AbsentScheduleSpecification.dateAndScheduleAndMember(
+                        absentRgstReq.getAbsentDate(), schedule, member);
+
+                if (absentScheduleRepository.count(spec) > 0) {
+                    throw new ConflictException(ErrorCode.CONFLICT.getMessage("부재 일정: " +
+                            absentRgstReq.getAbsentDate() + " " + schedule.getEventName()));
                 }
             }
 
             // Register absent schedule
             for (Schedule schedule : scheduleList) {
                 AbsentSchedule absentSchedule = AbsentSchedule.builder().absentDate(absentRgstReq.getAbsentDate())
-                        .eventName(schedule).member(member).description(absentRgstReq.getDescription())
+                        .schedule(schedule).member(member).description(absentRgstReq.getDescription())
                         .createdAt(DateUtil.getCurrentDateTime()).updatedAt(DateUtil.getCurrentDateTime()).build();
 
                 lo.setDBStart();
@@ -97,10 +103,48 @@ public class AbsentServiceImpl implements AbsentService {
                 lo.setDBEnd();
             }
             return new DTOResCommon(null, ErrorCode.OK.getCode(), ErrorCode.OK.getMessage());
-        } catch (NotFoundException | InvalidRequestException | ConflictException e) {
+        } catch (NotFoundException | InvalidRequestException |
+
+                ConflictException e) {
             return ExceptionUtil.handleException(e);
         }
 
     }
 
+    @Override
+    public AbsentListRes getAbsentSchedule(AbsentListReq absentListReq, LoggingService lo) {
+        try {
+            Specification<AbsentSchedule> spec = AbsentScheduleSpecification.hasYearMonth(absentListReq.getYearMonth());
+
+            List<Member> members = new ArrayList<>();
+            for (String name : absentListReq.getMemberNameList()) {
+                lo.setDBStart();
+                Member member = memberRepository.findByName(name);
+                lo.setDBEnd();
+                if (member == null)
+                    throw new NotFoundException(ErrorCode.NOT_FOUND.getMessage("스터디원 " + name));
+                members.add(member);
+            }
+
+            if (!members.isEmpty()) {
+                spec = spec.and(AbsentScheduleSpecification.hasMemberIn(members));
+            }
+
+            lo.setDBStart();
+            List<AbsentSchedule> absentSchedules = absentScheduleRepository.findAll(spec);
+            lo.setDBEnd();
+            List<AbsentList> result = new ArrayList<>();
+
+            for (AbsentSchedule as : absentSchedules) {
+                result.add(new AbsentList(as));
+            }
+
+            return new AbsentListRes(null, ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(),
+                    result);
+
+        } catch (NotFoundException e) {
+            DTOResCommon res = ExceptionUtil.handleException(e);
+            return new AbsentListRes(res.getSystemId(), res.getRetCode(), res.getRetMsg(), null);
+        }
+    }
 }

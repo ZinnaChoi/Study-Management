@@ -32,7 +32,7 @@ public class AbsentSchedule {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "event_name", nullable = false)
-    private Schedule eventName;
+    private Schedule schedule;
 
     @Column(nullable = false)
     private String description;
