@@ -89,7 +89,7 @@ public class AbsentServiceImpl implements AbsentService {
 
             // Check if the absent schedule already exists
             for (Schedule schedule : scheduleList) {
-                Specification<AbsentSchedule> spec = AbsentScheduleSpecification.dateAndScheduleAndMember(
+                Specification<AbsentSchedule> spec = AbsentScheduleSpecification.withAbsentDateAndScheduleAndMember(
                         absentRgstReq.getAbsentDate(), schedule, member);
 
                 lo.setDBStart();
@@ -121,7 +121,8 @@ public class AbsentServiceImpl implements AbsentService {
     @Override
     public AbsentListRes getAbsentSchedule(AbsentListReq absentListReq, LoggingService lo) {
         try {
-            Specification<AbsentSchedule> spec = AbsentScheduleSpecification.hasYearMonth(absentListReq.getYearMonth());
+            Specification<AbsentSchedule> spec = AbsentScheduleSpecification
+                    .withYearMonth(absentListReq.getYearMonth());
 
             List<Member> members = new ArrayList<>();
             if (absentListReq.getMemberNameList() == null || absentListReq.getMemberNameList().isEmpty()) {
@@ -138,7 +139,7 @@ public class AbsentServiceImpl implements AbsentService {
                     members.add(member);
                 }
             }
-            spec = spec.and(AbsentScheduleSpecification.hasMemberIn(members));
+            spec = spec.and(AbsentScheduleSpecification.withMemberIn(members));
 
             lo.setDBStart();
             List<AbsentSchedule> absentSchedules = absentScheduleRepository.findAll(spec);

@@ -66,11 +66,11 @@ public class PostServiceImpl implements PostService {
 
         lo.setDBStart();
         if (postListReq.getSearchType() == PostSearchType.TITLE) {
-            spec = PostSpecification.titleContains(searchKeyWord);
+            spec = PostSpecification.withTitleContaining(searchKeyWord);
         } else {
             lo.setDBStart();
             List<Member> members = memberRepository.findByNameContaining(searchKeyWord);
-            spec = PostSpecification.memberIn(members);
+            spec = PostSpecification.withMemberIn(members);
             lo.setDBEnd();
         }
         posts = postRepository.findAll(spec, pageable);
@@ -89,8 +89,9 @@ public class PostServiceImpl implements PostService {
     public PostDetailRes getPostDetail(Long postId, LoggingService lo) {
 
         try {
+            Specification<Post> spec = PostSpecification.withPostId(postId);
             lo.setDBStart();
-            Post post = postRepository.findByPostId(postId)
+            Post post = postRepository.findOne(spec)
                     .orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND.getMessage("게시글")));
             lo.setDBEnd();
 
@@ -105,8 +106,9 @@ public class PostServiceImpl implements PostService {
     public DTOResCommon updatePost(Long postId, PostReq postUpdateReq, LoggingService lo) {
         try {
             DTOResCommon result = new DTOResCommon();
+            Specification<Post> spec = PostSpecification.withPostId(postId);
             lo.setDBStart();
-            Post post = postRepository.findByPostId(postId)
+            Post post = postRepository.findOne(spec)
                     .orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND.getMessage("게시글")));
 
             Member loginMember = memberRepository.findById(SecurityUtil.getLoginUserId());
@@ -138,8 +140,9 @@ public class PostServiceImpl implements PostService {
     @Override
     public DTOResCommon deletePost(Long postId, LoggingService lo) {
         try {
+            Specification<Post> spec = PostSpecification.withPostId(postId);
             lo.setDBStart();
-            Post post = postRepository.findByPostId(postId)
+            Post post = postRepository.findOne(spec)
                     .orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND.getMessage("게시글")));
 
             Member loginMember = memberRepository.findById(SecurityUtil.getLoginUserId());
