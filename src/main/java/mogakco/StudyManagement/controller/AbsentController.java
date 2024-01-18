@@ -77,7 +77,7 @@ public class AbsentController extends CommonController {
     }
 
     @Operation(summary = "부재일정 상세 조회", description = "부재일정 일별 상세 조회")
-    @GetMapping("/absent/calendar/detail")
+    @GetMapping("/absent/detail")
     public AbsentDetailRes getAbsentScheduleDetail(HttpServletRequest request,
             @ModelAttribute @Valid AbsentDetailReq absentDetailReq) {
 
