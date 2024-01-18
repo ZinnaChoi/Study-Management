@@ -74,17 +74,7 @@ public class AbsentServiceImpl implements AbsentService {
                 throw new InvalidRequestException("하나 이상의 부재 일정을 등록해야 합니다");
             }
 
-            // Check if the Event Name exists
-            Set<String> eventNameSet = new HashSet<>();
-            for (Schedule schedule : scheduleList) {
-                eventNameSet.add(schedule.getEventName());
-            }
-            for (String eventName : absentReq.getEventNameList()) {
-                if (!eventNameSet.contains(eventName)) {
-                    throw new NotFoundException(ErrorCode.NOT_FOUND.getMessage("스터디 타임 " + eventName));
-
-                }
-            }
+            validateEventNames(scheduleList, absentReq.getEventNameList());
 
             // Validate member schedule
             Set<String> eventTimeSet = new HashSet<>();
@@ -233,27 +223,17 @@ public class AbsentServiceImpl implements AbsentService {
 
             lo.setDBStart();
             List<Schedule> scheduleList = scheduleRepository.findByEventNameIn(absentReq.getEventNameList());
-            List<AbsentSchedule> absentSchedule = absentScheduleRepository.findAll(spec);
+            List<AbsentSchedule> absentScheduleList = absentScheduleRepository.findAll(spec);
             lo.setDBEnd();
 
-            // Check if the Event Name exists
-            Set<String> eventNameSet = new HashSet<>();
-            for (Schedule schedule : scheduleList) {
-                eventNameSet.add(schedule.getEventName());
-            }
-            for (String eventName : absentReq.getEventNameList()) {
-                if (!eventNameSet.contains(eventName)) {
-                    throw new NotFoundException(ErrorCode.NOT_FOUND.getMessage("스터디 타임 " + eventName));
+            validateEventNames(scheduleList, absentReq.getEventNameList());
 
-                }
-            }
-
-            Set<String> existEventNames = absentSchedule.stream()
+            Set<String> existEventNames = absentScheduleList.stream()
                     .map(as -> as.getSchedule().getEventName())
                     .collect(Collectors.toSet());
             Set<String> reqEventNames = new HashSet<>(absentReq.getEventNameList());
 
-            boolean isDescriptionChanged = absentSchedule.get(0).isDescriptionChanged(absentReq);
+            boolean isDescriptionChanged = absentScheduleList.get(0).isDescriptionChanged(absentReq);
             boolean isEventNameListChanged = !existEventNames.equals(reqEventNames);
 
             if (isDescriptionChanged || isEventNameListChanged) {
@@ -264,7 +244,7 @@ public class AbsentServiceImpl implements AbsentService {
                 Set<String> addedEventNames = new HashSet<>(reqEventNames);
                 addedEventNames.removeAll(existEventNames);
 
-                for (AbsentSchedule schedule : absentSchedule) {
+                for (AbsentSchedule schedule : absentScheduleList) {
                     schedule.updateUpdatedAt(DateUtil.getCurrentDateTime());
                     if (isDescriptionChanged) {
                         schedule.updateDescription(absentReq.getDescription());
@@ -308,6 +288,18 @@ public class AbsentServiceImpl implements AbsentService {
 
         } catch (InvalidRequestException | NotFoundException e) {
             return ExceptionUtil.handleException(e);
+        }
+    }
+
+    private void validateEventNames(List<Schedule> scheduleList, List<String> eventNameList) {
+        Set<String> eventNameSet = scheduleList.stream()
+                .map(Schedule::getEventName)
+                .collect(Collectors.toSet());
+
+        for (String eventName : eventNameList) {
+            if (!eventNameSet.contains(eventName)) {
+                throw new NotFoundException(ErrorCode.NOT_FOUND.getMessage("스터디 타임 " + eventName));
+            }
         }
     }
 
