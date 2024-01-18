@@ -250,14 +250,12 @@ public class AbsentServiceImpl implements AbsentService {
                         absentScheduleRepository.save(schedule);
                         lo.setDBEnd();
                     }
-
                     // EventNames to be Removed
                     if (removedEventNames.contains(schedule.getSchedule().getEventName())) {
                         lo.setDBStart();
                         absentScheduleRepository.delete(schedule);
                         lo.setDBEnd();
                     }
-
                 }
 
                 // Add new EventName
@@ -303,15 +301,17 @@ public class AbsentServiceImpl implements AbsentService {
 
             lo.setDBStart();
             List<AbsentSchedule> absentScheduleList = absentScheduleRepository.findAll(spec);
+            lo.setDBEnd();
 
             if (absentScheduleList.isEmpty()) {
                 throw new NotFoundException(
                         ErrorCode.NOT_FOUND.getMessage(absentDate + " " + loginMember.getName() + "의 부재일정"));
             }
             for (AbsentSchedule schedule : absentScheduleList) {
+                lo.setDBStart();
                 absentScheduleRepository.delete(schedule);
+                lo.setDBEnd();
             }
-            lo.setDBEnd();
 
             return new DTOResCommon(null, ErrorCode.DELETED.getCode(),
                     ErrorCode.DELETED.getMessage("부재일정"));
