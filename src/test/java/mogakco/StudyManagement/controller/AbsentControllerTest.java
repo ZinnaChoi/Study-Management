@@ -246,4 +246,91 @@ public class AbsentControllerTest {
 
         TestUtil.performRequest(mockMvc, uriBuilder.toUriString(), null, "GET", 400, 400);
     }
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    @Test
+    @Sql("/absent/AbsentSetup.sql")
+    @WithMockUser(username = "AbsentUser", authorities = { "USER" })
+    @DisplayName("부재일정 수정 성공 - 새로운 부재일정 추가")
+    public void updateAbsentScheduleSuccessAddSchedule() throws Exception {
+        AbsentReq request = new AbsentReq(DateUtil.getCurrentDateTime(), systemId, "20240116", "가족여행",
+                Arrays.asList("TESTPM1", "TESTPM7"));
+        String requestBodyJson = objectMapper.writeValueAsString(request);
+
+        TestUtil.performRequest(mockMvc, ABSENT_API_URL, requestBodyJson, "PATCH", 200, 200);
+    }
+
+    @Test
+    @Sql("/absent/AbsentSetup.sql")
+    @WithMockUser(username = "AbsentUser2", authorities = { "USER" })
+    @DisplayName("부재일정 수정 성공 - 부재일정 일부 삭제")
+    public void updateAbsentScheduleSuccessRemoveSomeSchedule() throws Exception {
+        AbsentReq request = new AbsentReq(DateUtil.getCurrentDateTime(), systemId, "20240116", "가족여행",
+                Arrays.asList("TESTPM1"));
+        String requestBodyJson = objectMapper.writeValueAsString(request);
+
+        TestUtil.performRequest(mockMvc, ABSENT_API_URL, requestBodyJson, "PATCH", 200, 200);
+    }
+
+    @Test
+    @Sql("/absent/AbsentSetup.sql")
+    @WithMockUser(username = "AbsentUser", authorities = { "USER" })
+    @DisplayName("부재일정 수정 성공 - 부재사유 변경")
+    public void updateAbsentScheduleSuccessChangeDescription() throws Exception {
+        AbsentReq request = new AbsentReq(DateUtil.getCurrentDateTime(), systemId, "20240116", "개인 사유",
+                Arrays.asList("TESTPM1"));
+        String requestBodyJson = objectMapper.writeValueAsString(request);
+
+        TestUtil.performRequest(mockMvc, ABSENT_API_URL, requestBodyJson, "PATCH", 200, 200);
+    }
+
+    @Test
+    @Sql("/absent/AbsentSetup.sql")
+    @WithMockUser(username = "AbsentUser", authorities = { "USER" })
+    @DisplayName("부재일정 수정 안됨 - 변경사항 없음")
+    public void updateAbsentScheduleFailNotChanged() throws Exception {
+        AbsentReq request = new AbsentReq(DateUtil.getCurrentDateTime(), systemId, "20240116", "가족여행",
+                Arrays.asList("TESTPM1"));
+        String requestBodyJson = objectMapper.writeValueAsString(request);
+
+        TestUtil.performRequest(mockMvc, ABSENT_API_URL, requestBodyJson, "PATCH", 200, 204);
+    }
+
+    @Test
+    @Sql("/absent/AbsentSetup.sql")
+    @WithMockUser(username = "AbsentUser", authorities = { "USER" })
+    @DisplayName("부재일정 수정 실패 - 잘못된 absentDate 형식")
+    public void updateAbsentScheduleFailInvalidAbsentDateFormat() throws Exception {
+        AbsentReq request = new AbsentReq(DateUtil.getCurrentDateTime(), systemId, "2024-01-16", "가족여행",
+                Arrays.asList("TESTPM1"));
+        String requestBodyJson = objectMapper.writeValueAsString(request);
+
+        TestUtil.performRequest(mockMvc, ABSENT_API_URL, requestBodyJson, "PATCH", 400, 400);
+    }
+
+    @Test
+    @Sql("/absent/AbsentSetup.sql")
+    @WithMockUser(username = "AbsentUser", authorities = { "USER" })
+    @DisplayName("부재일정 수정 실패 - 빈 스터디 시간")
+    public void updateAbsentScheduleFailInvalidEmptyEventTime() throws Exception {
+        AbsentReq request = new AbsentReq(DateUtil.getCurrentDateTime(), systemId, "20240116", "가족여행",
+                Arrays.asList());
+        String requestBodyJson = objectMapper.writeValueAsString(request);
+
+        TestUtil.performRequest(mockMvc, ABSENT_API_URL, requestBodyJson, "PATCH", 200, 400);
+    }
+
+    @Test
+    @Sql("/absent/AbsentSetup.sql")
+    @WithMockUser(username = "AbsentUser", authorities = { "USER" })
+    @DisplayName("부재일정 수정 실패 - 존재하지 않는 스터디 시간")
+    public void updateAbsentScheduleFailNotFoundEventName() throws Exception {
+        AbsentReq request = new AbsentReq(DateUtil.getCurrentDateTime(), systemId, "20240116", "가족여행",
+                Arrays.asList("INVALID TESTTIME"));
+        String requestBodyJson = objectMapper.writeValueAsString(request);
+
+        TestUtil.performRequest(mockMvc, ABSENT_API_URL, requestBodyJson, "PATCH", 200, 404);
+    }
+
 }

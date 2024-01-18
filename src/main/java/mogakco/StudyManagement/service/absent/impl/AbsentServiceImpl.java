@@ -218,77 +218,97 @@ public class AbsentServiceImpl implements AbsentService {
     public DTOResCommon updateAbsentSchedule(AbsentReq absentReq, LoggingService lo) {
 
         DTOResCommon result = new DTOResCommon();
-        lo.setDBStart();
-        Member loginMember = memberRepository.findById(SecurityUtil.getLoginUserId());
-        lo.setDBEnd();
+        try {
+            if (absentReq.getEventNameList().isEmpty()) {
+                throw new InvalidRequestException("하나 이상의 스터디 시간을 선택해야 합니다");
+            }
 
-        Specification<AbsentSchedule> spec = AbsentScheduleSpecification.withAbsentDate(absentReq.getAbsentDate())
-                .and(AbsentScheduleSpecification
-                        .withAbsentDateAndMember(absentReq.getAbsentDate(), loginMember));
+            lo.setDBStart();
+            Member loginMember = memberRepository.findById(SecurityUtil.getLoginUserId());
+            lo.setDBEnd();
 
-        lo.setDBStart();
-        List<AbsentSchedule> absentSchedule = absentScheduleRepository.findAll(spec);
-        lo.setDBEnd();
+            Specification<AbsentSchedule> spec = AbsentScheduleSpecification.withAbsentDate(absentReq.getAbsentDate())
+                    .and(AbsentScheduleSpecification
+                            .withAbsentDateAndMember(absentReq.getAbsentDate(), loginMember));
 
-        Set<String> existEventNames = absentSchedule.stream()
-                .map(as -> as.getSchedule().getEventName())
-                .collect(Collectors.toSet());
-        Set<String> reqEventNames = new HashSet<>(absentReq.getEventNameList());
+            lo.setDBStart();
+            List<Schedule> scheduleList = scheduleRepository.findByEventNameIn(absentReq.getEventNameList());
+            List<AbsentSchedule> absentSchedule = absentScheduleRepository.findAll(spec);
+            lo.setDBEnd();
 
-        boolean isDescriptionChanged = absentSchedule.get(0).isDescriptionChanged(absentReq);
-        boolean isEventNameListChanged = !existEventNames.equals(reqEventNames);
+            // Check if the Event Name exists
+            Set<String> eventNameSet = new HashSet<>();
+            for (Schedule schedule : scheduleList) {
+                eventNameSet.add(schedule.getEventName());
+            }
+            for (String eventName : absentReq.getEventNameList()) {
+                if (!eventNameSet.contains(eventName)) {
+                    throw new NotFoundException(ErrorCode.NOT_FOUND.getMessage("스터디 타임 " + eventName));
 
-        if (isDescriptionChanged || isEventNameListChanged) {
+                }
+            }
 
-            Set<String> removedEventNames = new HashSet<>(existEventNames);
-            removedEventNames.removeAll(reqEventNames);
+            Set<String> existEventNames = absentSchedule.stream()
+                    .map(as -> as.getSchedule().getEventName())
+                    .collect(Collectors.toSet());
+            Set<String> reqEventNames = new HashSet<>(absentReq.getEventNameList());
 
-            Set<String> addedEventNames = new HashSet<>(reqEventNames);
-            addedEventNames.removeAll(existEventNames);
+            boolean isDescriptionChanged = absentSchedule.get(0).isDescriptionChanged(absentReq);
+            boolean isEventNameListChanged = !existEventNames.equals(reqEventNames);
 
-            for (AbsentSchedule schedule : absentSchedule) {
-                schedule.updateUpdatedAt(DateUtil.getCurrentDateTime());
-                if (isDescriptionChanged) {
-                    schedule.updateDescription(absentReq.getDescription());
+            if (isDescriptionChanged || isEventNameListChanged) {
+
+                Set<String> removedEventNames = new HashSet<>(existEventNames);
+                removedEventNames.removeAll(reqEventNames);
+
+                Set<String> addedEventNames = new HashSet<>(reqEventNames);
+                addedEventNames.removeAll(existEventNames);
+
+                for (AbsentSchedule schedule : absentSchedule) {
+                    schedule.updateUpdatedAt(DateUtil.getCurrentDateTime());
+                    if (isDescriptionChanged) {
+                        schedule.updateDescription(absentReq.getDescription());
+                        lo.setDBStart();
+                        absentScheduleRepository.save(schedule);
+                        lo.setDBEnd();
+                    }
+
+                    // EventNames to be Removed
+                    if (removedEventNames.contains(schedule.getSchedule().getEventName())) {
+                        lo.setDBStart();
+                        absentScheduleRepository.delete(schedule);
+                        lo.setDBEnd();
+                    }
+
+                }
+
+                // Add new EventName
+                for (String addedEventName : addedEventNames) {
                     lo.setDBStart();
-                    absentScheduleRepository.save(schedule);
+                    Schedule addedSchedule = scheduleRepository.findByEventName(addedEventName);
+                    lo.setDBEnd();
+
+                    AbsentSchedule newSchedule = AbsentSchedule.builder().absentDate(absentReq.getAbsentDate())
+                            .schedule(addedSchedule).member(loginMember).description(absentReq.getDescription())
+                            .createdAt(DateUtil.getCurrentDateTime()).updatedAt(DateUtil.getCurrentDateTime()).build();
+
+                    lo.setDBStart();
+                    absentScheduleRepository.save(newSchedule);
                     lo.setDBEnd();
                 }
 
-                // EventNames to be Removed
-                if (removedEventNames.contains(schedule.getSchedule().getEventName())) {
-                    lo.setDBStart();
-                    absentScheduleRepository.delete(schedule);
-                    lo.setDBEnd();
-                }
+                result.setRetCode(ErrorCode.OK.getCode());
+                result.setRetMsg(ErrorCode.OK.getMessage());
 
+            } else {
+                result.setRetCode(ErrorCode.UNCHANGED.getCode());
+                result.setRetMsg(ErrorCode.UNCHANGED.getMessage("부재 일정"));
             }
+            return result;
 
-            // Add new EventName
-            for (String addedEventName : addedEventNames) {
-                lo.setDBStart();
-                Schedule addedSchedule = scheduleRepository.findByEventName(addedEventName);
-                lo.setDBEnd();
-
-                AbsentSchedule newSchedule = AbsentSchedule.builder().absentDate(absentReq.getAbsentDate())
-                        .schedule(addedSchedule).member(loginMember).description(absentReq.getDescription())
-                        .createdAt(DateUtil.getCurrentDateTime()).updatedAt(DateUtil.getCurrentDateTime()).build();
-
-                lo.setDBStart();
-                absentScheduleRepository.save(newSchedule);
-                lo.setDBEnd();
-            }
-
-            result.setRetCode(ErrorCode.OK.getCode());
-            result.setRetMsg(ErrorCode.OK.getMessage());
-
-        } else {
-            result.setRetCode(ErrorCode.UNCHANGED.getCode());
-            result.setRetMsg(ErrorCode.UNCHANGED.getMessage("부재 일정"));
+        } catch (InvalidRequestException | NotFoundException e) {
+            return ExceptionUtil.handleException(e);
         }
-
-        return result;
-
     }
 
 }

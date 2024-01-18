@@ -10,6 +10,7 @@ INSERT INTO study.schedule
 VALUES
 ('1500', 'TESTPM1', '1300'),
 ('1700', 'TESTPM3', '1500'),
+('2100', 'TESTPM7', '1900'),
 ('2300', 'TESTPM9', '2100');
 
 
@@ -19,6 +20,7 @@ INSERT INTO study.member_schedule
 VALUES
 ((SELECT member_id FROM member WHERE id = 'AbsentUser'), DATE_FORMAT(NOW(6), '%Y%m%d24%H%i%s%f'), 'TESTPM1', DATE_FORMAT(NOW(6), '%Y%m%d24%H%i%s%f')),
 ((SELECT member_id FROM member WHERE id = 'AbsentUser'), DATE_FORMAT(NOW(6), '%Y%m%d24%H%i%s%f'), 'TESTPM3', DATE_FORMAT(NOW(6), '%Y%m%d24%H%i%s%f')),
+((SELECT member_id FROM member WHERE id = 'AbsentUser'), DATE_FORMAT(NOW(6), '%Y%m%d24%H%i%s%f'), 'TESTPM7', DATE_FORMAT(NOW(6), '%Y%m%d24%H%i%s%f')),
 ((SELECT member_id FROM member WHERE id = 'AbsentUser2'), DATE_FORMAT(NOW(6), '%Y%m%d24%H%i%s%f'), 'TESTPM1', DATE_FORMAT(NOW(6), '%Y%m%d24%H%i%s%f')),
 ((SELECT member_id FROM member WHERE id = 'AbsentUser2'), DATE_FORMAT(NOW(6), '%Y%m%d24%H%i%s%f'), 'TESTPM3', DATE_FORMAT(NOW(6), '%Y%m%d24%H%i%s%f'));
 
