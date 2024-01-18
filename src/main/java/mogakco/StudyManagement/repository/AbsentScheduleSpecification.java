@@ -18,6 +18,10 @@ public class AbsentScheduleSpecification {
         };
     }
 
+    public static Specification<AbsentSchedule> withAbsentDate(String absentDate) {
+        return (root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("absentDate"), absentDate);
+    }
+
     public static Specification<AbsentSchedule> withMemberIn(List<Member> members) {
         return (root, query, criteriaBuilder) -> root.get("member").in(members);
     }

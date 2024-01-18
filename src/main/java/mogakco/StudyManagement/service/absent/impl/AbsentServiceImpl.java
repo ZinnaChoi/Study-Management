@@ -18,6 +18,9 @@ import mogakco.StudyManagement.domain.Schedule;
 import mogakco.StudyManagement.dto.AbsentCalendar;
 import mogakco.StudyManagement.dto.AbsentCalendarReq;
 import mogakco.StudyManagement.dto.AbsentCalendarRes;
+import mogakco.StudyManagement.dto.AbsentDetail;
+import mogakco.StudyManagement.dto.AbsentDetailReq;
+import mogakco.StudyManagement.dto.AbsentDetailRes;
 import mogakco.StudyManagement.dto.AbsentRgstReq;
 import mogakco.StudyManagement.dto.DTOResCommon;
 import mogakco.StudyManagement.enums.ErrorCode;
@@ -179,4 +182,31 @@ public class AbsentServiceImpl implements AbsentService {
             return new AbsentCalendarRes(res.getSystemId(), res.getRetCode(), res.getRetMsg(), null);
         }
     }
+
+    @Override
+    public AbsentDetailRes getAbsentScheduleDetail(AbsentDetailReq absentDetailReq, LoggingService lo) {
+
+        List<AbsentSchedule> absentSchedules = new ArrayList<>();
+        Specification<AbsentSchedule> spec = AbsentScheduleSpecification
+                .withAbsentDate(absentDetailReq.getAbsentDate());
+                
+        lo.setDBStart();
+        absentSchedules = absentScheduleRepository.findAll(spec);
+        lo.setDBEnd();
+
+        Map<String, AbsentDetail> groupedSchedules = new HashMap<>();
+        for (AbsentSchedule schedule : absentSchedules) {
+            String memberName = schedule.getMember().getName();
+
+            AbsentDetail detail = groupedSchedules.getOrDefault(memberName, new AbsentDetail(schedule));
+            detail.addEventName(schedule.getSchedule().getEventName());
+
+            groupedSchedules.put(memberName, detail);
+        }
+
+        return new AbsentDetailRes(null, ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(),
+                new ArrayList<>(groupedSchedules.values()));
+
+    }
+
 }
