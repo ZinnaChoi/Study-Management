@@ -55,6 +55,8 @@ public class AbsentControllerTest {
     private String systemId;
 
     private static final String ABSENT_API_URL = "/api/v1/absent";
+    private static final String ABSENT_CALENDAR_GET_URL = "/api/v1/absent/calendar";
+    private static final String ABSENT_DETAIL_GET_URL = "/api/v1/absent/detail";
 
     @Test
     @Sql("/absent/AbsentSetup.sql")
@@ -149,13 +151,14 @@ public class AbsentControllerTest {
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
     @Test
     @Sql("/absent/AbsentSetup.sql")
     @WithMockUser(username = "AbsentUser", authorities = { "USER" })
     @DisplayName("부재일정 조회 성공 - 전체 member의 부재 일정 조회")
     public void getAbsentScheduleSuccessAll() throws Exception {
 
-        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(ABSENT_API_URL);
+        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(ABSENT_CALENDAR_GET_URL);
 
         uriBuilder.queryParam("sendDate", DateUtil.getCurrentDateTime())
                 .queryParam("systemId", systemId)
@@ -171,7 +174,7 @@ public class AbsentControllerTest {
     @WithMockUser(username = "AbsentUser", authorities = { "USER" })
     @DisplayName("부재일정 조회 성공 - 특정 member의 부재 일정 조회")
     public void getAbsentScheduleSuccesSpecificMembers() throws Exception {
-        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(ABSENT_API_URL);
+        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(ABSENT_CALENDAR_GET_URL);
 
         uriBuilder.queryParam("sendDate", DateUtil.getCurrentDateTime())
                 .queryParam("systemId", systemId)
@@ -182,7 +185,7 @@ public class AbsentControllerTest {
 
         JsonNode responseBody = objectMapper.readTree(result.getResponse().getContentAsString());
         int contentCount = responseBody.path("content").size();
-        assertTrue(contentCount == 3);
+        assertTrue(contentCount == 2);
     }
 
     @Test
@@ -190,7 +193,7 @@ public class AbsentControllerTest {
     @WithMockUser(username = "AbsentUser", authorities = { "USER" })
     @DisplayName("부재일정 조회 실패 - 존재하지 않는 Member 부재일정 조회")
     public void getAbsentScheduleFailMemberNotFound() throws Exception {
-        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(ABSENT_API_URL);
+        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(ABSENT_CALENDAR_GET_URL);
 
         uriBuilder.queryParam("sendDate", DateUtil.getCurrentDateTime())
                 .queryParam("systemId", systemId)
@@ -205,7 +208,7 @@ public class AbsentControllerTest {
     @WithMockUser(username = "AbsentUser", authorities = { "USER" })
     @DisplayName("부재일정 조회 실패 - 잘못된 YearMonth 형식")
     public void getAbsentScheduleFailInvalidYearMonthFormat() throws Exception {
-        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(ABSENT_API_URL);
+        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(ABSENT_CALENDAR_GET_URL);
 
         uriBuilder.queryParam("sendDate", DateUtil.getCurrentDateTime())
                 .queryParam("systemId", systemId)
@@ -215,4 +218,32 @@ public class AbsentControllerTest {
         TestUtil.performRequest(mockMvc, uriBuilder.toUriString(), null, "GET", 400, 400);
     }
 
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    @Test
+    @Sql("/absent/AbsentSetup.sql")
+    @WithMockUser(username = "AbsentUser", authorities = { "USER" })
+    @DisplayName("부재일정 조회 성공 - 특정 날짜의 부재일정 상세 조회")
+    public void getAbsentScheduleDetailSuccessAll() throws Exception {
+        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(ABSENT_DETAIL_GET_URL);
+
+        uriBuilder.queryParam("sendDate", DateUtil.getCurrentDateTime())
+                .queryParam("systemId", systemId)
+                .queryParam("absentDate", "20240116");
+
+        TestUtil.performRequest(mockMvc, uriBuilder.toUriString(), null, "GET", 200, 200);
+    }
+
+    @Test
+    @Sql("/absent/AbsentSetup.sql")
+    @WithMockUser(username = "AbsentUser", authorities = { "USER" })
+    @DisplayName("부재일정 조회 실패 - 잘못된 absentDate 형식")
+    public void getAbsentScheduleDetailFailInvalidAbsentDateFormat() throws Exception {
+        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(ABSENT_DETAIL_GET_URL);
+
+        uriBuilder.queryParam("sendDate", DateUtil.getCurrentDateTime())
+                .queryParam("systemId", systemId)
+                .queryParam("absentDate", "2024-01-16");
+
+        TestUtil.performRequest(mockMvc, uriBuilder.toUriString(), null, "GET", 400, 400);
+    }
 }

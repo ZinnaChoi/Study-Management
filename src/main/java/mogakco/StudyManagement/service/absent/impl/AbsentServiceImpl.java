@@ -1,10 +1,12 @@
 package mogakco.StudyManagement.service.absent.impl;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.Map;
+import java.util.HashMap;
 
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -13,9 +15,12 @@ import mogakco.StudyManagement.domain.AbsentSchedule;
 import mogakco.StudyManagement.domain.Member;
 import mogakco.StudyManagement.domain.MemberSchedule;
 import mogakco.StudyManagement.domain.Schedule;
-import mogakco.StudyManagement.dto.AbsentList;
-import mogakco.StudyManagement.dto.AbsentListReq;
-import mogakco.StudyManagement.dto.AbsentListRes;
+import mogakco.StudyManagement.dto.AbsentCalendar;
+import mogakco.StudyManagement.dto.AbsentCalendarReq;
+import mogakco.StudyManagement.dto.AbsentCalendarRes;
+import mogakco.StudyManagement.dto.AbsentDetail;
+import mogakco.StudyManagement.dto.AbsentDetailReq;
+import mogakco.StudyManagement.dto.AbsentDetailRes;
 import mogakco.StudyManagement.dto.AbsentRgstReq;
 import mogakco.StudyManagement.dto.DTOResCommon;
 import mogakco.StudyManagement.enums.ErrorCode;
@@ -30,6 +35,7 @@ import mogakco.StudyManagement.exception.NotFoundException;
 import mogakco.StudyManagement.service.absent.AbsentService;
 import mogakco.StudyManagement.service.common.LoggingService;
 import mogakco.StudyManagement.util.DateUtil;
+
 import mogakco.StudyManagement.util.ExceptionUtil;
 import mogakco.StudyManagement.util.SecurityUtil;
 
@@ -89,7 +95,7 @@ public class AbsentServiceImpl implements AbsentService {
 
             // Check if the absent schedule already exists
             for (Schedule schedule : scheduleList) {
-                Specification<AbsentSchedule> spec = AbsentScheduleSpecification.dateAndScheduleAndMember(
+                Specification<AbsentSchedule> spec = AbsentScheduleSpecification.withAbsentDateAndScheduleAndMember(
                         absentRgstReq.getAbsentDate(), schedule, member);
 
                 lo.setDBStart();
@@ -119,17 +125,18 @@ public class AbsentServiceImpl implements AbsentService {
     }
 
     @Override
-    public AbsentListRes getAbsentSchedule(AbsentListReq absentListReq, LoggingService lo) {
+    public AbsentCalendarRes getAbsentScheduleByMonth(AbsentCalendarReq absentCalendarReq, LoggingService lo) {
         try {
-            Specification<AbsentSchedule> spec = AbsentScheduleSpecification.hasYearMonth(absentListReq.getYearMonth());
+            Specification<AbsentSchedule> spec = AbsentScheduleSpecification
+                    .withYearMonth(absentCalendarReq.getYearMonth());
 
             List<Member> members = new ArrayList<>();
-            if (absentListReq.getMemberNameList() == null || absentListReq.getMemberNameList().isEmpty()) {
+            if (absentCalendarReq.getMemberNameList() == null || absentCalendarReq.getMemberNameList().isEmpty()) {
                 lo.setDBStart();
                 members = memberRepository.findAll();
                 lo.setDBEnd();
             } else {
-                for (String name : absentListReq.getMemberNameList()) {
+                for (String name : absentCalendarReq.getMemberNameList()) {
                     lo.setDBStart();
                     Member member = memberRepository.findByName(name);
                     lo.setDBEnd();
@@ -138,19 +145,68 @@ public class AbsentServiceImpl implements AbsentService {
                     members.add(member);
                 }
             }
-            spec = spec.and(AbsentScheduleSpecification.hasMemberIn(members));
+            spec = spec.and(AbsentScheduleSpecification.withMemberIn(members));
 
             lo.setDBStart();
+            // Get AbsentSchedules By YearMonth and MemberNameList
             List<AbsentSchedule> absentSchedules = absentScheduleRepository.findAll(spec);
             lo.setDBEnd();
 
-            return new AbsentListRes(null, ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), absentSchedules.stream()
-                    .map(AbsentList::new)
-                    .collect(Collectors.toList()));
+            Map<String, AbsentCalendar> groupedSchedules = new HashMap<>();
+            for (AbsentSchedule schedule : absentSchedules) {
+                // Group By AbsentDate & EventName
+                String key = schedule.getAbsentDate() + "-" + schedule.getSchedule().getEventName();
+
+                AbsentCalendar calendarList = groupedSchedules.getOrDefault(key,
+                        new AbsentCalendar(schedule));
+                calendarList.addMemberName(schedule.getMember().getName());
+
+                groupedSchedules.put(key, calendarList);
+            }
+
+            // Sort By AbsentDate, EventName
+            List<AbsentCalendar> sortedCalendarList = new ArrayList<>(groupedSchedules.values());
+            Collections.sort(sortedCalendarList, (o1, o2) -> {
+                int dateCompare = o1.getAbsentDate().compareTo(o2.getAbsentDate());
+                if (dateCompare != 0) {
+                    return dateCompare;
+                } else {
+                    return o1.getEventName().compareTo(o2.getEventName());
+                }
+            });
+
+            return new AbsentCalendarRes(null, ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), sortedCalendarList);
 
         } catch (NotFoundException e) {
             DTOResCommon res = ExceptionUtil.handleException(e);
-            return new AbsentListRes(res.getSystemId(), res.getRetCode(), res.getRetMsg(), null);
+            return new AbsentCalendarRes(res.getSystemId(), res.getRetCode(), res.getRetMsg(), null);
         }
     }
+
+    @Override
+    public AbsentDetailRes getAbsentScheduleDetail(AbsentDetailReq absentDetailReq, LoggingService lo) {
+
+        List<AbsentSchedule> absentSchedules = new ArrayList<>();
+        Specification<AbsentSchedule> spec = AbsentScheduleSpecification
+                .withAbsentDate(absentDetailReq.getAbsentDate());
+                
+        lo.setDBStart();
+        absentSchedules = absentScheduleRepository.findAll(spec);
+        lo.setDBEnd();
+
+        Map<String, AbsentDetail> groupedSchedules = new HashMap<>();
+        for (AbsentSchedule schedule : absentSchedules) {
+            String memberName = schedule.getMember().getName();
+
+            AbsentDetail detail = groupedSchedules.getOrDefault(memberName, new AbsentDetail(schedule));
+            detail.addEventName(schedule.getSchedule().getEventName());
+
+            groupedSchedules.put(memberName, detail);
+        }
+
+        return new AbsentDetailRes(null, ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(),
+                new ArrayList<>(groupedSchedules.values()));
+
+    }
+
 }
