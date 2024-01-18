@@ -2,8 +2,6 @@ package mogakco.StudyManagement.service.member.impl;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -14,7 +12,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import mogakco.StudyManagement.exception.InvalidRequestException;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import mogakco.StudyManagement.domain.Member;
 import mogakco.StudyManagement.domain.MemberSchedule;
 import mogakco.StudyManagement.domain.Schedule;
@@ -30,7 +28,6 @@ import mogakco.StudyManagement.dto.MemberLoginReq;
 import mogakco.StudyManagement.dto.MemberLoginRes;
 import mogakco.StudyManagement.enums.ErrorCode;
 import mogakco.StudyManagement.enums.MemberRole;
-import mogakco.StudyManagement.exception.InvalidRequestException;
 import mogakco.StudyManagement.repository.MemberRepository;
 import mogakco.StudyManagement.repository.MemberScheduleRepository;
 import mogakco.StudyManagement.repository.ScheduleRepository;

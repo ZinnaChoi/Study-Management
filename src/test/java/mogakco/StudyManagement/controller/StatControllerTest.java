@@ -25,7 +25,7 @@ import mogakco.StudyManagement.util.TestUtil;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 
 @ActiveProfiles("test")
 @AutoConfigureMockMvc
