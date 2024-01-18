@@ -26,6 +26,14 @@ public class AbsentScheduleSpecification {
         return (root, query, criteriaBuilder) -> root.get("member").in(members);
     }
 
+    public static Specification<AbsentSchedule> withAbsentDateAndMember(String absentDate, Member member) {
+        return (root, query, criteriaBuilder) -> {
+            Predicate datePredicate = criteriaBuilder.equal(root.get("absentDate"), absentDate);
+            Predicate memberPredicate = criteriaBuilder.equal(root.get("member"), member);
+            return criteriaBuilder.and(datePredicate, memberPredicate);
+        };
+    }
+
     public static Specification<AbsentSchedule> withAbsentDateAndScheduleAndMember(String absentDate, Schedule schedule,
             Member member) {
         return (root, query, criteriaBuilder) -> {
