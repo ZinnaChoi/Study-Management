@@ -12,17 +12,13 @@ public class AbsentDetail {
 
     private String memberName;
 
-    private String absentDate;
-
     private String description;
 
     private List<String> eventNameList = new ArrayList<>();
 
     public AbsentDetail(AbsentSchedule absentSchedule) {
         this.memberName = absentSchedule.getMember().getName();
-        this.absentDate = absentSchedule.getAbsentDate();
         this.description = absentSchedule.getDescription();
-
     }
 
     public void addEventName(String name) {
