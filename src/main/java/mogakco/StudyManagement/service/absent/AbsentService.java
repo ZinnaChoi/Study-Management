@@ -2,7 +2,6 @@ package mogakco.StudyManagement.service.absent;
 
 import mogakco.StudyManagement.dto.AbsentCalendarReq;
 import mogakco.StudyManagement.dto.AbsentCalendarRes;
-import mogakco.StudyManagement.dto.AbsentDelReq;
 import mogakco.StudyManagement.dto.AbsentDetailReq;
 import mogakco.StudyManagement.dto.AbsentDetailRes;
 import mogakco.StudyManagement.dto.AbsentReq;
@@ -19,6 +18,6 @@ public interface AbsentService {
 
     DTOResCommon updateAbsentSchedule(AbsentReq absentReq, LoggingService lo);
 
-    DTOResCommon deleteAbsentSchedule(AbsentDelReq absentDelReq, LoggingService lo);
+    DTOResCommon deleteAbsentSchedule(String absentDate, LoggingService lo);
 
 }

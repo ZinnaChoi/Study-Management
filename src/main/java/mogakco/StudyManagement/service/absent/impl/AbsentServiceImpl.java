@@ -20,7 +20,6 @@ import mogakco.StudyManagement.domain.Schedule;
 import mogakco.StudyManagement.dto.AbsentCalendar;
 import mogakco.StudyManagement.dto.AbsentCalendarReq;
 import mogakco.StudyManagement.dto.AbsentCalendarRes;
-import mogakco.StudyManagement.dto.AbsentDelReq;
 import mogakco.StudyManagement.dto.AbsentDetail;
 import mogakco.StudyManagement.dto.AbsentDetailReq;
 import mogakco.StudyManagement.dto.AbsentDetailRes;
@@ -111,7 +110,7 @@ public class AbsentServiceImpl implements AbsentService {
                 absentScheduleRepository.save(absentSchedule);
                 lo.setDBEnd();
             }
-            return new DTOResCommon(null, ErrorCode.CREATED.getCode(), ErrorCode.CREATED.getMessage());
+            return new DTOResCommon(null, ErrorCode.CREATED.getCode(), ErrorCode.CREATED.getMessage("부재 일정"));
         } catch (NotFoundException | InvalidRequestException | ConflictException e) {
             return ExceptionUtil.handleException(e);
         }
@@ -292,24 +291,33 @@ public class AbsentServiceImpl implements AbsentService {
 
     @Override
     @Transactional
-    public DTOResCommon deleteAbsentSchedule(AbsentDelReq absentDelReq, LoggingService lo) {
+    public DTOResCommon deleteAbsentSchedule(String absentDate, LoggingService lo) {
 
-        lo.setDBStart();
-        Member loginMember = memberRepository.findById(SecurityUtil.getLoginUserId());
-        lo.setDBEnd();
+        try {
+            lo.setDBStart();
+            Member loginMember = memberRepository.findById(SecurityUtil.getLoginUserId());
+            lo.setDBEnd();
 
-        Specification<AbsentSchedule> spec = AbsentScheduleSpecification
-                .withAbsentDateAndMember(absentDelReq.getAbsentDate(), loginMember);
+            Specification<AbsentSchedule> spec = AbsentScheduleSpecification
+                    .withAbsentDateAndMember(absentDate, loginMember);
 
-        lo.setDBStart();
-        List<AbsentSchedule> absentScheduleList = absentScheduleRepository.findAll(spec);
-        for (AbsentSchedule schedule : absentScheduleList) {
-            absentScheduleRepository.delete(schedule);
+            lo.setDBStart();
+            List<AbsentSchedule> absentScheduleList = absentScheduleRepository.findAll(spec);
+
+            if (absentScheduleList.isEmpty()) {
+                throw new NotFoundException(
+                        ErrorCode.NOT_FOUND.getMessage(absentDate + " " + loginMember.getName() + "의 부재일정"));
+            }
+            for (AbsentSchedule schedule : absentScheduleList) {
+                absentScheduleRepository.delete(schedule);
+            }
+            lo.setDBEnd();
+
+            return new DTOResCommon(null, ErrorCode.DELETED.getCode(),
+                    ErrorCode.DELETED.getMessage("부재일정"));
+        } catch (NotFoundException e) {
+            return ExceptionUtil.handleException(e);
         }
-        lo.setDBEnd();
-
-        return new DTOResCommon(null, ErrorCode.DELETED.getCode(),
-                ErrorCode.DELETED.getMessage("부재일정"));
     }
 
     private void validateEventNames(List<Schedule> scheduleList, List<String> eventNameList) {

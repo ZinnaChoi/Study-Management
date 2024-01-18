@@ -300,7 +300,7 @@ public class AbsentControllerTest {
     @Test
     @Sql("/absent/AbsentSetup.sql")
     @WithMockUser(username = "AbsentUser", authorities = { "USER" })
-    @DisplayName("부재일정 수정 실패 - 잘못된 absentDate 형식")
+    @DisplayName("부재일정 수정 실패 - 잘못된 부재 일자 형식")
     public void updateAbsentScheduleFailInvalidAbsentDateFormat() throws Exception {
         AbsentReq request = new AbsentReq(DateUtil.getCurrentDateTime(), systemId, "2024-01-16", "가족여행",
                 Arrays.asList("TESTPM1"));
@@ -333,4 +333,21 @@ public class AbsentControllerTest {
         TestUtil.performRequest(mockMvc, ABSENT_API_URL, requestBodyJson, "PATCH", 200, 404);
     }
 
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    @Test
+    @Sql("/absent/AbsentSetup.sql")
+    @WithMockUser(username = "AbsentUser", authorities = { "USER" })
+    @DisplayName("부재일정 삭제 성공")
+    public void deleteAbsentScheduleSuccess() throws Exception {
+        TestUtil.performRequest(mockMvc, ABSENT_API_URL + "?absentDate=20240116", null, "DELETE", 200, 204);
+    }
+
+    @Test
+    @Sql("/absent/AbsentSetup.sql")
+    @WithMockUser(username = "AbsentUser", authorities = { "USER" })
+    @DisplayName("부재일정 삭제 실패 - 부재일정을 찾을 수 없음")
+    public void deleteAbsentScheduleFailInvalidAbsentDate() throws Exception {
+        TestUtil.performRequest(mockMvc, ABSENT_API_URL + "?absentDate=20240101", null, "DELETE", 200, 404);
+    }
 }

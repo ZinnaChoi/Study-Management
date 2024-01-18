@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -14,11 +15,11 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Pattern;
 import mogakco.StudyManagement.dto.AbsentDetailReq;
 import mogakco.StudyManagement.dto.AbsentDetailRes;
 import mogakco.StudyManagement.dto.AbsentCalendarReq;
 import mogakco.StudyManagement.dto.AbsentCalendarRes;
-import mogakco.StudyManagement.dto.AbsentDelReq;
 import mogakco.StudyManagement.dto.AbsentReq;
 import mogakco.StudyManagement.dto.DTOResCommon;
 import mogakco.StudyManagement.enums.ErrorCode;
@@ -123,11 +124,11 @@ public class AbsentController extends CommonController {
     @Operation(summary = "부재일정 삭제", description = "부재일정 삭제")
     @DeleteMapping("/absent")
     public DTOResCommon deleteAbsentSchedule(HttpServletRequest request,
-            @RequestBody @Valid AbsentDelReq absentDelReq) {
+            @RequestParam @Pattern(regexp = "^[0-9]{8}$") String absentDate) {
         DTOResCommon result = new DTOResCommon();
         try {
             startAPI(lo, null);
-            result = absentService.deleteAbsentSchedule(absentDelReq, lo);
+            result = absentService.deleteAbsentSchedule(absentDate, lo);
             result.setSendDate(DateUtil.getCurrentDateTime());
             result.setSystemId(systemId);
         } catch (Exception e) {
