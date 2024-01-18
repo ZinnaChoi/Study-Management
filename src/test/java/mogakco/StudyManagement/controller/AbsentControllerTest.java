@@ -55,6 +55,7 @@ public class AbsentControllerTest {
     private String systemId;
 
     private static final String ABSENT_API_URL = "/api/v1/absent";
+    private static final String ABSENT_CALENDAR_GET_URL = "/api/v1/absent/calendar";
 
     @Test
     @Sql("/absent/AbsentSetup.sql")
@@ -155,7 +156,7 @@ public class AbsentControllerTest {
     @DisplayName("부재일정 조회 성공 - 전체 member의 부재 일정 조회")
     public void getAbsentScheduleSuccessAll() throws Exception {
 
-        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(ABSENT_API_URL);
+        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(ABSENT_CALENDAR_GET_URL);
 
         uriBuilder.queryParam("sendDate", DateUtil.getCurrentDateTime())
                 .queryParam("systemId", systemId)
@@ -171,7 +172,7 @@ public class AbsentControllerTest {
     @WithMockUser(username = "AbsentUser", authorities = { "USER" })
     @DisplayName("부재일정 조회 성공 - 특정 member의 부재 일정 조회")
     public void getAbsentScheduleSuccesSpecificMembers() throws Exception {
-        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(ABSENT_API_URL);
+        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(ABSENT_CALENDAR_GET_URL);
 
         uriBuilder.queryParam("sendDate", DateUtil.getCurrentDateTime())
                 .queryParam("systemId", systemId)
@@ -182,7 +183,7 @@ public class AbsentControllerTest {
 
         JsonNode responseBody = objectMapper.readTree(result.getResponse().getContentAsString());
         int contentCount = responseBody.path("content").size();
-        assertTrue(contentCount == 3);
+        assertTrue(contentCount == 2);
     }
 
     @Test
@@ -190,7 +191,7 @@ public class AbsentControllerTest {
     @WithMockUser(username = "AbsentUser", authorities = { "USER" })
     @DisplayName("부재일정 조회 실패 - 존재하지 않는 Member 부재일정 조회")
     public void getAbsentScheduleFailMemberNotFound() throws Exception {
-        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(ABSENT_API_URL);
+        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(ABSENT_CALENDAR_GET_URL);
 
         uriBuilder.queryParam("sendDate", DateUtil.getCurrentDateTime())
                 .queryParam("systemId", systemId)

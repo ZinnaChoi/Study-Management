@@ -8,11 +8,11 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class AbsentListRes extends DTOResCommon {
+public class AbsentCalendarRes extends DTOResCommon {
 
-    private List<AbsentList> content;
+    private List<AbsentCalendar> content;
 
-    public AbsentListRes(String systemId, Integer retCode, String retMsg, List<AbsentList> content) {
+    public AbsentCalendarRes(String systemId, Integer retCode, String retMsg, List<AbsentCalendar> content) {
         super(systemId, retCode, retMsg);
         this.content = content;
     }

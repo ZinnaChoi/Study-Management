@@ -12,8 +12,9 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
-import mogakco.StudyManagement.dto.AbsentListReq;
-import mogakco.StudyManagement.dto.AbsentListRes;
+import mogakco.StudyManagement.dto.AbsentDetailReq;
+import mogakco.StudyManagement.dto.AbsentCalendarReq;
+import mogakco.StudyManagement.dto.AbsentCalendarRes;
 import mogakco.StudyManagement.dto.AbsentRgstReq;
 import mogakco.StudyManagement.dto.DTOResCommon;
 import mogakco.StudyManagement.enums.ErrorCode;
@@ -54,24 +55,44 @@ public class AbsentController extends CommonController {
         return result;
     }
 
-    @Operation(summary = "부재일정 조회", description = "부재일정 조회")
-    @GetMapping("/absent")
-    public AbsentListRes getAbsentSchedule(HttpServletRequest request,
-            @ModelAttribute @Valid AbsentListReq absentListReq) {
+    @Operation(summary = "부재일정 캘린더 조회", description = "부재일정 월별 조회")
+    @GetMapping("/absent/calendar")
+    public AbsentCalendarRes getAbsentScheduleByMonth(HttpServletRequest request,
+            @ModelAttribute @Valid AbsentCalendarReq absentCalendarReq) {
 
-        AbsentListRes result = new AbsentListRes();
+        AbsentCalendarRes result = new AbsentCalendarRes();
         try {
-            startAPI(lo, absentListReq);
-            result = absentService.getAbsentSchedule(absentListReq, lo);
+            startAPI(lo, absentCalendarReq);
+            result = absentService.getAbsentScheduleByMonth(absentCalendarReq, lo);
             result.setSendDate(DateUtil.getCurrentDateTime());
             result.setSystemId(systemId);
         } catch (Exception e) {
-            result = new AbsentListRes(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
+            result = new AbsentCalendarRes(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
                     ErrorCode.INTERNAL_ERROR.getMessage(), null);
         } finally {
             endAPI(request, findErrorCodeByCode(result.getRetCode()), lo, result);
         }
         return result;
     }
+
+    // @Operation(summary = "부재일정 상세 조회", description = "부재일정 일별 조회")
+    // @GetMapping("/absent/calendar/detail")
+    // public AbsentCalendarRes getAbsentScheduleDetail(HttpServletRequest request,
+    // @ModelAttribute @Valid AbsentDetailReq absentListReq) {
+
+    // AbsentCalendarRes result = new AbsentCalendarRes();
+    // try {
+    // startAPI(lo, absentListReq);
+    // // result = absentService.getAbsentSchedule(absentListReq, lo);
+    // result.setSendDate(DateUtil.getCurrentDateTime());
+    // result.setSystemId(systemId);
+    // } catch (Exception e) {
+    // result = new AbsentCalendarRes(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
+    // ErrorCode.INTERNAL_ERROR.getMessage(), null);
+    // } finally {
+    // endAPI(request, findErrorCodeByCode(result.getRetCode()), lo, result);
+    // }
+    // return result;
+    // }
 
 }
