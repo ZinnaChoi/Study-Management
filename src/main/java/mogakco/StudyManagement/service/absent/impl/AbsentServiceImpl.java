@@ -16,11 +16,11 @@ import org.springframework.transaction.annotation.Transactional;
 import mogakco.StudyManagement.domain.AbsentSchedule;
 import mogakco.StudyManagement.domain.Member;
 import mogakco.StudyManagement.domain.MemberSchedule;
-import mogakco.StudyManagement.domain.Post;
 import mogakco.StudyManagement.domain.Schedule;
 import mogakco.StudyManagement.dto.AbsentCalendar;
 import mogakco.StudyManagement.dto.AbsentCalendarReq;
 import mogakco.StudyManagement.dto.AbsentCalendarRes;
+import mogakco.StudyManagement.dto.AbsentDelReq;
 import mogakco.StudyManagement.dto.AbsentDetail;
 import mogakco.StudyManagement.dto.AbsentDetailReq;
 import mogakco.StudyManagement.dto.AbsentDetailRes;
@@ -217,9 +217,8 @@ public class AbsentServiceImpl implements AbsentService {
             Member loginMember = memberRepository.findById(SecurityUtil.getLoginUserId());
             lo.setDBEnd();
 
-            Specification<AbsentSchedule> spec = AbsentScheduleSpecification.withAbsentDate(absentReq.getAbsentDate())
-                    .and(AbsentScheduleSpecification
-                            .withAbsentDateAndMember(absentReq.getAbsentDate(), loginMember));
+            Specification<AbsentSchedule> spec = AbsentScheduleSpecification
+                    .withAbsentDateAndMember(absentReq.getAbsentDate(), loginMember);
 
             lo.setDBStart();
             List<Schedule> scheduleList = scheduleRepository.findByEventNameIn(absentReq.getEventNameList());
@@ -289,6 +288,28 @@ public class AbsentServiceImpl implements AbsentService {
         } catch (InvalidRequestException | NotFoundException e) {
             return ExceptionUtil.handleException(e);
         }
+    }
+
+    @Override
+    @Transactional
+    public DTOResCommon deleteAbsentSchedule(AbsentDelReq absentDelReq, LoggingService lo) {
+
+        lo.setDBStart();
+        Member loginMember = memberRepository.findById(SecurityUtil.getLoginUserId());
+        lo.setDBEnd();
+
+        Specification<AbsentSchedule> spec = AbsentScheduleSpecification
+                .withAbsentDateAndMember(absentDelReq.getAbsentDate(), loginMember);
+
+        lo.setDBStart();
+        List<AbsentSchedule> absentScheduleList = absentScheduleRepository.findAll(spec);
+        for (AbsentSchedule schedule : absentScheduleList) {
+            absentScheduleRepository.delete(schedule);
+        }
+        lo.setDBEnd();
+
+        return new DTOResCommon(null, ErrorCode.DELETED.getCode(),
+                ErrorCode.DELETED.getMessage("부재일정"));
     }
 
     private void validateEventNames(List<Schedule> scheduleList, List<String> eventNameList) {

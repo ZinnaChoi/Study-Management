@@ -1,5 +1,6 @@
 package mogakco.StudyManagement.controller;
 
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -17,6 +18,7 @@ import mogakco.StudyManagement.dto.AbsentDetailReq;
 import mogakco.StudyManagement.dto.AbsentDetailRes;
 import mogakco.StudyManagement.dto.AbsentCalendarReq;
 import mogakco.StudyManagement.dto.AbsentCalendarRes;
+import mogakco.StudyManagement.dto.AbsentDelReq;
 import mogakco.StudyManagement.dto.AbsentReq;
 import mogakco.StudyManagement.dto.DTOResCommon;
 import mogakco.StudyManagement.enums.ErrorCode;
@@ -116,6 +118,25 @@ public class AbsentController extends CommonController {
         }
         return result;
 
+    }
+
+    @Operation(summary = "부재일정 삭제", description = "부재일정 삭제")
+    @DeleteMapping("/absent")
+    public DTOResCommon deleteAbsentSchedule(HttpServletRequest request,
+            @RequestBody @Valid AbsentDelReq absentDelReq) {
+        DTOResCommon result = new DTOResCommon();
+        try {
+            startAPI(lo, null);
+            result = absentService.deleteAbsentSchedule(absentDelReq, lo);
+            result.setSendDate(DateUtil.getCurrentDateTime());
+            result.setSystemId(systemId);
+        } catch (Exception e) {
+            result = new DTOResCommon(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
+                    ErrorCode.INTERNAL_ERROR.getMessage());
+        } finally {
+            endAPI(request, findErrorCodeByCode(result.getRetCode()), lo, result);
+        }
+        return result;
     }
 
 }
