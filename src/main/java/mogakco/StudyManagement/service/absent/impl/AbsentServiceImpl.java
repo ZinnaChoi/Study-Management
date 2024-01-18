@@ -121,7 +121,7 @@ public class AbsentServiceImpl implements AbsentService {
                 absentScheduleRepository.save(absentSchedule);
                 lo.setDBEnd();
             }
-            return new DTOResCommon(null, ErrorCode.OK.getCode(), ErrorCode.OK.getMessage());
+            return new DTOResCommon(null, ErrorCode.CREATED.getCode(), ErrorCode.CREATED.getMessage());
         } catch (NotFoundException | InvalidRequestException | ConflictException e) {
             return ExceptionUtil.handleException(e);
         }

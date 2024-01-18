@@ -49,8 +49,8 @@ public class PostController extends CommonController {
         try {
             startAPI(lo, postCreateReq);
             postService.createPost(postCreateReq, lo);
-            result = new DTOResCommon(systemId, ErrorCode.OK.getCode(),
-                    ErrorCode.OK.getMessage());
+            result = new DTOResCommon(systemId, ErrorCode.CREATED.getCode(),
+                    ErrorCode.CREATED.getMessage());
         } catch (Exception e) {
             result = new DTOResCommon(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
                     ErrorCode.INTERNAL_ERROR.getMessage());

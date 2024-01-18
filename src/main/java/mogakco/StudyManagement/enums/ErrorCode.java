@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 public enum ErrorCode {
 
     OK(200, HttpStatus.OK, "성공"),
+    CREATED(201, HttpStatus.CREATED, "{0}이(가) 생성되었습니다."),
     DELETED(204, HttpStatus.NO_CONTENT, "{0}이(가) 삭제되었습니다"),
     UNCHANGED(204, HttpStatus.NO_CONTENT, "{0}은(는) 변경 사항이 없어 업데이트되지 않았습니다."),
     BAD_REQUEST(400, HttpStatus.BAD_REQUEST, "잘못된 요청: {0}"),

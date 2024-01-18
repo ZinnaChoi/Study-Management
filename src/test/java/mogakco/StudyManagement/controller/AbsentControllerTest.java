@@ -67,7 +67,7 @@ public class AbsentControllerTest {
                 Arrays.asList("TESTPM1", "TESTPM3"));
         String requestBodyJson = objectMapper.writeValueAsString(request);
 
-        TestUtil.performRequest(mockMvc, ABSENT_API_URL, requestBodyJson, "POST", 200, 200);
+        TestUtil.performRequest(mockMvc, ABSENT_API_URL, requestBodyJson, "POST", 200, 201);
     }
 
     @Test
