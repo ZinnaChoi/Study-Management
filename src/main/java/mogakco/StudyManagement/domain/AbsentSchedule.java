@@ -1,5 +1,7 @@
 package mogakco.StudyManagement.domain;
 
+import java.util.Objects;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -13,6 +15,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import mogakco.StudyManagement.dto.AbsentReq;
 
 @Entity
 @Builder
@@ -45,4 +48,16 @@ public class AbsentSchedule {
 
     @Column(nullable = false)
     private String updatedAt;
+
+    public void updateDescription(String description) {
+        this.description = description;
+    }
+
+    public void updateUpdatedAt(String updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public boolean isDescriptionChanged(AbsentReq absentReq) {
+        return !Objects.equals(this.description, absentReq.getDescription());
+    }
 }

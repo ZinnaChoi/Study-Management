@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import mogakco.StudyManagement.domain.Member;
 import mogakco.StudyManagement.domain.Post;
@@ -43,6 +44,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
+    @Transactional
     public void createPost(PostReq postCreateReq, LoggingService lo) {
         lo.setDBStart();
         Member member = memberRepository.findById(SecurityUtil.getLoginUserId());
@@ -103,6 +105,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
+    @Transactional
     public DTOResCommon updatePost(Long postId, PostReq postUpdateReq, LoggingService lo) {
         try {
             DTOResCommon result = new DTOResCommon();
@@ -138,6 +141,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
+    @Transactional
     public DTOResCommon deletePost(Long postId, LoggingService lo) {
         try {
             Specification<Post> spec = PostSpecification.withPostId(postId);

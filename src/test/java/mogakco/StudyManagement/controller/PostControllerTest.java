@@ -67,7 +67,7 @@ public class PostControllerTest {
         String requestBodyJson = objectMapper
                 .writeValueAsString(new PostReq(DateUtil.getCurrentDateTime(), systemId, "2024 2월 개발 뉴스 공유드립니다",
                         "chatGPT 5.0 도입"));
-        TestUtil.performRequest(mockMvc, POST_API_URL, requestBodyJson, "POST", 200, 200);
+        TestUtil.performRequest(mockMvc, POST_API_URL, requestBodyJson, "POST", 200, 201);
     }
 
     @Test

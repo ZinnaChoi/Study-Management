@@ -12,4 +12,6 @@ public interface ScheduleRepository extends JpaRepository<Schedule, String> {
 
     List<Schedule> findByEventNameIn(List<String> eventNames);
 
+    Schedule findByEventName(String eventName);
+
 }

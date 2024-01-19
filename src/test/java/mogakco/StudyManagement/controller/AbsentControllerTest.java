@@ -20,7 +20,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import mogakco.StudyManagement.dto.AbsentRgstReq;
+import mogakco.StudyManagement.dto.AbsentReq;
 import mogakco.StudyManagement.service.absent.AbsentService;
 import mogakco.StudyManagement.service.common.LoggingService;
 import mogakco.StudyManagement.util.DateUtil;
@@ -63,11 +63,11 @@ public class AbsentControllerTest {
     @WithMockUser(username = "AbsentUser", authorities = { "USER" })
     @DisplayName("부재일정 등록 성공")
     public void registerAbsentScheduleSuccess() throws Exception {
-        AbsentRgstReq request = new AbsentRgstReq(DateUtil.getCurrentDateTime(), systemId, "20240117", "개인 사유",
+        AbsentReq request = new AbsentReq(DateUtil.getCurrentDateTime(), systemId, "20240117", "개인 사유",
                 Arrays.asList("TESTPM1", "TESTPM3"));
         String requestBodyJson = objectMapper.writeValueAsString(request);
 
-        TestUtil.performRequest(mockMvc, ABSENT_API_URL, requestBodyJson, "POST", 200, 200);
+        TestUtil.performRequest(mockMvc, ABSENT_API_URL, requestBodyJson, "POST", 200, 201);
     }
 
     @Test
@@ -75,7 +75,7 @@ public class AbsentControllerTest {
     @WithMockUser(username = "AbsentUser", authorities = { "USER" })
     @DisplayName("부재일정 등록 실패 - 존재하지 않는 이벤트 이름")
     public void registerAbsentScheduleFailNotFound() throws Exception {
-        AbsentRgstReq request = new AbsentRgstReq(DateUtil.getCurrentDateTime(), systemId, "20240117", "개인 사유",
+        AbsentReq request = new AbsentReq(DateUtil.getCurrentDateTime(), systemId, "20240117", "개인 사유",
                 Arrays.asList("TESTAM1", "TESTAM3"));
         String requestBodyJson = objectMapper.writeValueAsString(request);
 
@@ -87,7 +87,7 @@ public class AbsentControllerTest {
     @WithMockUser(username = "AbsentUser", authorities = { "USER" })
     @DisplayName("부재일정 등록 실패 - 참여하지 않는 스터디 타임에 부재 요청")
     public void registerAbsentScheduleFailInvalidRequest() throws Exception {
-        AbsentRgstReq request = new AbsentRgstReq(DateUtil.getCurrentDateTime(), systemId, "20240117", "개인 사유",
+        AbsentReq request = new AbsentReq(DateUtil.getCurrentDateTime(), systemId, "20240117", "개인 사유",
                 Arrays.asList("TESTPM9"));
         String requestBodyJson = objectMapper.writeValueAsString(request);
 
@@ -99,7 +99,7 @@ public class AbsentControllerTest {
     @WithMockUser(username = "AbsentUser", authorities = { "USER" })
     @DisplayName("부재일정 등록 실패 - 이미 등록된 부재 일정")
     public void registerAbsentScheduleFailConflict() throws Exception {
-        AbsentRgstReq request = new AbsentRgstReq(DateUtil.getCurrentDateTime(), systemId, "20240116", "개인 사유",
+        AbsentReq request = new AbsentReq(DateUtil.getCurrentDateTime(), systemId, "20240116", "개인 사유",
                 Arrays.asList("TESTPM1"));
         String requestBodyJson = objectMapper.writeValueAsString(request);
 
@@ -111,7 +111,7 @@ public class AbsentControllerTest {
     @WithMockUser(username = "AbsentUser", authorities = { "USER" })
     @DisplayName("부재일정 등록 실패 - 부재 일자 형식 불일치")
     public void registerAbsentScheduleFailInvalidDate() throws Exception {
-        AbsentRgstReq request = new AbsentRgstReq(DateUtil.getCurrentDateTime(), systemId, "2024-01-17", "개인 사유",
+        AbsentReq request = new AbsentReq(DateUtil.getCurrentDateTime(), systemId, "2024-01-17", "개인 사유",
                 Arrays.asList("TESTPM1"));
         String requestBodyJson = objectMapper.writeValueAsString(request);
 
@@ -142,7 +142,7 @@ public class AbsentControllerTest {
     @WithMockUser(username = "AbsentUser", authorities = { "USER" })
     @DisplayName("부재일정 등록 실패 - 빈 eventNameList 요청")
     public void registerAbsentScheduleFailEmptyEventNameList() throws Exception {
-        AbsentRgstReq request = new AbsentRgstReq(DateUtil.getCurrentDateTime(), systemId, "20240117", "개인 사유",
+        AbsentReq request = new AbsentReq(DateUtil.getCurrentDateTime(), systemId, "20240117", "개인 사유",
                 Arrays.asList());
         String requestBodyJson = objectMapper.writeValueAsString(request);
 
@@ -245,5 +245,109 @@ public class AbsentControllerTest {
                 .queryParam("absentDate", "2024-01-16");
 
         TestUtil.performRequest(mockMvc, uriBuilder.toUriString(), null, "GET", 400, 400);
+    }
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    @Test
+    @Sql("/absent/AbsentSetup.sql")
+    @WithMockUser(username = "AbsentUser", authorities = { "USER" })
+    @DisplayName("부재일정 수정 성공 - 새로운 부재일정 추가")
+    public void updateAbsentScheduleSuccessAddSchedule() throws Exception {
+        AbsentReq request = new AbsentReq(DateUtil.getCurrentDateTime(), systemId, "20240116", "가족여행",
+                Arrays.asList("TESTPM1", "TESTPM7"));
+        String requestBodyJson = objectMapper.writeValueAsString(request);
+
+        TestUtil.performRequest(mockMvc, ABSENT_API_URL, requestBodyJson, "PATCH", 200, 200);
+    }
+
+    @Test
+    @Sql("/absent/AbsentSetup.sql")
+    @WithMockUser(username = "AbsentUser2", authorities = { "USER" })
+    @DisplayName("부재일정 수정 성공 - 부재일정 일부 삭제")
+    public void updateAbsentScheduleSuccessRemoveSomeSchedule() throws Exception {
+        AbsentReq request = new AbsentReq(DateUtil.getCurrentDateTime(), systemId, "20240116", "가족여행",
+                Arrays.asList("TESTPM1"));
+        String requestBodyJson = objectMapper.writeValueAsString(request);
+
+        TestUtil.performRequest(mockMvc, ABSENT_API_URL, requestBodyJson, "PATCH", 200, 200);
+    }
+
+    @Test
+    @Sql("/absent/AbsentSetup.sql")
+    @WithMockUser(username = "AbsentUser", authorities = { "USER" })
+    @DisplayName("부재일정 수정 성공 - 부재사유 변경")
+    public void updateAbsentScheduleSuccessChangeDescription() throws Exception {
+        AbsentReq request = new AbsentReq(DateUtil.getCurrentDateTime(), systemId, "20240116", "개인 사유",
+                Arrays.asList("TESTPM1"));
+        String requestBodyJson = objectMapper.writeValueAsString(request);
+
+        TestUtil.performRequest(mockMvc, ABSENT_API_URL, requestBodyJson, "PATCH", 200, 200);
+    }
+
+    @Test
+    @Sql("/absent/AbsentSetup.sql")
+    @WithMockUser(username = "AbsentUser", authorities = { "USER" })
+    @DisplayName("부재일정 수정 안됨 - 변경사항 없음")
+    public void updateAbsentScheduleFailNotChanged() throws Exception {
+        AbsentReq request = new AbsentReq(DateUtil.getCurrentDateTime(), systemId, "20240116", "가족여행",
+                Arrays.asList("TESTPM1"));
+        String requestBodyJson = objectMapper.writeValueAsString(request);
+
+        TestUtil.performRequest(mockMvc, ABSENT_API_URL, requestBodyJson, "PATCH", 200, 204);
+    }
+
+    @Test
+    @Sql("/absent/AbsentSetup.sql")
+    @WithMockUser(username = "AbsentUser", authorities = { "USER" })
+    @DisplayName("부재일정 수정 실패 - 잘못된 부재 일자 형식")
+    public void updateAbsentScheduleFailInvalidAbsentDateFormat() throws Exception {
+        AbsentReq request = new AbsentReq(DateUtil.getCurrentDateTime(), systemId, "2024-01-16", "가족여행",
+                Arrays.asList("TESTPM1"));
+        String requestBodyJson = objectMapper.writeValueAsString(request);
+
+        TestUtil.performRequest(mockMvc, ABSENT_API_URL, requestBodyJson, "PATCH", 400, 400);
+    }
+
+    @Test
+    @Sql("/absent/AbsentSetup.sql")
+    @WithMockUser(username = "AbsentUser", authorities = { "USER" })
+    @DisplayName("부재일정 수정 실패 - 빈 스터디 시간")
+    public void updateAbsentScheduleFailInvalidEmptyEventTime() throws Exception {
+        AbsentReq request = new AbsentReq(DateUtil.getCurrentDateTime(), systemId, "20240116", "가족여행",
+                Arrays.asList());
+        String requestBodyJson = objectMapper.writeValueAsString(request);
+
+        TestUtil.performRequest(mockMvc, ABSENT_API_URL, requestBodyJson, "PATCH", 200, 400);
+    }
+
+    @Test
+    @Sql("/absent/AbsentSetup.sql")
+    @WithMockUser(username = "AbsentUser", authorities = { "USER" })
+    @DisplayName("부재일정 수정 실패 - 존재하지 않는 스터디 시간")
+    public void updateAbsentScheduleFailNotFoundEventName() throws Exception {
+        AbsentReq request = new AbsentReq(DateUtil.getCurrentDateTime(), systemId, "20240116", "가족여행",
+                Arrays.asList("INVALID TESTTIME"));
+        String requestBodyJson = objectMapper.writeValueAsString(request);
+
+        TestUtil.performRequest(mockMvc, ABSENT_API_URL, requestBodyJson, "PATCH", 200, 404);
+    }
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    @Test
+    @Sql("/absent/AbsentSetup.sql")
+    @WithMockUser(username = "AbsentUser", authorities = { "USER" })
+    @DisplayName("부재일정 삭제 성공")
+    public void deleteAbsentScheduleSuccess() throws Exception {
+        TestUtil.performRequest(mockMvc, ABSENT_API_URL + "?absentDate=20240116", null, "DELETE", 200, 204);
+    }
+
+    @Test
+    @Sql("/absent/AbsentSetup.sql")
+    @WithMockUser(username = "AbsentUser", authorities = { "USER" })
+    @DisplayName("부재일정 삭제 실패 - 부재일정을 찾을 수 없음")
+    public void deleteAbsentScheduleFailInvalidAbsentDate() throws Exception {
+        TestUtil.performRequest(mockMvc, ABSENT_API_URL + "?absentDate=20240101", null, "DELETE", 200, 404);
     }
 }
