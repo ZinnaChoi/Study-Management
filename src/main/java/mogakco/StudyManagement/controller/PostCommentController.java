@@ -1,0 +1,55 @@
+package mogakco.StudyManagement.controller;
+
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
+import mogakco.StudyManagement.dto.DTOResCommon;
+import mogakco.StudyManagement.dto.PostCommentReq;
+import mogakco.StudyManagement.enums.ErrorCode;
+import mogakco.StudyManagement.service.common.LoggingService;
+import mogakco.StudyManagement.service.post.PostCommentService;
+import mogakco.StudyManagement.util.DateUtil;
+
+@Tag(name = "게시판 댓글", description = "게시판 댓글 관련 API 분류")
+@SecurityRequirement(name = "bearer-key")
+@RequestMapping(path = "/api/v1/posts")
+@RestController
+public class PostCommentController extends CommonController {
+
+    private final PostCommentService postCommentService;
+
+    public PostCommentController(PostCommentService postCommentService, LoggingService lo) {
+        super(lo);
+        this.postCommentService = postCommentService;
+    }
+
+    @Operation(summary = "게시판 댓글 등록", description = "새 댓글 추가")
+    @PostMapping("/{postId}/comments")
+    public DTOResCommon createPostComment(HttpServletRequest request,
+            @PathVariable(name = "postId", required = true) Long postId,
+            @RequestBody @Valid PostCommentReq postCommentReq) {
+
+        DTOResCommon result = new DTOResCommon();
+        try {
+            startAPI(lo, postCommentReq);
+            result = postCommentService.createPostComment(postId, postCommentReq, lo);
+            result.setSystemId(systemId);
+            result.setSendDate(DateUtil.getCurrentDateTime());
+        } catch (Exception e) {
+            result = new DTOResCommon(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
+                    ErrorCode.INTERNAL_ERROR.getMessage());
+        } finally {
+            endAPI(request, findErrorCodeByCode(result.getRetCode()), lo, result);
+        }
+        return result;
+    }
+
+}
