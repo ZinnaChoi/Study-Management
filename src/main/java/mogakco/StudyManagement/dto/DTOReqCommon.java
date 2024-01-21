@@ -1,6 +1,7 @@
 package mogakco.StudyManagement.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -15,6 +16,7 @@ import lombok.Setter;
 public class DTOReqCommon {
 
     @Schema(name = "sendDate", example = "20240112113804899")
+    @NotBlank(message = "요청에는 sendDate가 필요합니다.")
     private String sendDate;
 
     @Schema(name = "systemId", example = "STUDY_0001")

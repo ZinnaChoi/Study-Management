@@ -79,7 +79,7 @@ public class MemberControllerTest {
         MemberLoginReq req = new MemberLoginReq(null, "SYS_01", adminId, password);
         String requestBodyJson = objectMapper.writeValueAsString(req);
 
-        TestUtil.performRequest(mockMvc, LOGIN_URL, requestBodyJson, "POST", 200, 404);
+        TestUtil.performRequest(mockMvc, LOGIN_URL, requestBodyJson, "POST", 400, 400);
     }
 
     @Test
@@ -132,7 +132,7 @@ public class MemberControllerTest {
         req.setSystemId("SYS_01");
         String requestBodyJson = objectMapper.writeValueAsString(req);
 
-        TestUtil.performRequest(mockMvc, JOIN_URL, requestBodyJson, "POST", 200, 404);
+        TestUtil.performRequest(mockMvc, JOIN_URL, requestBodyJson, "POST", 400, 400);
     }
 
     @Test
@@ -200,7 +200,7 @@ public class MemberControllerTest {
         req.setSystemId("SYS_01");
         String requestBodyJson = objectMapper.writeValueAsString(req);
 
-        TestUtil.performRequest(mockMvc, ID_DUPLICATED_CHECK_URL, requestBodyJson, "POST", 200, 404);
+        TestUtil.performRequest(mockMvc, ID_DUPLICATED_CHECK_URL, requestBodyJson, "POST", 400, 400);
     }
 
     /////////////////////////////////////////////////////////////////
@@ -222,15 +222,15 @@ public class MemberControllerTest {
 
     @Test
     @WithMockUser(username = "admin", authorities = { "ADMIN" })
-    @DisplayName("단일 회원정보 조회 성공_not include sendDate")
+    @DisplayName("단일 회원정보 조회 실패_not include sendDate")
     public void getMemberInfo_NotIncludeSendDate() throws Exception {
 
         UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(MEMBER_INFO_URL);
 
         uriBuilder.queryParam("systemId", "SYS_01");
 
-        MvcResult result = TestUtil.performRequest(mockMvc, uriBuilder.toUriString(), null, "GET", 200, 404);
-        assertEquals(200, result.getResponse().getStatus());
+        MvcResult result = TestUtil.performRequest(mockMvc, uriBuilder.toUriString(), null, "GET", 400, 400);
+        assertEquals(400, result.getResponse().getStatus());
     }
 
     /////////////////////////////////////////////////////////////////
