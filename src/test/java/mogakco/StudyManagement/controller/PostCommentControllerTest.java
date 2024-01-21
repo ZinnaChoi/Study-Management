@@ -52,6 +52,7 @@ public class PostCommentControllerTest {
     private String systemId;
 
     private static final String POST_COMMENT_API_URL = "/api/v1/posts/{postId}/comments";
+    private static final String POST_COMMENT_REPLY_API_UIRL = "/api/v1/posts/{postId}/comments/{commentId}/replies";
 
     @Test
     @Sql("/post/PostCommentSetup.sql")
@@ -88,11 +89,75 @@ public class PostCommentControllerTest {
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+    @Test
+    @Sql("/post/PostCommentSetup.sql")
+    @WithMockUser(username = "PostUser", authorities = { "USER" })
+    @DisplayName("게시판 답글 등록 성공")
+    public void registerPostCommentReplySuccess() throws Exception {
+        String requestBodyJson = objectMapper
+                .writeValueAsString(new PostCommentReq(DateUtil.getCurrentDateTime(), systemId, "Good~!"));
+        String url = POST_COMMENT_REPLY_API_UIRL.replace("{postId}", getLatestPostIdByMemberId("PostUser").toString())
+                .replace("{commentId}", getLatestCommentIdByContentAndMemberId("comment1", "PostUser").toString());
+
+        TestUtil.performRequest(mockMvc, url, requestBodyJson, "POST", 200, 201);
+    }
+
+    @Test
+    @Sql("/post/PostCommentSetup.sql")
+    @WithMockUser(username = "PostUser", authorities = { "USER" })
+    @DisplayName("게시판 답글 등록 실패 - 존재하지 않는 게시글")
+    public void registerPostCommentReplyFailPostNotFound() throws Exception {
+        String requestBodyJson = objectMapper
+                .writeValueAsString(new PostCommentReq(DateUtil.getCurrentDateTime(), systemId, "Good~!"));
+        String url = POST_COMMENT_REPLY_API_UIRL.replace("{postId}", "-1")
+                .replace("{commentId}", getLatestCommentIdByContentAndMemberId("comment1", "PostUser").toString());
+
+        TestUtil.performRequest(mockMvc, url, requestBodyJson, "POST", 200, 404);
+
+    }
+
+    @Test
+    @Sql("/post/PostCommentSetup.sql")
+    @WithMockUser(username = "PostUser", authorities = { "USER" })
+    @DisplayName("게시판 답글 등록 실패 - 존재하지 않는 게시판 댓글")
+    public void registerPostCommentReplyFailPostCommentNotFound() throws Exception {
+        String requestBodyJson = objectMapper
+                .writeValueAsString(new PostCommentReq(DateUtil.getCurrentDateTime(), systemId, "Good~!"));
+        String url = POST_COMMENT_REPLY_API_UIRL.replace("{postId}", getLatestPostIdByMemberId("PostUser").toString())
+                .replace("{commentId}", "-1");
+
+        TestUtil.performRequest(mockMvc, url, requestBodyJson, "POST", 200, 404);
+    }
+
+    @Test
+    @Sql("/post/PostCommentSetup.sql")
+    @WithMockUser(username = "PostUser", authorities = { "USER" })
+    @DisplayName("게시판 답글 등록 실패 - 답글에 답글 생성 요청")
+    public void registerPostCommentReplyFailInvalidRequest() throws Exception {
+        String requestBodyJson = objectMapper
+                .writeValueAsString(new PostCommentReq(DateUtil.getCurrentDateTime(), systemId, "Good~!"));
+        String url = POST_COMMENT_REPLY_API_UIRL.replace("{postId}", getLatestPostIdByMemberId("PostUser").toString())
+                .replace("{commentId}", getLatestCommentIdByContentAndMemberId("reply1", "PostUser").toString());
+
+        TestUtil.performRequest(mockMvc, url, requestBodyJson, "POST", 200, 400);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
     public Long getLatestPostIdByMemberId(String memberId) {
         return jdbcTemplate.queryForObject(
                 "SELECT post_id FROM post WHERE member_id = (SELECT member_id FROM member WHERE id = ?) ORDER BY created_at DESC LIMIT 1",
                 Long.class,
                 memberId);
+    }
+
+    public Long getLatestCommentIdByContentAndMemberId(String content, String memberId) {
+        return jdbcTemplate.queryForObject(
+                "SELECT comment_id FROM study.post_comment " +
+                        "WHERE content = ? AND member_id = (SELECT member_id FROM study.member WHERE id = ?) " +
+                        "ORDER BY created_at DESC LIMIT 1",
+                Long.class,
+                content, memberId);
     }
 
 }

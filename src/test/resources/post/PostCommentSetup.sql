@@ -22,3 +22,31 @@ FROM (
     UNION ALL
     SELECT 'post4' AS title, 'content4' AS content
 ) AS data;
+
+
+
+
+INSERT INTO study.post_comment
+( member_id, parent_comment_id, post_id, content, created_at, updated_at)
+VALUES 
+(   
+    (SELECT member_id FROM member WHERE id = 'PostUser'),
+    null,
+    (select  post_id from post
+    where title  = 'post1'),
+    'comment1',
+    DATE_FORMAT(NOW(6), '%Y%m%d24%H%i%s%f'),
+    DATE_FORMAT(NOW(6), '%Y%m%d24%H%i%s%f')
+);
+
+INSERT INTO study.post_comment
+(member_id, parent_comment_id, post_id, content, created_at, updated_at)
+VALUES 
+(
+    (SELECT member_id FROM member WHERE id = 'PostUser'),
+    (SELECT comment_id FROM (SELECT comment_id FROM post_comment WHERE content = 'comment1') AS tmp),
+    ( SELECT post_id FROM post WHERE title = 'post1'),
+    'reply1',
+    DATE_FORMAT(NOW(6), '%Y%m%d24%H%i%s%f'),
+    DATE_FORMAT(NOW(6), '%Y%m%d24%H%i%s%f')
+);
