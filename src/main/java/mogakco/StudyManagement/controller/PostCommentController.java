@@ -52,4 +52,26 @@ public class PostCommentController extends CommonController {
         return result;
     }
 
+    @Operation(summary = "게시판 답글 등록", description = "새 답글 추가")
+    @PostMapping("/{postId}/comments/{commentId}/replies")
+    public DTOResCommon createPostCommentReply(HttpServletRequest request,
+            @PathVariable(name = "postId", required = true) Long postId,
+            @PathVariable(name = "commentId", required = true) Long commentId,
+            @RequestBody @Valid PostCommentReq postCommentReq) {
+
+        DTOResCommon result = new DTOResCommon();
+        try {
+            startAPI(lo, postCommentReq);
+            result = postCommentService.createPostCommentReply(postId, commentId, postCommentReq, lo);
+            result.setSystemId(systemId);
+            result.setSendDate(DateUtil.getCurrentDateTime());
+        } catch (Exception e) {
+            result = new DTOResCommon(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
+                    ErrorCode.INTERNAL_ERROR.getMessage());
+        } finally {
+            endAPI(request, findErrorCodeByCode(result.getRetCode()), lo, result);
+        }
+        return result;
+    }
+
 }
