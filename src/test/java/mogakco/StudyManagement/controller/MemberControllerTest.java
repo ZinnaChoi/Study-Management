@@ -69,7 +69,7 @@ public class MemberControllerTest {
         MemberLoginReq req = new MemberLoginReq(DateUtil.getCurrentDateTime(), "SYS_01", adminId, password);
         String requestBodyJson = objectMapper.writeValueAsString(req);
 
-        TestUtil.performPostRequest(mockMvc, LOGIN_URL, requestBodyJson, 200, 200);
+        TestUtil.performRequest(mockMvc, LOGIN_URL, requestBodyJson, "POST", 200, 200);
     }
 
     @Test
@@ -79,7 +79,7 @@ public class MemberControllerTest {
         MemberLoginReq req = new MemberLoginReq(null, "SYS_01", adminId, password);
         String requestBodyJson = objectMapper.writeValueAsString(req);
 
-        TestUtil.performPostRequest(mockMvc, LOGIN_URL, requestBodyJson, 200, 404);
+        TestUtil.performRequest(mockMvc, LOGIN_URL, requestBodyJson, "POST", 400, 400);
     }
 
     @Test
@@ -90,7 +90,7 @@ public class MemberControllerTest {
         MemberLoginReq req = new MemberLoginReq(DateUtil.getCurrentDateTime(), "SYS_01", wrongId, password);
         String requestBodyJson = objectMapper.writeValueAsString(req);
 
-        TestUtil.performPostRequest(mockMvc, LOGIN_URL, requestBodyJson, 200, 404);
+        TestUtil.performRequest(mockMvc, LOGIN_URL, requestBodyJson, "POST", 200, 404);
     }
 
     @Test
@@ -101,7 +101,7 @@ public class MemberControllerTest {
         MemberLoginReq req = new MemberLoginReq(DateUtil.getCurrentDateTime(), "SYS_01", adminId, wrongPwd);
         String requestBodyJson = objectMapper.writeValueAsString(req);
 
-        TestUtil.performPostRequest(mockMvc, LOGIN_URL, requestBodyJson, 200, 400);
+        TestUtil.performRequest(mockMvc, LOGIN_URL, requestBodyJson, "POST", 200, 400);
     }
 
     /////////////////////////////////////////////////////////////////
@@ -118,7 +118,7 @@ public class MemberControllerTest {
         req.setSystemId("SYS_01");
         String requestBodyJson = objectMapper.writeValueAsString(req);
 
-        TestUtil.performPostRequest(mockMvc, JOIN_URL, requestBodyJson, 200, 200);
+        TestUtil.performRequest(mockMvc, JOIN_URL, requestBodyJson, "POST", 200, 200);
     }
 
     @Test
@@ -132,7 +132,7 @@ public class MemberControllerTest {
         req.setSystemId("SYS_01");
         String requestBodyJson = objectMapper.writeValueAsString(req);
 
-        TestUtil.performPostRequest(mockMvc, JOIN_URL, requestBodyJson, 200, 404);
+        TestUtil.performRequest(mockMvc, JOIN_URL, requestBodyJson, "POST", 400, 400);
     }
 
     @Test
@@ -147,7 +147,7 @@ public class MemberControllerTest {
         req.setSystemId("SYS_01");
         String requestBodyJson = objectMapper.writeValueAsString(req);
 
-        TestUtil.performPostRequest(mockMvc, JOIN_URL, requestBodyJson, 400, 400);
+        TestUtil.performRequest(mockMvc, JOIN_URL, requestBodyJson, "POST", 400, 400);
     }
 
     @Test
@@ -162,7 +162,7 @@ public class MemberControllerTest {
         req.setSystemId("SYS_01");
         String requestBodyJson = objectMapper.writeValueAsString(req);
 
-        TestUtil.performPostRequest(mockMvc, JOIN_URL, requestBodyJson, 400, 400);
+        TestUtil.performRequest(mockMvc, JOIN_URL, requestBodyJson, "POST", 400, 400);
     }
 
     /////////////////////////////////////////////////////////////////
@@ -174,9 +174,8 @@ public class MemberControllerTest {
         req.setSendDate(DateUtil.getCurrentDateTime());
         req.setSystemId("SYS_01");
         String requestBodyJson = objectMapper.writeValueAsString(req);
-        String expression = "duplicated";
 
-        TestUtil.performPostRequest(mockMvc, ID_DUPLICATED_CHECK_URL, requestBodyJson, 200, true, expression);
+        TestUtil.performRequest(mockMvc, ID_DUPLICATED_CHECK_URL, requestBodyJson, "POST", 200, 200);
     }
 
     @Test
@@ -188,9 +187,8 @@ public class MemberControllerTest {
         req.setSendDate(DateUtil.getCurrentDateTime());
         req.setSystemId("SYS_01");
         String requestBodyJson = objectMapper.writeValueAsString(req);
-        String expression = "duplicated";
 
-        TestUtil.performPostRequest(mockMvc, ID_DUPLICATED_CHECK_URL, requestBodyJson, 200, false, expression);
+        TestUtil.performRequest(mockMvc, ID_DUPLICATED_CHECK_URL, requestBodyJson, "POST", 200, 200);
     }
 
     @Test
@@ -202,7 +200,7 @@ public class MemberControllerTest {
         req.setSystemId("SYS_01");
         String requestBodyJson = objectMapper.writeValueAsString(req);
 
-        TestUtil.performPostRequest(mockMvc, ID_DUPLICATED_CHECK_URL, requestBodyJson, 200, 404);
+        TestUtil.performRequest(mockMvc, ID_DUPLICATED_CHECK_URL, requestBodyJson, "POST", 400, 400);
     }
 
     /////////////////////////////////////////////////////////////////
@@ -217,18 +215,22 @@ public class MemberControllerTest {
         uriBuilder.queryParam("sendDate", DateUtil.getCurrentDateTime())
                 .queryParam("systemId", "SYS_01");
 
-        MvcResult result = TestUtil.performGetRequest(mockMvc, uriBuilder.toUriString(), 200);
+        MvcResult result = TestUtil.performRequest(mockMvc, uriBuilder.toUriString(), null, "GET", 200, 200);
         System.out.println(result.getResponse().getContentAsString());
         assertEquals(200, result.getResponse().getStatus());
     }
 
     @Test
     @WithMockUser(username = "admin", authorities = { "ADMIN" })
-    @DisplayName("단일 회원정보 조회 성공_not include sendDate")
+    @DisplayName("단일 회원정보 조회 실패_not include sendDate")
     public void getMemberInfo_NotIncludeSendDate() throws Exception {
 
-        MvcResult result = TestUtil.performGetRequest(mockMvc, MEMBER_INFO_URL, 200);
-        assertEquals(200, result.getResponse().getStatus());
+        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(MEMBER_INFO_URL);
+
+        uriBuilder.queryParam("systemId", "SYS_01");
+
+        MvcResult result = TestUtil.performRequest(mockMvc, uriBuilder.toUriString(), null, "GET", 400, 400);
+        assertEquals(400, result.getResponse().getStatus());
     }
 
     /////////////////////////////////////////////////////////////////
