@@ -41,19 +41,14 @@ public class MemberController extends CommonController {
 
     @Operation(summary = "로그인", description = "로그인을 통해 JWT 발급")
     @PostMapping("/login")
-    public MemberLoginRes doLogin(HttpServletRequest request, @RequestBody MemberLoginReq loginInfo) {
+    public MemberLoginRes doLogin(HttpServletRequest request, @Valid @RequestBody MemberLoginReq loginInfo) {
         MemberLoginRes result = new MemberLoginRes();
 
         try {
             startAPI(lo, loginInfo);
-            if (loginInfo.getSendDate() == null) {
-                result = new MemberLoginRes(systemId, ErrorCode.NOT_FOUND.getCode(),
-                        ErrorCode.NOT_FOUND.getMessage("sendDate"), "");
-            } else {
-                result = memberService.login(loginInfo, lo);
-                result.setSendDate(DateUtil.getCurrentDateTime());
-                result.setSystemId(systemId);
-            }
+            result = memberService.login(loginInfo, lo);
+            result.setSendDate(DateUtil.getCurrentDateTime());
+            result.setSystemId(systemId);
         } catch (Exception e) {
             result = new MemberLoginRes(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
                     ErrorCode.INTERNAL_ERROR.getMessage(), "");
@@ -70,12 +65,7 @@ public class MemberController extends CommonController {
 
         try {
             startAPI(lo, joinInfo);
-            if (joinInfo.getSendDate() == null) {
-                result = new DTOResCommon(systemId, ErrorCode.NOT_FOUND.getCode(),
-                        ErrorCode.NOT_FOUND.getMessage("sendDate"));
-            } else {
-                result = memberService.join(joinInfo, lo);
-            }
+            result = memberService.join(joinInfo, lo);
         } catch (Exception e) {
             e.printStackTrace();
             result = new DTOResCommon(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
@@ -88,19 +78,14 @@ public class MemberController extends CommonController {
 
     @Operation(summary = "중복 아이디 확인", description = "회원가입시 사용자가 입력한 아이디 중복 검증 true: 중복 false: 사용 가능")
     @PostMapping("/id-duplicated")
-    public MemberIdDuplRes checkIdDuplicated(HttpServletRequest request, @RequestBody MemberIdDuplReq idInfo) {
+    public MemberIdDuplRes checkIdDuplicated(HttpServletRequest request, @Valid @RequestBody MemberIdDuplReq idInfo) {
         MemberIdDuplRes result = new MemberIdDuplRes();
 
         try {
             startAPI(lo, idInfo);
-            if (idInfo.getSendDate() == null) {
-                result = new MemberIdDuplRes(systemId, ErrorCode.NOT_FOUND.getCode(),
-                        ErrorCode.NOT_FOUND.getMessage("sendDate"));
-            } else {
-                boolean isDuplicated = memberService.isIdDuplicated(idInfo, lo);
-                result = new MemberIdDuplRes(systemId, ErrorCode.OK.getCode(), ErrorCode.OK.getMessage());
-                result.setDuplicated(isDuplicated);
-            }
+            boolean isDuplicated = memberService.isIdDuplicated(idInfo, lo);
+            result = new MemberIdDuplRes(systemId, ErrorCode.OK.getCode(), ErrorCode.OK.getMessage());
+            result.setDuplicated(isDuplicated);
         } catch (Exception e) {
             result = new MemberIdDuplRes(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
                     ErrorCode.INTERNAL_ERROR.getMessage());
@@ -114,18 +99,13 @@ public class MemberController extends CommonController {
     @Operation(summary = "MyPage 회원 정보 조회", description = "로그인 된 회원 정보 조회")
     @SecurityRequirement(name = "bearer-key")
     @GetMapping("/member")
-    public MemberInfoRes getMemberInfo(HttpServletRequest request, @ModelAttribute DTOReqCommon info) {
+    public MemberInfoRes getMemberInfo(HttpServletRequest request, @Valid @ModelAttribute DTOReqCommon info) {
         MemberInfoRes result = new MemberInfoRes();
 
         try {
             startAPI(lo, info);
-            if (info.getSendDate() == null) {
-                result = new MemberInfoRes(systemId, ErrorCode.NOT_FOUND.getCode(),
-                        ErrorCode.NOT_FOUND.getMessage("sendDate"), null, null, null, null, null, null, null);
-            } else {
-                result = memberService.getMemberInfo(lo);
-                result.setSendDate(DateUtil.getCurrentDateTime());
-            }
+            result = memberService.getMemberInfo(lo);
+            result.setSendDate(DateUtil.getCurrentDateTime());
         } catch (Exception e) {
             result = new MemberInfoRes(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
                     ErrorCode.INTERNAL_ERROR.getMessage(), null, null, null, null, null, null, null);
@@ -144,12 +124,7 @@ public class MemberController extends CommonController {
 
         try {
             startAPI(lo, updateInfo);
-            if (updateInfo.getSendDate() == null) {
-                result = new DTOResCommon(systemId, ErrorCode.NOT_FOUND.getCode(),
-                        ErrorCode.NOT_FOUND.getMessage("sendDate"));
-            } else {
-                result = memberService.setMemberInfo(updateInfo, lo);
-            }
+            result = memberService.setMemberInfo(updateInfo, lo);
         } catch (Exception e) {
             e.printStackTrace();
             result = new DTOResCommon(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
