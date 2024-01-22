@@ -141,7 +141,7 @@ public class MemberController extends CommonController {
         return result;
     }
 
-    @Operation(summary = "참여 스터디 별 멤버 조회", description = "참여 스터디, 이벤트 이름을 통한 멤버 조회(event == null일 경우 스터디 참여 인원 전체 조회)")
+    @Operation(summary = "이벤트(운영 타입) 별 멤버 조회", description = "이벤트 이름을 통한 멤버 조회(event == null일 경우 스터디 참여 인원 전체 조회)")
     @SecurityRequirement(name = "bearer-key")
     @GetMapping("/members/joined-study")
     public StudyMembersRes getMembersByEvent(
@@ -173,7 +173,7 @@ public class MemberController extends CommonController {
             HttpServletRequest request,
             @Parameter(name = "info", description = "요청 시 필수 값") @ModelAttribute @Valid DTOReqCommon info,
             @Parameter(name = "paging", description = "paging") @PageableDefault(size = 10, page = 0, sort = "memberId", direction = Sort.Direction.DESC) Pageable pageable,
-            @RequestParam(name = "time", required = false) String time) {
+            @Parameter(description = "(HHmm) format") @RequestParam(name = "time", required = false) String time) {
 
         StudyMembersRes result = new StudyMembersRes();
         try {

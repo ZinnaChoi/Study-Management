@@ -323,7 +323,6 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
             return m;
         }).collect(Collectors.toList());
 
-        // simplePageable = PageUtil.createSimplePageable(pSchedules);
         return new StudyMembersRes(systemId, ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), memberInfos,
                 simplePageable);
     }
@@ -333,16 +332,10 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
 
         Page<WakeUp> pWakeUp;
         List<MemberInfo> memberInfos = new ArrayList<>();
-        // 전체 조회
-        if (time == null) {
-            lo.setDBStart();
-            pWakeUp = wakeUpRepository.findAll(pageable);
-            lo.setDBEnd();
-        } else {
-            lo.setDBStart();
-            pWakeUp = wakeUpRepository.findAllByWakeupTime(time, pageable);
-            lo.setDBEnd();
-        }
+        lo.setDBStart();
+        pWakeUp = time == null ? wakeUpRepository.findAll(pageable)
+                : wakeUpRepository.findAllByWakeupTime(time, pageable);
+        lo.setDBEnd();
         List<Member> mWakeUp = pWakeUp.getContent().stream().map(WakeUp::getMember)
                 .collect(Collectors.toList());
         List<Long> ids = mWakeUp.stream().map(Member::getMemberId).collect(Collectors.toList());
