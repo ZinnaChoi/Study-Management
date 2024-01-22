@@ -2,9 +2,12 @@ package mogakco.StudyManagement.service.member.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Page;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -21,11 +24,14 @@ import mogakco.StudyManagement.domain.WakeUp;
 import mogakco.StudyManagement.dto.DTOResCommon;
 import mogakco.StudyManagement.dto.MemberDetails;
 import mogakco.StudyManagement.dto.MemberIdDuplReq;
+import mogakco.StudyManagement.dto.MemberInfo;
 import mogakco.StudyManagement.dto.MemberInfoRes;
 import mogakco.StudyManagement.dto.MemberInfoUpdateReq;
 import mogakco.StudyManagement.dto.MemberJoinReq;
 import mogakco.StudyManagement.dto.MemberLoginReq;
 import mogakco.StudyManagement.dto.MemberLoginRes;
+import mogakco.StudyManagement.dto.SimplePageable;
+import mogakco.StudyManagement.dto.StudyMembersRes;
 import mogakco.StudyManagement.enums.ErrorCode;
 import mogakco.StudyManagement.enums.MemberRole;
 import mogakco.StudyManagement.repository.MemberRepository;
@@ -38,6 +44,7 @@ import mogakco.StudyManagement.service.member.MemberService;
 import mogakco.StudyManagement.util.DateUtil;
 import mogakco.StudyManagement.util.ExceptionUtil;
 import mogakco.StudyManagement.util.JWTUtil;
+import mogakco.StudyManagement.util.PageUtil;
 import mogakco.StudyManagement.util.SecurityUtil;
 
 @Service
@@ -279,6 +286,70 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
 
         return result;
 
+    }
+
+    @Override
+    public StudyMembersRes getMembersByEvent(LoggingService lo, String event, Pageable pageable) {
+
+        List<MemberInfo> memberInfos = new ArrayList<>();
+        List<Member> members = new ArrayList<>();
+        SimplePageable simplePageable;
+
+        if (event == null) { // 전체 조회
+            lo.setDBStart();
+            // admin 계정은 조회 X
+            Page<Member> pMembers = memberRepository.findAllByRoleNot(MemberRole.ADMIN,
+                    pageable);
+            lo.setDBEnd();
+            members = pMembers.getContent();
+            simplePageable = PageUtil.createSimplePageable(pMembers);
+        } else {
+            // 멤버 스케줄에서 이벤트로 조건 걸어서 가져온 member_id로 member에서 id, name 조회
+            Schedule schedule = Schedule.builder().eventName(event).build();
+            lo.setDBStart();
+            Page<MemberSchedule> pSchedules = memberScheduleRepository.findAllByEventName(schedule, pageable);
+            lo.setDBEnd();
+            List<Member> mSchedules = pSchedules.getContent().stream().map(MemberSchedule::getMember)
+                    .collect(Collectors.toList());
+            Set<Long> ids = mSchedules.stream().map(Member::getMemberId).collect(Collectors.toSet());
+            lo.setDBStart();
+            members = memberRepository.findAllById(ids);
+            lo.setDBEnd();
+            simplePageable = PageUtil.createSimplePageable(pSchedules);
+        }
+
+        members.stream().map(m -> {
+            memberInfos.add(new MemberInfo(m.getId(), m.getName()));
+            return m;
+        }).collect(Collectors.toList());
+
+        return new StudyMembersRes(systemId, ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), memberInfos,
+                simplePageable);
+    }
+
+    @Override
+    public StudyMembersRes getMembersByWakeupTime(LoggingService lo, String time, Pageable pageable) {
+
+        Page<WakeUp> pWakeUp;
+        List<MemberInfo> memberInfos = new ArrayList<>();
+        lo.setDBStart();
+        pWakeUp = time == null ? wakeUpRepository.findAll(pageable)
+                : wakeUpRepository.findAllByWakeupTime(time, pageable);
+        lo.setDBEnd();
+        List<Member> mWakeUp = pWakeUp.getContent().stream().map(WakeUp::getMember)
+                .collect(Collectors.toList());
+        List<Long> ids = mWakeUp.stream().map(Member::getMemberId).collect(Collectors.toList());
+        lo.setDBStart();
+        List<Member> members = memberRepository.findAllById(ids);
+        lo.setDBEnd();
+        members.stream().map(m -> {
+            memberInfos.add(new MemberInfo(m.getId(), m.getName()));
+            return m;
+        }).collect(Collectors.toList());
+
+        SimplePageable simplePageable = PageUtil.createSimplePageable(pWakeUp);
+        return new StudyMembersRes(systemId, ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), memberInfos,
+                simplePageable);
     }
 
     private List<MemberSchedule> calculateInserts(List<Schedule> userSchedules, List<String> dbEventNames,
