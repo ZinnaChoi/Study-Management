@@ -62,6 +62,7 @@ public class MemberControllerTest {
     private static final String ID_DUPLICATED_CHECK_URL = "/api/v1/id-duplicated";
     private static final String MEMBER_INFO_URL = "/api/v1/member";
     private static final String MEMBERS_INFO_BY_EVENT_URL = "/api/v1/members/joined-study";
+    private static final String MEMBERS_INFO_BY_WAKEUP_URL = "/api/v1/members/wakeup-time";
 
     @Test
     @WithMockUser(authorities = "ADMIN")
@@ -310,6 +311,43 @@ public class MemberControllerTest {
 
         uriBuilder.queryParam("systemId", "SYS_01")
                 .queryParam("event", "AM1")
+                .queryParam("page", 0)
+                .queryParam("size", 10)
+                .queryParam("sort", "memberId,desc");
+
+        TestUtil.performRequest(mockMvc, uriBuilder.toUriString(), null, "GET", 400, 400);
+    }
+
+    /////////////////////////////////////////////////////////////////
+
+    @Test
+    @Sql("/member/MemberSetup.sql")
+    @WithMockUser(username = "user1", authorities = { "USER" })
+    @DisplayName("기상 시간별 다수 회원 이름, 아이디 조회 성공")
+    public void getMembersByWakeup_Success() throws Exception {
+
+        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(MEMBERS_INFO_BY_WAKEUP_URL);
+
+        uriBuilder.queryParam("sendDate", DateUtil.getCurrentDateTime())
+                .queryParam("systemId", "SYS_01")
+                .queryParam("time", "1530")
+                .queryParam("page", 0)
+                .queryParam("size", 10)
+                .queryParam("sort", "memberId,desc");
+
+        TestUtil.performRequest(mockMvc, uriBuilder.toUriString(), null, "GET", 200, 200);
+    }
+
+    @Test
+    @Sql("/member/MemberSetup.sql")
+    @WithMockUser(username = "user1", authorities = { "USER" })
+    @DisplayName("기상 시간별 다수 회원 이름, 아이디 조회 실패_not include sendDate")
+    public void getMembersByWakeup_NotIncludeSendDate() throws Exception {
+
+        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(MEMBERS_INFO_BY_WAKEUP_URL);
+
+        uriBuilder.queryParam("systemId", "SYS_01")
+                .queryParam("time", "1530")
                 .queryParam("page", 0)
                 .queryParam("size", 10)
                 .queryParam("sort", "memberId,desc");

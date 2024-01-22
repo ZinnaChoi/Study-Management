@@ -43,3 +43,13 @@ VALUES(999, '111111111111111', 'AM4', '111111111111111');
 INSERT INTO study.member_schedule
 (member_id, created_at, event_name, updated_at)
 VALUES(998, '111111111111111', 'AM1', '111111111111111');
+
+
+-- wakeup table
+INSERT INTO study.wakeup
+(member_id, wakeup_time)
+VALUES(999, '1530');
+
+INSERT INTO study.wakeup
+(member_id, wakeup_time)
+VALUES(998, '1800');

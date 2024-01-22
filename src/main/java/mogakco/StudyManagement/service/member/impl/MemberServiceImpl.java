@@ -291,27 +291,70 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
     @Override
     public StudyMembersRes getMembersByEvent(LoggingService lo, String event, Pageable pageable) {
 
-        Page<MemberSchedule> pSchedules;
         List<MemberInfo> memberInfos = new ArrayList<>();
-        // 전체 조회
-        if (event == null) {
-            // 멤버 스케줄에서 가져온 member_id로 member에서 id, name 조회
-            pSchedules = memberScheduleRepository.findAll(pageable);
+        List<Member> members = new ArrayList<>();
+        SimplePageable simplePageable;
+
+        if (event == null) { // 전체 조회
+            lo.setDBStart();
+            // admin 계정은 조회 X
+            Page<Member> pMembers = memberRepository.findAllByRoleNot(MemberRole.ADMIN,
+                    pageable);
+            lo.setDBEnd();
+            members = pMembers.getContent();
+            simplePageable = PageUtil.createSimplePageable(pMembers);
         } else {
             // 멤버 스케줄에서 이벤트로 조건 걸어서 가져온 member_id로 member에서 id, name 조회
             Schedule schedule = Schedule.builder().eventName(event).build();
-            pSchedules = memberScheduleRepository.findAllByEventName(schedule, pageable);
+            lo.setDBStart();
+            Page<MemberSchedule> pSchedules = memberScheduleRepository.findAllByEventName(schedule, pageable);
+            lo.setDBEnd();
+            List<Member> mSchedules = pSchedules.getContent().stream().map(MemberSchedule::getMember)
+                    .collect(Collectors.toList());
+            Set<Long> ids = mSchedules.stream().map(Member::getMemberId).collect(Collectors.toSet());
+            lo.setDBStart();
+            members = memberRepository.findAllById(ids);
+            lo.setDBEnd();
+            simplePageable = PageUtil.createSimplePageable(pSchedules);
         }
-        Set<Member> mSchedules = pSchedules.getContent().stream().map(MemberSchedule::getMember)
-                .collect(Collectors.toSet());
-        Set<Long> ids = mSchedules.stream().map(Member::getMemberId).collect(Collectors.toSet());
-        List<Member> members = memberRepository.findAllById(ids);
+
         members.stream().map(m -> {
             memberInfos.add(new MemberInfo(m.getId(), m.getName()));
             return m;
         }).collect(Collectors.toList());
 
-        SimplePageable simplePageable = PageUtil.createSimplePageable(pSchedules);
+        // simplePageable = PageUtil.createSimplePageable(pSchedules);
+        return new StudyMembersRes(systemId, ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), memberInfos,
+                simplePageable);
+    }
+
+    @Override
+    public StudyMembersRes getMembersByWakeupTime(LoggingService lo, String time, Pageable pageable) {
+
+        Page<WakeUp> pWakeUp;
+        List<MemberInfo> memberInfos = new ArrayList<>();
+        // 전체 조회
+        if (time == null) {
+            lo.setDBStart();
+            pWakeUp = wakeUpRepository.findAll(pageable);
+            lo.setDBEnd();
+        } else {
+            lo.setDBStart();
+            pWakeUp = wakeUpRepository.findAllByWakeupTime(time, pageable);
+            lo.setDBEnd();
+        }
+        List<Member> mWakeUp = pWakeUp.getContent().stream().map(WakeUp::getMember)
+                .collect(Collectors.toList());
+        List<Long> ids = mWakeUp.stream().map(Member::getMemberId).collect(Collectors.toList());
+        lo.setDBStart();
+        List<Member> members = memberRepository.findAllById(ids);
+        lo.setDBEnd();
+        members.stream().map(m -> {
+            memberInfos.add(new MemberInfo(m.getId(), m.getName()));
+            return m;
+        }).collect(Collectors.toList());
+
+        SimplePageable simplePageable = PageUtil.createSimplePageable(pWakeUp);
         return new StudyMembersRes(systemId, ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), memberInfos,
                 simplePageable);
     }
