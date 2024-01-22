@@ -61,6 +61,7 @@ public class MemberControllerTest {
     private static final String JOIN_URL = "/api/v1/join";
     private static final String ID_DUPLICATED_CHECK_URL = "/api/v1/id-duplicated";
     private static final String MEMBER_INFO_URL = "/api/v1/member";
+    private static final String MEMBERS_INFO_BY_EVENT_URL = "/api/v1/members/joined-study";
 
     @Test
     @WithMockUser(authorities = "ADMIN")
@@ -109,9 +110,9 @@ public class MemberControllerTest {
     @Test
     @WithMockUser(authorities = "ADMIN")
     @DisplayName("회원가입 API 성공")
-    @Sql("/member/ScheduleSetup.sql")
+    @Sql("/member/MemberSetup.sql")
     void joinSuccess() throws Exception {
-        MemberJoinReq req = new MemberJoinReq("user1", "password123!", "HongGilDong", "01011112222", "모각코 스터디",
+        MemberJoinReq req = new MemberJoinReq("user90919239", "password123!", "HongGilDong", "01011112222", "모각코 스터디",
                 Arrays.asList("AM1", "AM2"),
                 "1530");
         req.setSendDate(DateUtil.getCurrentDateTime());
@@ -237,7 +238,7 @@ public class MemberControllerTest {
 
     @Test
     @WithMockUser(username = "user1", authorities = { "USER" })
-    @Sql("/member/MemberInfoUpdateSetup.sql")
+    @Sql("/member/MemberSetup.sql")
     @DisplayName("MyPage 회원 정보변경 성공")
     void setMemberInfo_Success() throws Exception {
         MemberInfoUpdateReq req = new MemberInfoUpdateReq(MemberUpdateType.EVENT_NAMES, "아무개", "010-1111-1111",
@@ -251,7 +252,7 @@ public class MemberControllerTest {
 
     @Test
     @WithMockUser(username = "user1", authorities = { "USER" })
-    @Sql("/member/MemberInfoUpdateSetup.sql")
+    @Sql("/member/MemberSetup.sql")
     @DisplayName("MyPage 회원 정보변경 실패_이름 빈 값")
     // 이름, 이벤트 이름, 비밀번호, 기상 시간 빈 값등은 다 똑같은 실패 케이스로 케이스마다 테스트 코드 추가하지는 않았음
     void setMemberInfo_EmptyName() throws Exception {
@@ -266,7 +267,7 @@ public class MemberControllerTest {
 
     @Test
     @WithMockUser(username = "user1", authorities = { "USER" })
-    @Sql("/member/MemberInfoUpdateSetup.sql")
+    @Sql("/member/MemberSetup.sql")
     @DisplayName("MyPage 회원 정보변경 실패_잘못된 비밀번호 형식")
     void setMemberInfo_WrongPwd() throws Exception {
         String wrongPwd = "p1";
@@ -279,4 +280,40 @@ public class MemberControllerTest {
         TestUtil.performRequest(mockMvc, MEMBER_INFO_URL, requestBodyJson, "PATCH", 400, 400);
     }
 
+    /////////////////////////////////////////////////////////////////
+
+    @Test
+    @Sql("/member/MemberSetup.sql")
+    @WithMockUser(username = "user1", authorities = { "USER" })
+    @DisplayName("운영 타입별 다수 회원 이름, 아이디 조회 성공")
+    public void getMembersByEvent_Success() throws Exception {
+
+        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(MEMBERS_INFO_BY_EVENT_URL);
+
+        uriBuilder.queryParam("sendDate", DateUtil.getCurrentDateTime())
+                .queryParam("systemId", "SYS_01")
+                .queryParam("event", "AM1")
+                .queryParam("page", 0)
+                .queryParam("size", 10)
+                .queryParam("sort", "memberId,desc");
+
+        TestUtil.performRequest(mockMvc, uriBuilder.toUriString(), null, "GET", 200, 200);
+    }
+
+    @Test
+    @Sql("/member/MemberSetup.sql")
+    @WithMockUser(username = "user1", authorities = { "USER" })
+    @DisplayName("운영 타입별 다수 회원 이름, 아이디 조회 실패_not include sendDate")
+    public void getMembersByEvent__NotIncludeSendDate() throws Exception {
+
+        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(MEMBERS_INFO_BY_EVENT_URL);
+
+        uriBuilder.queryParam("systemId", "SYS_01")
+                .queryParam("event", "AM1")
+                .queryParam("page", 0)
+                .queryParam("size", 10)
+                .queryParam("sort", "memberId,desc");
+
+        TestUtil.performRequest(mockMvc, uriBuilder.toUriString(), null, "GET", 400, 400);
+    }
 }

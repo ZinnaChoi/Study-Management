@@ -1,14 +1,19 @@
 package mogakco.StudyManagement.controller;
 
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
@@ -22,6 +27,7 @@ import mogakco.StudyManagement.dto.MemberInfoUpdateReq;
 import mogakco.StudyManagement.dto.MemberJoinReq;
 import mogakco.StudyManagement.dto.MemberLoginReq;
 import mogakco.StudyManagement.dto.MemberLoginRes;
+import mogakco.StudyManagement.dto.StudyMembersRes;
 import mogakco.StudyManagement.enums.ErrorCode;
 import mogakco.StudyManagement.service.common.LoggingService;
 import mogakco.StudyManagement.service.member.MemberService;
@@ -135,4 +141,28 @@ public class MemberController extends CommonController {
         return result;
     }
 
+    @Operation(summary = "참여 스터디 별 멤버 조회", description = "참여 스터디, 이벤트 이름을 통한 멤버 조회(event == null일 경우 스터디 참여 인원 전체 조회)")
+    @SecurityRequirement(name = "bearer-key")
+    @GetMapping("/members/joined-study")
+    public StudyMembersRes getMembersByEvent(
+            HttpServletRequest request,
+            @Parameter(name = "info", description = "요청 시 필수 값") @ModelAttribute @Valid DTOReqCommon info,
+            @Parameter(name = "paging", description = "paging") @PageableDefault(size = 10, page = 0, sort = "memberId", direction = Sort.Direction.DESC) Pageable pageable,
+            @RequestParam(name = "event", required = false) String event) {
+
+        StudyMembersRes result = new StudyMembersRes();
+        try {
+            startAPI(lo, info);
+            result = memberService.getMembersByEvent(lo, event, pageable);
+            result.setSendDate(DateUtil.getCurrentDateTime());
+            result.setSystemId(systemId);
+        } catch (Exception e) {
+            e.printStackTrace();
+            result = new StudyMembersRes(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
+                    ErrorCode.INTERNAL_ERROR.getMessage(), null, null);
+        } finally {
+            endAPI(request, findErrorCodeByCode(result.getRetCode()), lo, result);
+        }
+        return result;
+    }
 }
