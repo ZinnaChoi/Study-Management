@@ -50,4 +50,11 @@ public class Notice {
 
     @Column(name = "last_share_date", nullable = false)
     private String lastShareDate;
+
+    public Notice(Notice notice) {
+        this.wakeup = notice.getWakeup();
+        this.absent = notice.getAbsent();
+        this.newPost = notice.getNewPost();
+        this.linkShare = notice.getLinkShare();
+    }
 }
