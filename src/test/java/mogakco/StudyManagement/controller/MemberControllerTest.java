@@ -61,7 +61,7 @@ public class MemberControllerTest {
     private static final String JOIN_URL = "/api/v1/join";
     private static final String ID_DUPLICATED_CHECK_URL = "/api/v1/id-duplicated";
     private static final String MEMBER_INFO_URL = "/api/v1/member";
-    private static final String MEMBERS_INFO_BY_SCHEDULE_URL = "/api/v1/members/joined-study";
+    private static final String MEMBERS_INFO_BY_SCHEDULE_URL = "/api/v1/members/schedule-name";
     private static final String MEMBERS_INFO_BY_WAKEUP_URL = "/api/v1/members/wakeup-time";
 
     @Test
