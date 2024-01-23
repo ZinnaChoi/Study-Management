@@ -34,6 +34,11 @@ public class NoticeServiceImpl implements NoticeService {
 
         List<NoticeList> noticeLists = notice.stream().map(NoticeList::new).collect(Collectors.toList());
 
+        if (noticeLists.size() == 0) {
+            return new NoticeGetRes(null, ErrorCode.NOT_FOUND.getCode(),
+                    ErrorCode.NOT_FOUND.getMessage("memberId"), null);
+        }
+
         return new NoticeGetRes(null, ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), noticeLists);
 
     }

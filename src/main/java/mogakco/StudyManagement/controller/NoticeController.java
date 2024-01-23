@@ -38,11 +38,6 @@ public class NoticeController extends CommonController {
             startAPI(lo, null);
             result = noticeService.getNotice(memberId, lo);
 
-            if (result == null || result.getContent() == null ||
-                    result.getContent().isEmpty()) {
-                result = new NoticeGetRes(systemId, ErrorCode.NOT_FOUND.getCode(),
-                        ErrorCode.NOT_FOUND.getMessage("member"), null);
-            }
         } catch (Exception e) {
             result = new NoticeGetRes(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
                     ErrorCode.INTERNAL_ERROR.getMessage(), null);
