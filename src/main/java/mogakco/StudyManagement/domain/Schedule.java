@@ -2,6 +2,8 @@ package mogakco.StudyManagement.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -19,8 +21,11 @@ import lombok.NoArgsConstructor;
 public class Schedule {
 
     @Id
-    @Column(nullable = false)
-    private String eventName;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long scheduleId;
+
+    @Column(nullable = false, unique = true)
+    private String scheduleName;
 
     @Column(nullable = false)
     private String startTime;

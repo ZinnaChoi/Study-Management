@@ -138,12 +138,14 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
                 .build();
 
         List<MemberSchedule> mSchedules = new ArrayList<>();
-        List<Schedule> schedules = scheduleRepository.findAllById(joinInfo.getEventNames());
+        lo.setDBStart();
+        List<Schedule> schedules = scheduleRepository.findAllByScheduleNameIn(joinInfo.getEventNames());
+        lo.setDBEnd();
         if (schedules.size() != 0) {
             for (Schedule s : schedules) {
                 mSchedules.add(MemberSchedule.builder()
                         .member(member)
-                        .eventName(s)
+                        .schedule(s)
                         .createdAt(DateUtil.getCurrentDateTime())
                         .updatedAt(DateUtil.getCurrentDateTime())
                         .build());
@@ -190,10 +192,10 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
 
         List<MemberSchedule> memberSchedules = memberScheduleRepository.findAllByMember(member);
         List<Schedule> schedules = memberSchedules.stream()
-                .map(MemberSchedule::getEventName)
+                .map(MemberSchedule::getSchedule)
                 .collect(Collectors.toList());
         List<String> eventNames = schedules.stream()
-                .map(Schedule::getEventName)
+                .map(Schedule::getScheduleName)
                 .collect(Collectors.toList());
 
         result.setEventName(eventNames);
@@ -230,10 +232,10 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
                 }
                 lo.setDBStart();
                 List<MemberSchedule> mSchedules = memberScheduleRepository.findAllByMember(member);
-                List<Schedule> userSchedules = scheduleRepository.findByEventNameIn(userEventNames);
+                List<Schedule> userSchedules = scheduleRepository.findAllByScheduleNameIn(userEventNames);
                 lo.setDBEnd();
 
-                List<String> dbEventNames = mSchedules.stream().map(m -> m.getEventName().getEventName())
+                List<String> dbEventNames = mSchedules.stream().map(m -> m.getSchedule().getScheduleName())
                         .collect(Collectors.toList());
 
                 List<MemberSchedule> toInsert = calculateInserts(userSchedules, dbEventNames, member);
@@ -305,9 +307,9 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
             simplePageable = PageUtil.createSimplePageable(pMembers);
         } else {
             // 멤버 스케줄에서 이벤트로 조건 걸어서 가져온 member_id로 member에서 id, name 조회
-            Schedule schedule = Schedule.builder().eventName(event).build();
             lo.setDBStart();
-            Page<MemberSchedule> pSchedules = memberScheduleRepository.findAllByEventName(schedule, pageable);
+            Schedule schedule = scheduleRepository.findByScheduleName(event);
+            Page<MemberSchedule> pSchedules = memberScheduleRepository.findAllBySchedule(schedule, pageable);
             lo.setDBEnd();
             List<Member> mSchedules = pSchedules.getContent().stream().map(MemberSchedule::getMember)
                     .collect(Collectors.toList());
@@ -355,12 +357,12 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
     private List<MemberSchedule> calculateInserts(List<Schedule> userSchedules, List<String> dbEventNames,
             Member member) {
         List<Schedule> insertCandidates = userSchedules.stream()
-                .filter(u -> !dbEventNames.contains(u.getEventName()))
+                .filter(u -> !dbEventNames.contains(u.getScheduleName()))
                 .collect(Collectors.toList());
 
         List<MemberSchedule> insertObj = new ArrayList<>();
         for (Schedule iCdd : insertCandidates) {
-            insertObj.add(MemberSchedule.builder().member(member).eventName(iCdd)
+            insertObj.add(MemberSchedule.builder().member(member).schedule(iCdd)
                     .createdAt(DateUtil.getCurrentDateTime()).updatedAt(DateUtil.getCurrentDateTime()).build());
         }
         return insertObj;
@@ -369,14 +371,14 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
     private List<MemberSchedule> calculateUpdates(List<Schedule> userSchedules, List<String> dbEventNames,
             List<MemberSchedule> mSchedules) {
         List<Schedule> updateCandidates = userSchedules.stream()
-                .filter(u -> dbEventNames.contains(u.getEventName()))
+                .filter(u -> dbEventNames.contains(u.getScheduleName()))
                 .collect(Collectors.toList());
         List<String> eventNamesToUpdate = updateCandidates.stream()
-                .map(u -> u.getEventName())
+                .map(u -> u.getScheduleName())
                 .collect(Collectors.toList());
 
         List<MemberSchedule> updateObj = mSchedules.stream()
-                .filter(schedule -> eventNamesToUpdate.contains(schedule.getEventName().getEventName()))
+                .filter(schedule -> eventNamesToUpdate.contains(schedule.getSchedule().getScheduleName()))
                 .map(schedule -> {
                     schedule.updateUpdatedAt(DateUtil.getCurrentDateTime());
                     return schedule;
@@ -388,7 +390,7 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
 
     private List<MemberSchedule> calculateDeletes(List<String> userEventNames, List<MemberSchedule> mSchedules) {
         List<MemberSchedule> deleteObj = mSchedules.stream()
-                .filter(d -> !userEventNames.contains(d.getEventName().getEventName()))
+                .filter(d -> !userEventNames.contains(d.getSchedule().getScheduleName()))
                 .collect(Collectors.toList());
         return deleteObj;
     }

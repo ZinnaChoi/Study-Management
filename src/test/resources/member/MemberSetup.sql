@@ -11,38 +11,35 @@ VALUES
 
 
 -- schedule table
-INSERT IGNORE INTO schedule (event_name, start_time, end_time)
-VALUES ('AM1', '1500', '1600');
+INSERT IGNORE INTO schedule (schedule_id, schedule_name, start_time, end_time)
+VALUES (999, 'AM1', '1500', '1600');
 
-INSERT IGNORE INTO schedule (event_name, start_time, end_time)
-VALUES ('AM2', '1600', '1700');
+INSERT IGNORE INTO schedule (schedule_id, schedule_name, start_time, end_time)
+VALUES (998, 'AM2', '1600', '1700');
 
-INSERT IGNORE INTO schedule (event_name, start_time, end_time)
-VALUES ('AM3', '1700', '1800');
+INSERT IGNORE INTO schedule (schedule_id, schedule_name, start_time, end_time)
+VALUES (997, 'AM3', '1700', '1800');
 
-INSERT IGNORE INTO schedule (event_name, start_time, end_time)
-VALUES ('AM4', '1900', '2000');
+INSERT IGNORE INTO schedule (schedule_id, schedule_name, start_time, end_time)
+VALUES (996, 'AM4', '1900', '2000');
 
 -- member_schedule table
 INSERT INTO study.member_schedule
-(member_id, created_at, event_name, updated_at)
-VALUES(999, '111111111111111', 'AM1', '111111111111111');
+(member_id, created_at, schedule_id, updated_at)
+VALUES(999, '111111111111111', 999, '111111111111111');
 
 INSERT INTO study.member_schedule
-(member_id, created_at, event_name, updated_at)
-VALUES(999, '111111111111111', 'AM2', '111111111111111');
+(member_id, created_at, schedule_id, updated_at)
+VALUES(999, '111111111111111', 998, '111111111111111');
 
 INSERT INTO study.member_schedule
-(member_id, created_at, event_name, updated_at)
-VALUES(999, '111111111111111', 'AM3', '111111111111111');
+(member_id, created_at, schedule_id, updated_at)
+VALUES(999, '111111111111111', 997, '111111111111111');
 
 INSERT INTO study.member_schedule
-(member_id, created_at, event_name, updated_at)
-VALUES(999, '111111111111111', 'AM4', '111111111111111');
+(member_id, created_at, schedule_id, updated_at)
+VALUES(999, '111111111111111', 996, '111111111111111');
 
-INSERT INTO study.member_schedule
-(member_id, created_at, event_name, updated_at)
-VALUES(998, '111111111111111', 'AM1', '111111111111111');
 
 
 -- wakeup table
