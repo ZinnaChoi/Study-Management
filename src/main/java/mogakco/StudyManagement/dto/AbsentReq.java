@@ -22,14 +22,14 @@ public class AbsentReq extends DTOReqCommon {
     private String description;
 
     @Schema(example = "[\"PM1\",\"PM2\"]")
-    private List<String> eventNameList;
+    private List<String> scheduleNameList;
 
     public AbsentReq(String sendDate, String systemId, String absentDate, String description,
-            List<String> eventNameList) {
+            List<String> scheduleNameList) {
         super(sendDate, systemId);
         this.absentDate = absentDate;
         this.description = description;
-        this.eventNameList = eventNameList;
+        this.scheduleNameList = scheduleNameList;
     }
 
 }

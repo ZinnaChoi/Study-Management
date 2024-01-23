@@ -15,6 +15,6 @@ public interface MemberScheduleRepository extends JpaRepository<MemberSchedule, 
 
     List<MemberSchedule> findAllByMember(Member member);
 
-    Page<MemberSchedule> findAllByEventName(Schedule schedule, Pageable pageable);
+    Page<MemberSchedule> findAllBySchedule(Schedule schedule, Pageable pageable);
 
 }

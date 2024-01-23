@@ -12,13 +12,13 @@ public class AbsentCalendar {
 
     private String absentDate;
 
-    private String eventName;
+    private String scheduleName;
 
     private List<String> memberNameList = new ArrayList<>();
 
     public AbsentCalendar(AbsentSchedule absentSchedule) {
         this.absentDate = absentSchedule.getAbsentDate();
-        this.eventName = absentSchedule.getSchedule().getEventName();
+        this.scheduleName = absentSchedule.getSchedule().getScheduleName();
     }
 
     public void addMemberName(String name) {

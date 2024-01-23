@@ -35,7 +35,7 @@ public class MemberJoinReq extends DTOReqCommon {
     private String studyName;
 
     @Schema(example = "[\"AM1\", \"AM2\"]")
-    private List<String> eventNames;
+    private List<String> scheduleNames;
 
     @Schema(example = "1530")
     private String wakeupTime;

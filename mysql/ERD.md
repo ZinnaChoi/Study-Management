@@ -81,11 +81,12 @@
 
 > 스터디 스케줄 관리 테이블
 
-| Column Name | Key         | Type   | Description |
-| ----------- | ----------- | ------ | ----------- |
-| event_name  | Primary Key | String | 스케줄 이름 |
-| start_time  |             | String | 시작 시간   |
-| end_time    |             | String | 종료 시간   |
+| Column Name   | Key         | Type   | Description   |
+| ------------- | ----------- | ------ | ------------- |
+| schedule_id   | Primary Key | Long   | 스케줄 아이디 |
+| schedule_name | Primary Key | String | 스케줄 이름   |
+| start_time    |             | String | 시작 시간     |
+| end_time      |             | String | 종료 시간     |
 
 ## member_schedule
 
@@ -95,7 +96,7 @@
 | ------------------ | ----------- | ------ | ------------- |
 | member_schedule_id | Primary Key | Long   |               |
 | member_id          | Foreign Key | Long   | 사용자 ID     |
-| event_name         | Foreign Key | String | 스케줄 이름   |
+| schedule_id        | Foreign Key | String | 스케줄 ID     |
 | created_at         |             | String | 생성 날짜     |
 | updated_at         |             | String | 업데이트 날짜 |
 
@@ -107,7 +108,7 @@
 | ----------- | ----------- | ------ | ------------- |
 | absent_id   | Primary Key | Long   |               |
 | member_id   | Foreign Key | Long   | 사용자 ID     |
-| event_name  | Foreign Key | String | 스케줄 이름   |
+| schedule_id | Foreign Key | String | 스케줄 ID     |
 | description |             | String | 부재 사유     |
 | absent_date |             | String | 부재 날짜     |
 | created_at  |             | String | 생성 날짜     |

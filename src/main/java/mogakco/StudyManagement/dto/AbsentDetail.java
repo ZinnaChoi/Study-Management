@@ -14,15 +14,15 @@ public class AbsentDetail {
 
     private String description;
 
-    private List<String> eventNameList = new ArrayList<>();
+    private List<String> scheduleNameList = new ArrayList<>();
 
     public AbsentDetail(AbsentSchedule absentSchedule) {
         this.memberName = absentSchedule.getMember().getName();
         this.description = absentSchedule.getDescription();
     }
 
-    public void addEventName(String name) {
-        this.eventNameList.add(name);
+    public void addScheduleName(String name) {
+        this.scheduleNameList.add(name);
     }
 
 }

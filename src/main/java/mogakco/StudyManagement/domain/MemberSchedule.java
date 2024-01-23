@@ -32,8 +32,8 @@ public class MemberSchedule {
     private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "event_name", nullable = false)
-    private Schedule eventName;
+    @JoinColumn(name = "schedule_id", nullable = false)
+    private Schedule schedule;
 
     @Column(nullable = false)
     private String createdAt;
