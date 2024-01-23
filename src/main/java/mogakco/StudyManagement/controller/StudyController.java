@@ -1,9 +1,6 @@
 package mogakco.StudyManagement.controller;
 
-import java.util.List;
-
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -37,6 +34,7 @@ public class StudyController extends CommonController {
     }
 
     @Operation(summary = "스터디 등록", description = "새 스터디 추가")
+    @SecurityRequirement(name = "bearer-key")
     @PostMapping(value = "/study", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public DTOResCommon createStudy(HttpServletRequest request,
             @Valid @RequestPart(value = "studyCreateReq") @Parameter(schema = @Schema(type = "string", format = "binary")) StudyCreateReq studyCreateReq,
@@ -57,7 +55,8 @@ public class StudyController extends CommonController {
         return result;
     }
 
-    @Operation(summary = "스터디 등록", description = "새 스터디 추가")
+    @Operation(summary = "스터디 정보 수정", description = "스터디 정보(스터디 이름, 로고, 스케줄) 수정")
+    @SecurityRequirement(name = "bearer-key")
     @PostMapping(value = "/study/{studyId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public DTOResCommon updateStudy(HttpServletRequest request,
             @Valid @RequestPart(value = "studyCreateReq") @Parameter(schema = @Schema(type = "string", format = "binary")) StudyCreateReq studyCreateReq,
