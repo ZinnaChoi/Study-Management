@@ -9,4 +9,6 @@ import mogakco.StudyManagement.domain.PostLike;
 @Repository
 public interface PostLikeRepository extends JpaRepository<PostLike, Long>, JpaSpecificationExecutor<PostLike> {
 
+    Integer countByPostPostId(Long postId);
+
 }
