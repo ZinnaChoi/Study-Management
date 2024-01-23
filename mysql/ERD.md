@@ -81,11 +81,12 @@
 
 > 스터디 스케줄 관리 테이블
 
-| Column Name | Key         | Type   | Description |
-| ----------- | ----------- | ------ | ----------- |
-| event_name  | Primary Key | String | 스케줄 이름 |
-| start_time  |             | String | 시작 시간   |
-| end_time    |             | String | 종료 시간   |
+| Column Name   | Key         | Type   | Description   |
+| ------------- | ----------- | ------ | ------------- |
+| schedule_id   | Primary Key | Long   | 스케줄 아이디 |
+| schedule_name | Primary Key | String | 스케줄 이름   |
+| start_time    |             | String | 시작 시간     |
+| end_time      |             | String | 종료 시간     |
 
 ## member_schedule
 
