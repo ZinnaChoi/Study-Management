@@ -40,4 +40,12 @@ public class StudyInfo {
     @Column(nullable = false)
     private String db_password;
 
+    public void updateStudyName(String studyName) {
+        this.studyName = studyName;
+    }
+
+    public void updateStudyLogo(byte[] studyLogo) {
+        this.studyLogo = studyLogo;
+    }
+
 }

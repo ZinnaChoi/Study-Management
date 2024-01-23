@@ -9,7 +9,10 @@ import mogakco.StudyManagement.dto.StudyCreateReq;
 import mogakco.StudyManagement.service.common.LoggingService;
 
 public interface StudyService {
-    DTOResCommon createStudy(StudyCreateReq studyCreateReq, MultipartFile imageFile, LoggingService lo)
-            throws IOException;
+        DTOResCommon createStudy(StudyCreateReq studyCreateReq, MultipartFile imageFile, LoggingService lo)
+                        throws IOException;
+
+        DTOResCommon updateStudy(StudyCreateReq studyCreateReq, MultipartFile imageFile, LoggingService lo)
+                        throws IOException;
 
 }

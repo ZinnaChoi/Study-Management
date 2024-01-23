@@ -92,4 +92,24 @@ public class StudyServiceImpl implements StudyService {
                 }
                 return result;
         }
+
+        @Override
+        @Transactional
+        public DTOResCommon updateStudy(StudyCreateReq studyCreateReq, MultipartFile imageFile, LoggingService lo)
+                        throws IOException {
+
+                DTOResCommon result = new DTOResCommon(systemId, ErrorCode.OK.getCode(), ErrorCode.OK.getMessage());
+                // 스터디 인포 테이블에 study_name, img 업데이트
+                StudyInfo sInfo = studyInfoRepository.findByStudyName(studyCreateReq.getStudyName());
+                sInfo.updateStudyName(studyCreateReq.getStudyName());
+                sInfo.updateStudyLogo(imageFile == null ? null : imageFile.getBytes());
+                lo.setDBStart();
+                studyInfoRepository.save(sInfo);
+                lo.setDBEnd();
+
+                // 멤버 스케줄 테이블, 엡센트 스케줄 테이블에 해당 스케줄이 둘 중 하나 존재한다
+                // true - 업데이트 못한다고 리턴
+                // false - 스케줄 테이블에 schedule(event_name, start_time, end_time) 업데이트
+                return new DTOResCommon();
+        }
 }
