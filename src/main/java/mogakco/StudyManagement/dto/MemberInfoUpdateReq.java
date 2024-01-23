@@ -27,7 +27,7 @@ public class MemberInfoUpdateReq extends DTOReqCommon {
     private String contact;
 
     @Schema(example = "[\"AM1\", \"AM2\"]")
-    private List<String> eventName;
+    private List<String> scheduleName;
 
     @Schema(example = "1530")
     @Pattern(regexp = "(0[0-9]|1[0-9]|2[0-3])([0-5][0-9])", message = "올바른 시, 분 형식을 입력하세요(HHMI)")

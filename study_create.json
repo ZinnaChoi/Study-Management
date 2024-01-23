@@ -4,12 +4,12 @@
   "studyName": "모각코 스터디",
   "schedules": [
     {
-      "eventName": "AM2",
+      "scheduleName": "AM2",
       "startTime": "13:00",
       "endTime": "14:00"
     },
     {
-      "eventName": "AM3",
+      "scheduleName": "AM3",
       "startTime": "15:00",
       "endTime": "16:00"
     }

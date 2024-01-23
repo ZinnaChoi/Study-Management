@@ -9,7 +9,7 @@ import lombok.Setter;
 public class ScheduleCreateReq {
 
     @Schema(example = "AM1")
-    private String eventName;
+    private String scheduleName;
 
     @Schema(example = "13:00")
     private String startTime;
@@ -20,8 +20,8 @@ public class ScheduleCreateReq {
     public ScheduleCreateReq() {
     }
 
-    public ScheduleCreateReq(String eventName, String startTime, String endTime) {
-        this.eventName = eventName;
+    public ScheduleCreateReq(String scheduleName, String startTime, String endTime) {
+        this.scheduleName = scheduleName;
         this.startTime = startTime;
         this.endTime = endTime;
     }

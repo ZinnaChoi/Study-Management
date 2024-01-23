@@ -6,12 +6,10 @@ import mogakco.StudyManagement.domain.Schedule;
 
 import java.util.List;
 
-public interface ScheduleRepository extends JpaRepository<Schedule, String> {
+public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
 
-    Boolean existsByEventName(String evnetName);
+    List<Schedule> findAllByScheduleNameIn(Iterable<String> scheduleNames);
 
-    List<Schedule> findByEventNameIn(List<String> eventNames);
-
-    Schedule findByEventName(String eventName);
+    Schedule findByScheduleName(String scheduleName);
 
 }

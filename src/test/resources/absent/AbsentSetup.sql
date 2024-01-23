@@ -6,7 +6,7 @@ VALUES
 
 
 INSERT INTO study.schedule
-(end_time, event_name, start_time)
+(end_time, schedule_name, start_time)
 VALUES
 ('1500', 'TESTPM1', '1300'),
 ('1700', 'TESTPM3', '1500'),
@@ -16,18 +16,18 @@ VALUES
 
 
 INSERT INTO study.member_schedule
-(member_id, created_at, event_name, updated_at)
+(member_id, created_at, schedule_id, updated_at)
 VALUES
-((SELECT member_id FROM member WHERE id = 'AbsentUser'), DATE_FORMAT(NOW(6), '%Y%m%d24%H%i%s%f'), 'TESTPM1', DATE_FORMAT(NOW(6), '%Y%m%d24%H%i%s%f')),
-((SELECT member_id FROM member WHERE id = 'AbsentUser'), DATE_FORMAT(NOW(6), '%Y%m%d24%H%i%s%f'), 'TESTPM3', DATE_FORMAT(NOW(6), '%Y%m%d24%H%i%s%f')),
-((SELECT member_id FROM member WHERE id = 'AbsentUser'), DATE_FORMAT(NOW(6), '%Y%m%d24%H%i%s%f'), 'TESTPM7', DATE_FORMAT(NOW(6), '%Y%m%d24%H%i%s%f')),
-((SELECT member_id FROM member WHERE id = 'AbsentUser2'), DATE_FORMAT(NOW(6), '%Y%m%d24%H%i%s%f'), 'TESTPM1', DATE_FORMAT(NOW(6), '%Y%m%d24%H%i%s%f')),
-((SELECT member_id FROM member WHERE id = 'AbsentUser2'), DATE_FORMAT(NOW(6), '%Y%m%d24%H%i%s%f'), 'TESTPM3', DATE_FORMAT(NOW(6), '%Y%m%d24%H%i%s%f'));
+((SELECT member_id FROM member WHERE id = 'AbsentUser'), DATE_FORMAT(NOW(6), '%Y%m%d24%H%i%s%f'), (SELECT schedule_id FROM schedule WHERE schedule_name ='TESTPM1'), DATE_FORMAT(NOW(6), '%Y%m%d24%H%i%s%f')),
+((SELECT member_id FROM member WHERE id = 'AbsentUser'), DATE_FORMAT(NOW(6), '%Y%m%d24%H%i%s%f'),(SELECT schedule_id FROM schedule WHERE schedule_name ='TESTPM3') , DATE_FORMAT(NOW(6), '%Y%m%d24%H%i%s%f')),
+((SELECT member_id FROM member WHERE id = 'AbsentUser'), DATE_FORMAT(NOW(6), '%Y%m%d24%H%i%s%f'), (SELECT schedule_id FROM schedule WHERE schedule_name ='TESTPM7'), DATE_FORMAT(NOW(6), '%Y%m%d24%H%i%s%f')),
+((SELECT member_id FROM member WHERE id = 'AbsentUser2'), DATE_FORMAT(NOW(6), '%Y%m%d24%H%i%s%f'), (SELECT schedule_id FROM schedule WHERE schedule_name ='TESTPM1'), DATE_FORMAT(NOW(6), '%Y%m%d24%H%i%s%f')),
+((SELECT member_id FROM member WHERE id = 'AbsentUser2'), DATE_FORMAT(NOW(6), '%Y%m%d24%H%i%s%f'), (SELECT schedule_id FROM schedule WHERE schedule_name ='TESTPM3'), DATE_FORMAT(NOW(6), '%Y%m%d24%H%i%s%f'));
 
 
 INSERT INTO study.absent_schedule
-(member_id, absent_date, created_at, description, event_name, updated_at)
+(member_id, absent_date, created_at, description, schedule_id, updated_at)
 VALUES
-((SELECT member_id FROM member WHERE id = 'AbsentUser'), '20240116', DATE_FORMAT(NOW(6), '%Y%m%d24%H%i%s%f'), '가족여행', 'TESTPM1', DATE_FORMAT(NOW(6), '%Y%m%d24%H%i%s%f')),
-((SELECT member_id FROM member WHERE id = 'AbsentUser2'), '20240116', DATE_FORMAT(NOW(6), '%Y%m%d24%H%i%s%f'), '가족여행', 'TESTPM1', DATE_FORMAT(NOW(6), '%Y%m%d24%H%i%s%f')),
-((SELECT member_id FROM member WHERE id = 'AbsentUser2'), '20240116', DATE_FORMAT(NOW(6), '%Y%m%d24%H%i%s%f'), '가족여행', 'TESTPM3', DATE_FORMAT(NOW(6), '%Y%m%d24%H%i%s%f'));
+((SELECT member_id FROM member WHERE id = 'AbsentUser'), '20240116', DATE_FORMAT(NOW(6), '%Y%m%d24%H%i%s%f'), '가족여행', (SELECT schedule_id FROM schedule WHERE schedule_name ='TESTPM1'), DATE_FORMAT(NOW(6), '%Y%m%d24%H%i%s%f')),
+((SELECT member_id FROM member WHERE id = 'AbsentUser2'), '20240116', DATE_FORMAT(NOW(6), '%Y%m%d24%H%i%s%f'), '가족여행',(SELECT schedule_id FROM schedule WHERE schedule_name ='TESTPM1'), DATE_FORMAT(NOW(6), '%Y%m%d24%H%i%s%f')),
+((SELECT member_id FROM member WHERE id = 'AbsentUser2'), '20240116', DATE_FORMAT(NOW(6), '%Y%m%d24%H%i%s%f'), '가족여행', (SELECT schedule_id FROM schedule WHERE schedule_name ='TESTPM3'), DATE_FORMAT(NOW(6), '%Y%m%d24%H%i%s%f'));

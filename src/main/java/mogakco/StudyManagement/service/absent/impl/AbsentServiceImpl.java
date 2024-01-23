@@ -64,24 +64,24 @@ public class AbsentServiceImpl implements AbsentService {
         try {
             lo.setDBStart();
             Member member = memberRepository.findById(SecurityUtil.getLoginUserId());
-            List<Schedule> scheduleList = scheduleRepository.findByEventNameIn(absentReq.getEventNameList());
+            List<Schedule> scheduleList = scheduleRepository.findAllByScheduleNameIn(absentReq.getScheduleNameList());
             List<MemberSchedule> memeberScheduleList = memberScheduleRepository.findAllByMember(member);
             lo.setDBEnd();
 
-            // Check if the Event Name List is Empty
-            if (absentReq.getEventNameList().isEmpty()) {
+            // Check if the Schedule Name List is Empty
+            if (absentReq.getScheduleNameList().isEmpty()) {
                 throw new InvalidRequestException("하나 이상의 부재 일정을 등록해야 합니다");
             }
 
-            validateEventNames(scheduleList, absentReq.getEventNameList());
+            validateScheduleNames(scheduleList, absentReq.getScheduleNameList());
 
             // Validate member schedule
-            Set<String> eventTimeSet = new HashSet<>();
+            Set<String> ScheduleTimeSet = new HashSet<>();
             for (MemberSchedule ms : memeberScheduleList) {
-                eventTimeSet.add(ms.getEventName().getEventName());
+                ScheduleTimeSet.add(ms.getSchedule().getScheduleName());
             }
-            for (String eventTime : absentReq.getEventNameList()) {
-                if (!eventTimeSet.contains(eventTime)) {
+            for (String scheduleTime : absentReq.getScheduleNameList()) {
+                if (!ScheduleTimeSet.contains(scheduleTime)) {
                     throw new InvalidRequestException(ErrorCode.BAD_REQUEST.getMessage("참여하지 않는 타임의 부재 신청은 할 수 없습니다"));
                 }
             }
@@ -96,7 +96,7 @@ public class AbsentServiceImpl implements AbsentService {
                 lo.setDBEnd();
                 if (absentScheduleCnt > 0) {
                     throw new ConflictException(ErrorCode.CONFLICT.getMessage("부재 일정: " +
-                            absentReq.getAbsentDate() + " " + schedule.getEventName()));
+                            absentReq.getAbsentDate() + " " + schedule.getScheduleName()));
                 }
             }
 
@@ -147,8 +147,8 @@ public class AbsentServiceImpl implements AbsentService {
 
             Map<String, AbsentCalendar> groupedSchedules = new HashMap<>();
             for (AbsentSchedule schedule : absentSchedules) {
-                // Group By AbsentDate & EventName
-                String key = schedule.getAbsentDate() + "-" + schedule.getSchedule().getEventName();
+                // Group By AbsentDate & ScheduleName
+                String key = schedule.getAbsentDate() + "-" + schedule.getSchedule().getScheduleName();
 
                 AbsentCalendar calendarList = groupedSchedules.getOrDefault(key,
                         new AbsentCalendar(schedule));
@@ -157,14 +157,14 @@ public class AbsentServiceImpl implements AbsentService {
                 groupedSchedules.put(key, calendarList);
             }
 
-            // Sort By AbsentDate, EventName
+            // Sort By AbsentDate, ScheduleName
             List<AbsentCalendar> sortedCalendarList = new ArrayList<>(groupedSchedules.values());
             Collections.sort(sortedCalendarList, (o1, o2) -> {
                 int dateCompare = o1.getAbsentDate().compareTo(o2.getAbsentDate());
                 if (dateCompare != 0) {
                     return dateCompare;
                 } else {
-                    return o1.getEventName().compareTo(o2.getEventName());
+                    return o1.getScheduleName().compareTo(o2.getScheduleName());
                 }
             });
 
@@ -192,7 +192,7 @@ public class AbsentServiceImpl implements AbsentService {
             String memberName = schedule.getMember().getName();
 
             AbsentDetail detail = groupedSchedules.getOrDefault(memberName, new AbsentDetail(schedule));
-            detail.addEventName(schedule.getSchedule().getEventName());
+            detail.addScheduleName(schedule.getSchedule().getScheduleName());
 
             groupedSchedules.put(memberName, detail);
         }
@@ -208,7 +208,7 @@ public class AbsentServiceImpl implements AbsentService {
 
         DTOResCommon result = new DTOResCommon();
         try {
-            if (absentReq.getEventNameList().isEmpty()) {
+            if (absentReq.getScheduleNameList().isEmpty()) {
                 throw new InvalidRequestException("하나 이상의 스터디 시간을 선택해야 합니다");
             }
 
@@ -220,27 +220,27 @@ public class AbsentServiceImpl implements AbsentService {
                     .withAbsentDateAndMember(absentReq.getAbsentDate(), loginMember);
 
             lo.setDBStart();
-            List<Schedule> scheduleList = scheduleRepository.findByEventNameIn(absentReq.getEventNameList());
+            List<Schedule> scheduleList = scheduleRepository.findAllByScheduleNameIn(absentReq.getScheduleNameList());
             List<AbsentSchedule> absentScheduleList = absentScheduleRepository.findAll(spec);
             lo.setDBEnd();
 
-            validateEventNames(scheduleList, absentReq.getEventNameList());
+            validateScheduleNames(scheduleList, absentReq.getScheduleNameList());
 
-            Set<String> existEventNames = absentScheduleList.stream()
-                    .map(as -> as.getSchedule().getEventName())
+            Set<String> existScheduleNames = absentScheduleList.stream()
+                    .map(as -> as.getSchedule().getScheduleName())
                     .collect(Collectors.toSet());
-            Set<String> reqEventNames = new HashSet<>(absentReq.getEventNameList());
+            Set<String> reqScheduleNames = new HashSet<>(absentReq.getScheduleNameList());
 
             boolean isDescriptionChanged = absentScheduleList.get(0).isDescriptionChanged(absentReq);
-            boolean isEventNameListChanged = !existEventNames.equals(reqEventNames);
+            boolean isScheduleNameListChanged = !existScheduleNames.equals(reqScheduleNames);
 
-            if (isDescriptionChanged || isEventNameListChanged) {
+            if (isDescriptionChanged || isScheduleNameListChanged) {
 
-                Set<String> removedEventNames = new HashSet<>(existEventNames);
-                removedEventNames.removeAll(reqEventNames);
+                Set<String> removedScheduleNames = new HashSet<>(existScheduleNames);
+                removedScheduleNames.removeAll(reqScheduleNames);
 
-                Set<String> addedEventNames = new HashSet<>(reqEventNames);
-                addedEventNames.removeAll(existEventNames);
+                Set<String> addedScheduleNames = new HashSet<>(reqScheduleNames);
+                addedScheduleNames.removeAll(existScheduleNames);
 
                 for (AbsentSchedule schedule : absentScheduleList) {
                     schedule.updateUpdatedAt(DateUtil.getCurrentDateTime());
@@ -250,18 +250,18 @@ public class AbsentServiceImpl implements AbsentService {
                         absentScheduleRepository.save(schedule);
                         lo.setDBEnd();
                     }
-                    // EventNames to be Removed
-                    if (removedEventNames.contains(schedule.getSchedule().getEventName())) {
+                    // ScheduleNames to be Removed
+                    if (removedScheduleNames.contains(schedule.getSchedule().getScheduleName())) {
                         lo.setDBStart();
                         absentScheduleRepository.delete(schedule);
                         lo.setDBEnd();
                     }
                 }
 
-                // Add new EventName
-                for (String addedEventName : addedEventNames) {
+                // Add new ScheduleName
+                for (String addedScheduleName : addedScheduleNames) {
                     lo.setDBStart();
-                    Schedule addedSchedule = scheduleRepository.findByEventName(addedEventName);
+                    Schedule addedSchedule = scheduleRepository.findByScheduleName(addedScheduleName);
                     lo.setDBEnd();
 
                     AbsentSchedule newSchedule = AbsentSchedule.builder().absentDate(absentReq.getAbsentDate())
@@ -320,14 +320,14 @@ public class AbsentServiceImpl implements AbsentService {
         }
     }
 
-    private void validateEventNames(List<Schedule> scheduleList, List<String> eventNameList) {
-        Set<String> eventNameSet = scheduleList.stream()
-                .map(Schedule::getEventName)
+    private void validateScheduleNames(List<Schedule> scheduleList, List<String> scheduleNameList) {
+        Set<String> scheduleNameSet = scheduleList.stream()
+                .map(Schedule::getScheduleName)
                 .collect(Collectors.toSet());
 
-        for (String eventName : eventNameList) {
-            if (!eventNameSet.contains(eventName)) {
-                throw new NotFoundException(ErrorCode.NOT_FOUND.getMessage("스터디 타임 " + eventName));
+        for (String scheduleName : scheduleNameList) {
+            if (!scheduleNameSet.contains(scheduleName)) {
+                throw new NotFoundException(ErrorCode.NOT_FOUND.getMessage("스터디 타임 " + scheduleName));
             }
         }
     }
