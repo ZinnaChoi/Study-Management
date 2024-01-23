@@ -96,7 +96,7 @@
 | ------------------ | ----------- | ------ | ------------- |
 | member_schedule_id | Primary Key | Long   |               |
 | member_id          | Foreign Key | Long   | 사용자 ID     |
-| event_name         | Foreign Key | String | 스케줄 이름   |
+| schedule_id        | Foreign Key | String | 스케줄 ID     |
 | created_at         |             | String | 생성 날짜     |
 | updated_at         |             | String | 업데이트 날짜 |
 
@@ -108,7 +108,7 @@
 | ----------- | ----------- | ------ | ------------- |
 | absent_id   | Primary Key | Long   |               |
 | member_id   | Foreign Key | Long   | 사용자 ID     |
-| event_name  | Foreign Key | String | 스케줄 이름   |
+| schedule_id | Foreign Key | String | 스케줄 ID     |
 | description |             | String | 부재 사유     |
 | absent_date |             | String | 부재 날짜     |
 | created_at  |             | String | 생성 날짜     |

@@ -58,18 +58,18 @@ public class StudyServiceImpl implements StudyService {
                                                         studyCreateReq.getStudyName() + "스터디 이름이 이미 존재합니다."));
                 }
                 List<ScheduleCreateReq> schedules = studyCreateReq.getSchedules();
-                List<String> eventNames = schedules.stream()
-                                .map(ScheduleCreateReq::getEventName)
+                List<String> scheduleNames = schedules.stream()
+                                .map(ScheduleCreateReq::getScheduleName)
                                 .collect(Collectors.toList());
 
-                List<Schedule> existSchedules = scheduleRepository.findAllByScheduleNameIn(eventNames);
+                List<Schedule> existSchedules = scheduleRepository.findAllByScheduleNameIn(scheduleNames);
                 if (existSchedules.size() != 0) {
-                        List<String> existEventNames = existSchedules.stream()
+                        List<String> existScheduleNames = existSchedules.stream()
                                         .map(Schedule::getScheduleName)
                                         .collect(Collectors.toList());
                         return new DTOResCommon(systemId, ErrorCode.BAD_REQUEST.getCode(),
                                         ErrorCode.BAD_REQUEST.getMessage(
-                                                        existEventNames.toString() + " event_name이 이미 존재합니다."));
+                                                        existScheduleNames.toString() + " schedule_name이 이미 존재합니다."));
                 }
                 byte[] studyLogoBytes = imageFile == null ? null : imageFile.getBytes();
                 StudyInfo studyInfo = StudyInfo.builder().studyName(studyCreateReq.getStudyName())
@@ -81,7 +81,7 @@ public class StudyServiceImpl implements StudyService {
                 lo.setDBEnd();
 
                 for (ScheduleCreateReq scheduleCreateReq : studyCreateReq.getSchedules()) {
-                        Schedule schedule = Schedule.builder().scheduleName(scheduleCreateReq.getEventName())
+                        Schedule schedule = Schedule.builder().scheduleName(scheduleCreateReq.getScheduleName())
                                         .startTime(scheduleCreateReq.getStartTime())
                                         .endTime(scheduleCreateReq.getEndTime())
                                         .build();

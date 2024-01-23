@@ -30,20 +30,20 @@ public class MemberInfoRes extends DTOResCommon {
     private String studyName;
 
     @Schema(example = "AM1")
-    private List<String> eventName;
+    private List<String> scheduleName;
 
     @Schema(example = "1530")
     private String wakeupTime;
 
     public MemberInfoRes(String systemId, int retCode, String retMsg, String id, String name, String contact,
-            MemberRole role, String studyName, List<String> eventName, String wakeupTime) {
+            MemberRole role, String studyName, List<String> scheduleName, String wakeupTime) {
         super(systemId, retCode, retMsg);
         this.id = id;
         this.name = name;
         this.contact = contact;
         this.role = role;
         this.studyName = studyName;
-        this.eventName = eventName;
+        this.scheduleName = scheduleName;
         this.wakeupTime = wakeupTime;
     }
 

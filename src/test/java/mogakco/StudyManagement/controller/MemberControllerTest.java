@@ -61,7 +61,7 @@ public class MemberControllerTest {
     private static final String JOIN_URL = "/api/v1/join";
     private static final String ID_DUPLICATED_CHECK_URL = "/api/v1/id-duplicated";
     private static final String MEMBER_INFO_URL = "/api/v1/member";
-    private static final String MEMBERS_INFO_BY_EVENT_URL = "/api/v1/members/joined-study";
+    private static final String MEMBERS_INFO_BY_SCHEDULE_URL = "/api/v1/members/joined-study";
     private static final String MEMBERS_INFO_BY_WAKEUP_URL = "/api/v1/members/wakeup-time";
 
     @Test
@@ -242,7 +242,7 @@ public class MemberControllerTest {
     @Sql("/member/MemberSetup.sql")
     @DisplayName("MyPage 회원 정보변경 성공")
     void setMemberInfo_Success() throws Exception {
-        MemberInfoUpdateReq req = new MemberInfoUpdateReq(MemberUpdateType.EVENT_NAMES, "아무개", "010-1111-1111",
+        MemberInfoUpdateReq req = new MemberInfoUpdateReq(MemberUpdateType.SCHEDULE_NAMES, "아무개", "010-1111-1111",
                 Arrays.asList("AM1", "AM2", "AM3", "AM4"), "1930", "password123!");
         req.setSendDate(DateUtil.getCurrentDateTime());
         req.setSystemId("SYS_01");
@@ -255,7 +255,7 @@ public class MemberControllerTest {
     @WithMockUser(username = "user1", authorities = { "USER" })
     @Sql("/member/MemberSetup.sql")
     @DisplayName("MyPage 회원 정보변경 실패_이름 빈 값")
-    // 이름, 이벤트 이름, 비밀번호, 기상 시간 빈 값등은 다 똑같은 실패 케이스로 케이스마다 테스트 코드 추가하지는 않았음
+    // 이름, 스케줄 이름, 비밀번호, 기상 시간 빈 값등은 다 똑같은 실패 케이스로 케이스마다 테스트 코드 추가하지는 않았음
     void setMemberInfo_EmptyName() throws Exception {
         MemberInfoUpdateReq req = new MemberInfoUpdateReq(MemberUpdateType.NAME, "", "010-1111-1111",
                 Arrays.asList("AM1", "AM2", "AM3", "AM4"), "1930", "password123!");
@@ -287,13 +287,13 @@ public class MemberControllerTest {
     @Sql("/member/MemberSetup.sql")
     @WithMockUser(username = "user1", authorities = { "USER" })
     @DisplayName("운영 타입별 다수 회원 이름, 아이디 조회 성공")
-    public void getMembersByEvent_Success() throws Exception {
+    public void getMembersBySchedule_Success() throws Exception {
 
-        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(MEMBERS_INFO_BY_EVENT_URL);
+        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(MEMBERS_INFO_BY_SCHEDULE_URL);
 
         uriBuilder.queryParam("sendDate", DateUtil.getCurrentDateTime())
                 .queryParam("systemId", "SYS_01")
-                .queryParam("event", "AM1")
+                .queryParam("schedule", "AM1")
                 .queryParam("page", 0)
                 .queryParam("size", 10)
                 .queryParam("sort", "memberId,desc");
@@ -305,12 +305,12 @@ public class MemberControllerTest {
     @Sql("/member/MemberSetup.sql")
     @WithMockUser(username = "user1", authorities = { "USER" })
     @DisplayName("운영 타입별 다수 회원 이름, 아이디 조회 실패_not include sendDate")
-    public void getMembersByEvent__NotIncludeSendDate() throws Exception {
+    public void getMembersBySchedule__NotIncludeSendDate() throws Exception {
 
-        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(MEMBERS_INFO_BY_EVENT_URL);
+        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(MEMBERS_INFO_BY_SCHEDULE_URL);
 
         uriBuilder.queryParam("systemId", "SYS_01")
-                .queryParam("event", "AM1")
+                .queryParam("schedule", "AM1")
                 .queryParam("page", 0)
                 .queryParam("size", 10)
                 .queryParam("sort", "memberId,desc");

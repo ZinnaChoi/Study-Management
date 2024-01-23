@@ -27,7 +27,7 @@ public interface MemberService {
 
     DTOResCommon setMemberInfo(MemberInfoUpdateReq updateInfo, LoggingService lo);
 
-    StudyMembersRes getMembersByEvent(LoggingService lo, String event, Pageable pageable);
+    StudyMembersRes getMembersBySchedule(LoggingService lo, String schedule, Pageable pageable);
 
     StudyMembersRes getMembersByWakeupTime(LoggingService lo, String time, Pageable pageable);
 }
