@@ -2,6 +2,7 @@ package mogakco.StudyManagement.controller;
 
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
@@ -15,7 +16,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import mogakco.StudyManagement.dto.DTOResCommon;
-import mogakco.StudyManagement.dto.StudyCUReq;
+import mogakco.StudyManagement.dto.StudyReq;
 import mogakco.StudyManagement.enums.ErrorCode;
 import mogakco.StudyManagement.service.common.LoggingService;
 import mogakco.StudyManagement.service.study.StudyService;
@@ -37,13 +38,13 @@ public class StudyController extends CommonController {
     @SecurityRequirement(name = "bearer-key")
     @PostMapping(value = "/study", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public DTOResCommon createStudy(HttpServletRequest request,
-            @Valid @RequestPart(value = "studyCUReq") @Parameter(schema = @Schema(type = "string", format = "binary")) StudyCUReq studyCUReq,
+            @Valid @RequestPart(value = "studyReq") @Parameter(schema = @Schema(type = "string", format = "binary")) StudyReq studyReq,
             @Parameter(description = "이미지 파일") @RequestPart(name = "logo file", required = false) MultipartFile imageFile) {
         DTOResCommon result = new DTOResCommon();
 
         try {
-            startAPI(lo, studyCUReq);
-            result = studyService.createStudy(studyCUReq, imageFile, lo);
+            startAPI(lo, studyReq);
+            result = studyService.createStudy(studyReq, imageFile, lo);
         } catch (Exception e) {
             e.printStackTrace();
             result = new DTOResCommon(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
@@ -57,15 +58,15 @@ public class StudyController extends CommonController {
 
     @Operation(summary = "스터디 정보 수정", description = "스터디 정보(스터디 이름, 로고, 스케줄) 수정")
     @SecurityRequirement(name = "bearer-key")
-    @PostMapping(value = "/studyinfo", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(value = "/studyinfo", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public DTOResCommon updateStudy(HttpServletRequest request,
-            @Valid @RequestPart(value = "studyCUReq") @Parameter(schema = @Schema(type = "string", format = "binary")) StudyCUReq studyCUReq,
+            @Valid @RequestPart(value = "studyReq") @Parameter(schema = @Schema(type = "string", format = "binary")) StudyReq studyReq,
             @Parameter(description = "이미지 파일") @RequestPart(name = "logo file", required = false) MultipartFile imageFile) {
         DTOResCommon result = new DTOResCommon();
 
         try {
-            startAPI(lo, studyCUReq);
-            result = studyService.updateStudy(studyCUReq, imageFile, lo);
+            startAPI(lo, studyReq);
+            result = studyService.updateStudy(studyReq, imageFile, lo);
         } catch (Exception e) {
             e.printStackTrace();
             result = new DTOResCommon(systemId, ErrorCode.INTERNAL_ERROR.getCode(),

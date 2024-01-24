@@ -7,8 +7,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-// schedule Create or Update DTO
-public class ScheduleCUReq extends DTOReqCommon {
+public class ScheduleReq extends DTOReqCommon {
 
     @Schema(example = "AM1")
     private String scheduleName;
@@ -21,10 +20,10 @@ public class ScheduleCUReq extends DTOReqCommon {
     @Pattern(regexp = "(0[0-9]|1[0-9]|2[0-3])([0-5][0-9])", message = "올바른 시, 분 형식을 입력하세요(HHMI)")
     private String endTime;
 
-    public ScheduleCUReq() {
+    public ScheduleReq() {
     }
 
-    public ScheduleCUReq(String scheduleName, String startTime, String endTime) {
+    public ScheduleReq(String scheduleName, String startTime, String endTime) {
         this.scheduleName = scheduleName;
         this.startTime = startTime;
         this.endTime = endTime;

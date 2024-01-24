@@ -5,6 +5,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.List;
 
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
@@ -42,25 +43,15 @@ public class TestUtil {
 
         resultActions = mockMvc.perform(requestBuilder);
 
-        if (expectedStatus == 200) {
-            resultActions.andExpect(status().isOk());
-        } else {
-            resultActions.andExpect(status().is(expectedStatus));
-        }
-
-        if (expectedRetCode != null) {
-            resultActions.andExpect(jsonPath("$.retCode").value(expectedRetCode));
-        }
-
-        return resultActions.andReturn();
+        return checkExpectedVal(resultActions, expectedStatus, expectedRetCode);
     }
 
-    public static MvcResult performFileRequest(MockMvc mockMvc, String url,
+    public static MvcResult performFileRequest(MockMvc mockMvc, String url, HttpMethod method,
             List<MockMultipartFile> files, int expectedStatus, Integer expectedRetCode) throws Exception {
         ResultActions resultActions = null;
         MockMultipartHttpServletRequestBuilder requestBuilder = null;
 
-        requestBuilder = (MockMultipartHttpServletRequestBuilder) MockMvcRequestBuilders.multipart(url)
+        requestBuilder = (MockMultipartHttpServletRequestBuilder) MockMvcRequestBuilders.multipart(method, url)
                 .contentType(MediaType.MULTIPART_FORM_DATA);
 
         for (int i = 0; i < files.size(); i++) {
@@ -69,6 +60,11 @@ public class TestUtil {
 
         resultActions = mockMvc.perform(requestBuilder);
 
+        return checkExpectedVal(resultActions, expectedStatus, expectedRetCode);
+    }
+
+    private static MvcResult checkExpectedVal(ResultActions resultActions, int expectedStatus, Integer expectedRetCode)
+            throws Exception {
         if (expectedStatus == 200) {
             resultActions.andExpect(status().isOk());
         } else {

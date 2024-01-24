@@ -11,6 +11,7 @@ import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpMethod;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
@@ -20,8 +21,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import mogakco.StudyManagement.dto.ScheduleCUReq;
-import mogakco.StudyManagement.dto.StudyCUReq;
+import mogakco.StudyManagement.dto.ScheduleReq;
+import mogakco.StudyManagement.dto.StudyReq;
 import mogakco.StudyManagement.service.common.LoggingService;
 import mogakco.StudyManagement.service.study.StudyService;
 import mogakco.StudyManagement.util.DateUtil;
@@ -58,20 +59,20 @@ public class StudyControllerTest {
 
                 MockMultipartFile file = new MockMultipartFile("logo file", "logo.png", "image/png",
                                 "yourImageData".getBytes());
-                ScheduleCUReq scheduleCreateReq = new ScheduleCUReq("없는 스케줄 이름123123", "13:00", "14:00");
-                List<ScheduleCUReq> schedules = Collections.singletonList(scheduleCreateReq);
+                ScheduleReq scheduleCreateReq = new ScheduleReq("없는 스케줄 이름123123", "13:00", "14:00");
+                List<ScheduleReq> schedules = Collections.singletonList(scheduleCreateReq);
 
-                StudyCUReq studyCUReq = new StudyCUReq(
+                StudyReq studyReq = new StudyReq(
                                 "없는 스터디 이름123123", "10.10.10.110", "admin", "password", schedules);
-                studyCUReq.setSendDate(DateUtil.getCurrentDateTime());
-                studyCUReq.setSystemId("SYS_01");
-                String requestBodyJson = objectMapper.writeValueAsString(studyCUReq);
+                studyReq.setSendDate(DateUtil.getCurrentDateTime());
+                studyReq.setSystemId("SYS_01");
+                String requestBodyJson = objectMapper.writeValueAsString(studyReq);
 
-                MockMultipartFile jsonFile = new MockMultipartFile("studyCUReq", "", "application/json",
+                MockMultipartFile jsonFile = new MockMultipartFile("studyReq", "", "application/json",
                                 requestBodyJson.getBytes());
 
                 List<MockMultipartFile> files = Lists.list(file, jsonFile);
-                TestUtil.performFileRequest(mockMvc, CREATE_STUDY_API_URL, files, 200, 200);
+                TestUtil.performFileRequest(mockMvc, CREATE_STUDY_API_URL, HttpMethod.POST, files, 200, 200);
         }
 
         @Test
@@ -82,20 +83,20 @@ public class StudyControllerTest {
 
                 MockMultipartFile file = new MockMultipartFile("logo file", "logo.png", "image/png",
                                 "yourImageData".getBytes());
-                ScheduleCUReq scheduleCreateReq = new ScheduleCUReq("없는 스케줄 이름123123", "13:00", "14:00");
-                List<ScheduleCUReq> schedules = Collections.singletonList(scheduleCreateReq);
+                ScheduleReq scheduleCreateReq = new ScheduleReq("없는 스케줄 이름123123", "13:00", "14:00");
+                List<ScheduleReq> schedules = Collections.singletonList(scheduleCreateReq);
 
-                StudyCUReq studyCUReq = new StudyCUReq(
+                StudyReq studyReq = new StudyReq(
                                 "없는 스터디 이름123123", "10.10.10.110", "admin", "password", schedules);
-                studyCUReq.setSendDate(DateUtil.getCurrentDateTime());
-                studyCUReq.setSystemId("SYS_01");
-                String requestBodyJson = objectMapper.writeValueAsString(studyCUReq);
+                studyReq.setSendDate(DateUtil.getCurrentDateTime());
+                studyReq.setSystemId("SYS_01");
+                String requestBodyJson = objectMapper.writeValueAsString(studyReq);
 
-                MockMultipartFile jsonFile = new MockMultipartFile("studyCUReq", "", "application/json",
+                MockMultipartFile jsonFile = new MockMultipartFile("studyReq", "", "application/json",
                                 requestBodyJson.getBytes());
 
                 List<MockMultipartFile> files = Lists.list(file, jsonFile);
-                TestUtil.performFileRequest(mockMvc, CREATE_STUDY_API_URL, files, 200, 400);
+                TestUtil.performFileRequest(mockMvc, CREATE_STUDY_API_URL, HttpMethod.POST, files, 200, 400);
         }
 
         @Test
@@ -106,20 +107,20 @@ public class StudyControllerTest {
 
                 MockMultipartFile file = new MockMultipartFile("logo file", "logo.png", "image/png",
                                 "yourImageData".getBytes());
-                ScheduleCUReq scheduleCreateReq = new ScheduleCUReq("없는 스케줄 이름123123", "13:00", "14:00");
-                List<ScheduleCUReq> schedules = Collections.singletonList(scheduleCreateReq);
+                ScheduleReq scheduleCreateReq = new ScheduleReq("없는 스케줄 이름123123", "13:00", "14:00");
+                List<ScheduleReq> schedules = Collections.singletonList(scheduleCreateReq);
 
-                StudyCUReq studyCUReq = new StudyCUReq(
+                StudyReq studyReq = new StudyReq(
                                 "없는 스터디 이름123123", "10.10.10.110", "admin", "password", schedules);
-                studyCUReq.setSendDate(DateUtil.getCurrentDateTime());
-                studyCUReq.setSystemId("SYS_01");
-                String requestBodyJson = objectMapper.writeValueAsString(studyCUReq);
+                studyReq.setSendDate(DateUtil.getCurrentDateTime());
+                studyReq.setSystemId("SYS_01");
+                String requestBodyJson = objectMapper.writeValueAsString(studyReq);
 
-                MockMultipartFile jsonFile = new MockMultipartFile("studyCUReq", "", "application/json",
+                MockMultipartFile jsonFile = new MockMultipartFile("studyReq", "", "application/json",
                                 requestBodyJson.getBytes());
 
                 List<MockMultipartFile> files = Lists.list(file, jsonFile);
-                TestUtil.performFileRequest(mockMvc, CREATE_STUDY_API_URL, files, 200, 400);
+                TestUtil.performFileRequest(mockMvc, CREATE_STUDY_API_URL, HttpMethod.POST, files, 200, 400);
         }
 
         @Test
@@ -130,20 +131,20 @@ public class StudyControllerTest {
 
                 MockMultipartFile file = new MockMultipartFile("logo file", "logo.png", "image/png",
                                 "yourImageData".getBytes());
-                ScheduleCUReq scheduleCreateReq = new ScheduleCUReq("없는 스케줄 이름123123", "13:00", "14:00");
-                List<ScheduleCUReq> schedules = Collections.singletonList(scheduleCreateReq);
+                ScheduleReq scheduleUpdateReq = new ScheduleReq("없는 스케줄 이름123123", "13:00", "14:00");
+                List<ScheduleReq> schedules = Collections.singletonList(scheduleUpdateReq);
 
-                StudyCUReq studyCUReq = new StudyCUReq(
+                StudyReq studyReq = new StudyReq(
                                 "없는 스터디 이름123123", "10.10.10.110", "admin", "password", schedules);
-                studyCUReq.setSendDate(DateUtil.getCurrentDateTime());
-                studyCUReq.setSystemId("SYS_01");
-                String requestBodyJson = objectMapper.writeValueAsString(studyCUReq);
+                studyReq.setSendDate(DateUtil.getCurrentDateTime());
+                studyReq.setSystemId("SYS_01");
+                String requestBodyJson = objectMapper.writeValueAsString(studyReq);
 
-                MockMultipartFile jsonFile = new MockMultipartFile("studyCUReq", "", "application/json",
+                MockMultipartFile jsonFile = new MockMultipartFile("studyReq", "", "application/json",
                                 requestBodyJson.getBytes());
 
                 List<MockMultipartFile> files = Lists.list(file, jsonFile);
-                TestUtil.performFileRequest(mockMvc, UPDATE_STUDY_API_URL, files, 200, 200);
+                TestUtil.performFileRequest(mockMvc, UPDATE_STUDY_API_URL, HttpMethod.PUT, files, 200, 200);
         }
 
         @Test
@@ -153,19 +154,19 @@ public class StudyControllerTest {
 
                 MockMultipartFile file = new MockMultipartFile("logo file", "logo.png", "image/png",
                                 "yourImageData".getBytes());
-                ScheduleCUReq scheduleCreateReq = new ScheduleCUReq("없는 스케줄 이름123123", "13:00", "14:00");
-                List<ScheduleCUReq> schedules = Collections.singletonList(scheduleCreateReq);
+                ScheduleReq scheduleUpdateReq = new ScheduleReq("없는 스케줄 이름123123", "13:00", "14:00");
+                List<ScheduleReq> schedules = Collections.singletonList(scheduleUpdateReq);
 
-                StudyCUReq studyCUReq = new StudyCUReq(
+                StudyReq studyReq = new StudyReq(
                                 "없는 스터디 이름123123", "10.10.10.110", "admin", "password", schedules);
-                studyCUReq.setSendDate(DateUtil.getCurrentDateTime());
-                studyCUReq.setSystemId("SYS_01");
-                String requestBodyJson = objectMapper.writeValueAsString(studyCUReq);
+                studyReq.setSendDate(DateUtil.getCurrentDateTime());
+                studyReq.setSystemId("SYS_01");
+                String requestBodyJson = objectMapper.writeValueAsString(studyReq);
 
-                MockMultipartFile jsonFile = new MockMultipartFile("studyCUReq", "", "application/json",
+                MockMultipartFile jsonFile = new MockMultipartFile("studyReq", "", "application/json",
                                 requestBodyJson.getBytes());
 
                 List<MockMultipartFile> files = Lists.list(file, jsonFile);
-                TestUtil.performFileRequest(mockMvc, UPDATE_STUDY_API_URL, files, 200, 404);
+                TestUtil.performFileRequest(mockMvc, UPDATE_STUDY_API_URL, HttpMethod.PUT, files, 200, 404);
         }
 }

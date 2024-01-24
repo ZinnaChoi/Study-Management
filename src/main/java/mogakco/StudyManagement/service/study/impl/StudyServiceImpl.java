@@ -15,9 +15,10 @@ import java.util.stream.Collectors;
 import mogakco.StudyManagement.domain.Schedule;
 import mogakco.StudyManagement.domain.StudyInfo;
 import mogakco.StudyManagement.dto.DTOResCommon;
-import mogakco.StudyManagement.dto.ScheduleCUReq;
-import mogakco.StudyManagement.dto.StudyCUReq;
+import mogakco.StudyManagement.dto.ScheduleReq;
+import mogakco.StudyManagement.dto.StudyReq;
 import mogakco.StudyManagement.enums.ErrorCode;
+import mogakco.StudyManagement.exception.InvalidRequestException;
 import mogakco.StudyManagement.exception.NotFoundException;
 import mogakco.StudyManagement.repository.ScheduleRepository;
 import mogakco.StudyManagement.repository.StudyInfoRepository;
@@ -53,17 +54,17 @@ public class StudyServiceImpl implements StudyService {
 
         @Override
         @Transactional
-        public DTOResCommon createStudy(StudyCUReq studyCUReq, MultipartFile imageFile, LoggingService lo)
+        public DTOResCommon createStudy(StudyReq studyReq, MultipartFile imageFile, LoggingService lo)
                         throws IOException {
                 DTOResCommon result = new DTOResCommon(systemId, ErrorCode.OK.getCode(), ErrorCode.OK.getMessage());
-                if (studyInfoRepository.existsByStudyName(studyCUReq.getStudyName())) {
+                if (studyInfoRepository.existsByStudyName(studyReq.getStudyName())) {
                         return new DTOResCommon(systemId, ErrorCode.BAD_REQUEST.getCode(),
                                         ErrorCode.BAD_REQUEST.getMessage(
-                                                        studyCUReq.getStudyName() + "스터디 이름이 이미 존재합니다."));
+                                                        studyReq.getStudyName() + "스터디 이름이 이미 존재합니다."));
                 }
-                List<ScheduleCUReq> schedules = studyCUReq.getSchedules();
+                List<ScheduleReq> schedules = studyReq.getSchedules();
                 List<String> scheduleNames = schedules.stream()
-                                .map(ScheduleCUReq::getScheduleName)
+                                .map(ScheduleReq::getScheduleName)
                                 .collect(Collectors.toList());
 
                 List<Schedule> existSchedules = scheduleRepository.findAllByScheduleNameIn(scheduleNames);
@@ -76,7 +77,7 @@ public class StudyServiceImpl implements StudyService {
                                                         existScheduleNames.toString() + " schedule_name이 이미 존재합니다."));
                 }
                 byte[] studyLogoBytes = imageFile == null ? null : imageFile.getBytes();
-                StudyInfo studyInfo = StudyInfo.builder().studyName(studyCUReq.getStudyName())
+                StudyInfo studyInfo = StudyInfo.builder().studyName(studyReq.getStudyName())
                                 .studyLogo(studyLogoBytes)
                                 .db_url(dbUrl).db_user(dbUser).db_password(bCryptPasswordEncoder.encode(dbPassword))
                                 .build();
@@ -84,7 +85,7 @@ public class StudyServiceImpl implements StudyService {
                 studyInfoRepository.save(studyInfo);
                 lo.setDBEnd();
 
-                for (ScheduleCUReq scheduleCreateReq : studyCUReq.getSchedules()) {
+                for (ScheduleReq scheduleCreateReq : studyReq.getSchedules()) {
                         Schedule schedule = Schedule.builder().scheduleName(scheduleCreateReq.getScheduleName())
                                         .startTime(scheduleCreateReq.getStartTime())
                                         .endTime(scheduleCreateReq.getEndTime())
@@ -99,23 +100,25 @@ public class StudyServiceImpl implements StudyService {
 
         @Override
         @Transactional
-        public DTOResCommon updateStudy(StudyCUReq studyCUReq, MultipartFile imageFile, LoggingService lo)
-                        throws IOException {
+        public DTOResCommon updateStudy(StudyReq studyReq, MultipartFile imageFile, LoggingService lo) {
 
-                List<String> scheduleNames = studyCUReq.getSchedules().stream()
-                                .map(ScheduleCUReq::getScheduleName).collect(Collectors.toList());
+                List<String> scheduleNames = studyReq.getSchedules().stream()
+                                .map(ScheduleReq::getScheduleName).collect(Collectors.toList());
                 lo.setDBStart();
-                StudyInfo sInfo = studyInfoRepository.findByStudyName(studyCUReq.getStudyName());
+                StudyInfo sInfo = studyInfoRepository.findByStudyName(studyReq.getStudyName());
                 List<Schedule> schedules = scheduleRepository.findAllByScheduleNameIn(scheduleNames);
                 lo.setDBEnd();
                 // study_info 객체에 study_name, img set
-                if (sInfo == null) {
+                try {
+                        sInfo.updateStudyName(studyReq.getStudyName());
+                        sInfo.updateStudyLogo(imageFile == null ? null : imageFile.getBytes());
+                } catch (NullPointerException e) {
                         return ExceptionUtil.handleException(new NotFoundException("등록된 스터디가 없어 수정할 수 없습니다"));
+                } catch (IOException e) {
+                        return ExceptionUtil.handleException(new InvalidRequestException("이미지 파일을 변환 중 문제가 발생했습니다."));
                 }
-                sInfo.updateStudyName(studyCUReq.getStudyName());
-                sInfo.updateStudyLogo(imageFile == null ? null : imageFile.getBytes());
 
-                List<ScheduleCUReq> req = studyCUReq.getSchedules();
+                List<ScheduleReq> req = studyReq.getSchedules();
                 List<Schedule> upsertCandidates = new ArrayList<>();
                 int maxLoopSize = Math.max(req.size(), schedules.size());
                 for (int i = 0; i < maxLoopSize; i++) {
