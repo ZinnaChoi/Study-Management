@@ -151,4 +151,25 @@ public class StudyServiceImpl implements StudyService {
 
                 return new DTOResCommon(systemId, ErrorCode.OK.getCode(), ErrorCode.OK.getMessage());
         }
+
+        @Override
+        @Transactional
+        public DTOResCommon deleteStudy(String studyName, LoggingService lo) {
+
+                lo.setDBStart();
+                StudyInfo studyInfo = studyInfoRepository.findByStudyName(studyName);
+                lo.setDBEnd();
+                if (studyInfo == null) {
+                        return ExceptionUtil.handleException(
+                                        new NotFoundException(studyName + " 이름으로 등록된 스터디가 존재하지 않아 삭제할 수 없습니다."));
+                }
+
+                // study_info 및 schedule 삭제(member_schedule, absent_schedule 테이블도 cascade 삭제됨)
+                lo.setDBStart();
+                studyInfoRepository.delete(studyInfo);
+                scheduleRepository.deleteAll();
+                lo.setDBEnd();
+
+                return new DTOResCommon(systemId, ErrorCode.OK.getCode(), ErrorCode.OK.getMessage());
+        }
 }

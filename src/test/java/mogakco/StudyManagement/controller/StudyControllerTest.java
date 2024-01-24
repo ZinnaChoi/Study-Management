@@ -18,6 +18,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -51,6 +52,7 @@ public class StudyControllerTest {
 
         private static final String CREATE_STUDY_API_URL = "/api/v1/study";
         private static final String UPDATE_STUDY_API_URL = "/api/v1/studyinfo";
+        private static final String DELETE_STUDY_API_URL = "/api/v1/study";
 
         @Test
         @WithMockUser(username = "admin", authorities = { "ADMIN" })
@@ -59,11 +61,11 @@ public class StudyControllerTest {
 
                 MockMultipartFile file = new MockMultipartFile("logo file", "logo.png", "image/png",
                                 "yourImageData".getBytes());
-                ScheduleReq scheduleCreateReq = new ScheduleReq("없는 스케줄 이름123123", "13:00", "14:00");
+                ScheduleReq scheduleCreateReq = new ScheduleReq("NotExistScheduleName", "13:00", "14:00");
                 List<ScheduleReq> schedules = Collections.singletonList(scheduleCreateReq);
 
                 StudyReq studyReq = new StudyReq(
-                                "없는 스터디 이름123123", "10.10.10.110", "admin", "password", schedules);
+                                "NotExistStudyName", "10.10.10.110", "admin", "password", schedules);
                 studyReq.setSendDate(DateUtil.getCurrentDateTime());
                 studyReq.setSystemId("SYS_01");
                 String requestBodyJson = objectMapper.writeValueAsString(studyReq);
@@ -83,11 +85,11 @@ public class StudyControllerTest {
 
                 MockMultipartFile file = new MockMultipartFile("logo file", "logo.png", "image/png",
                                 "yourImageData".getBytes());
-                ScheduleReq scheduleCreateReq = new ScheduleReq("없는 스케줄 이름123123", "13:00", "14:00");
+                ScheduleReq scheduleCreateReq = new ScheduleReq("NotExistScheduleName", "13:00", "14:00");
                 List<ScheduleReq> schedules = Collections.singletonList(scheduleCreateReq);
 
                 StudyReq studyReq = new StudyReq(
-                                "없는 스터디 이름123123", "10.10.10.110", "admin", "password", schedules);
+                                "NotExistStudyName", "10.10.10.110", "admin", "password", schedules);
                 studyReq.setSendDate(DateUtil.getCurrentDateTime());
                 studyReq.setSystemId("SYS_01");
                 String requestBodyJson = objectMapper.writeValueAsString(studyReq);
@@ -107,11 +109,11 @@ public class StudyControllerTest {
 
                 MockMultipartFile file = new MockMultipartFile("logo file", "logo.png", "image/png",
                                 "yourImageData".getBytes());
-                ScheduleReq scheduleCreateReq = new ScheduleReq("없는 스케줄 이름123123", "13:00", "14:00");
+                ScheduleReq scheduleCreateReq = new ScheduleReq("NotExistScheduleName", "13:00", "14:00");
                 List<ScheduleReq> schedules = Collections.singletonList(scheduleCreateReq);
 
                 StudyReq studyReq = new StudyReq(
-                                "없는 스터디 이름123123", "10.10.10.110", "admin", "password", schedules);
+                                "NotExistStudyName", "10.10.10.110", "admin", "password", schedules);
                 studyReq.setSendDate(DateUtil.getCurrentDateTime());
                 studyReq.setSystemId("SYS_01");
                 String requestBodyJson = objectMapper.writeValueAsString(studyReq);
@@ -131,11 +133,11 @@ public class StudyControllerTest {
 
                 MockMultipartFile file = new MockMultipartFile("logo file", "logo.png", "image/png",
                                 "yourImageData".getBytes());
-                ScheduleReq scheduleUpdateReq = new ScheduleReq("없는 스케줄 이름123123", "13:00", "14:00");
+                ScheduleReq scheduleUpdateReq = new ScheduleReq("NotExistScheduleName", "13:00", "14:00");
                 List<ScheduleReq> schedules = Collections.singletonList(scheduleUpdateReq);
 
                 StudyReq studyReq = new StudyReq(
-                                "없는 스터디 이름123123", "10.10.10.110", "admin", "password", schedules);
+                                "NotExistStudyName", "10.10.10.110", "admin", "password", schedules);
                 studyReq.setSendDate(DateUtil.getCurrentDateTime());
                 studyReq.setSystemId("SYS_01");
                 String requestBodyJson = objectMapper.writeValueAsString(studyReq);
@@ -154,11 +156,11 @@ public class StudyControllerTest {
 
                 MockMultipartFile file = new MockMultipartFile("logo file", "logo.png", "image/png",
                                 "yourImageData".getBytes());
-                ScheduleReq scheduleUpdateReq = new ScheduleReq("없는 스케줄 이름123123", "13:00", "14:00");
+                ScheduleReq scheduleUpdateReq = new ScheduleReq("NotExistScheduleName", "13:00", "14:00");
                 List<ScheduleReq> schedules = Collections.singletonList(scheduleUpdateReq);
 
                 StudyReq studyReq = new StudyReq(
-                                "없는 스터디 이름123123", "10.10.10.110", "admin", "password", schedules);
+                                "NotExistStudyName", "10.10.10.110", "admin", "password", schedules);
                 studyReq.setSendDate(DateUtil.getCurrentDateTime());
                 studyReq.setSystemId("SYS_01");
                 String requestBodyJson = objectMapper.writeValueAsString(studyReq);
@@ -168,5 +170,28 @@ public class StudyControllerTest {
 
                 List<MockMultipartFile> files = Lists.list(file, jsonFile);
                 TestUtil.performFileRequest(mockMvc, UPDATE_STUDY_API_URL, HttpMethod.PUT, files, 200, 404);
+        }
+
+        @Test
+        @WithMockUser(username = "admin", authorities = { "ADMIN" })
+        @DisplayName("관리자 스터디 삭제 성공")
+        @Sql("/study/StudySetup.sql")
+        public void deleteStudyInfoUpdate_Success() throws Exception {
+
+                UriComponentsBuilder uriBuilder = UriComponentsBuilder
+                                .fromUriString(DELETE_STUDY_API_URL).path("/NotExistStudyName");
+
+                TestUtil.performRequest(mockMvc, uriBuilder.toUriString(), null, "DELETE", 200, 200);
+        }
+
+        @Test
+        @WithMockUser(username = "admin", authorities = { "ADMIN" })
+        @DisplayName("관리자 스터디 삭제 실패_없는 스터디 이름 삭제 시도")
+        public void deleteStudyInfoUpdate_NoExistStudyNameTried() throws Exception {
+
+                UriComponentsBuilder uriBuilder = UriComponentsBuilder
+                                .fromUriString(DELETE_STUDY_API_URL).path("/NotExistStudyName");
+
+                TestUtil.performRequest(mockMvc, uriBuilder.toUriString(), null, "DELETE", 200, 404);
         }
 }

@@ -1,6 +1,8 @@
 package mogakco.StudyManagement.controller;
 
 import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -67,6 +69,27 @@ public class StudyController extends CommonController {
         try {
             startAPI(lo, studyReq);
             result = studyService.updateStudy(studyReq, imageFile, lo);
+        } catch (Exception e) {
+            e.printStackTrace();
+            result = new DTOResCommon(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
+                    ErrorCode.INTERNAL_ERROR.getMessage());
+        } finally {
+            endAPI(request, ErrorCode.OK, lo, result);
+        }
+
+        return result;
+    }
+
+    @Operation(summary = "스터디 정보 수정", description = "스터디 정보(스터디 이름, 로고, 스케줄) 수정")
+    @SecurityRequirement(name = "bearer-key")
+    @DeleteMapping(value = "/study/{studyname}")
+    public DTOResCommon deleteStudy(HttpServletRequest request,
+            @PathVariable(name = "studyname", required = true) String studyName) {
+        DTOResCommon result = new DTOResCommon();
+
+        try {
+            startAPI(lo, null);
+            result = studyService.deleteStudy(studyName, lo);
         } catch (Exception e) {
             e.printStackTrace();
             result = new DTOResCommon(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
