@@ -10,15 +10,16 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class StudyCreateReq extends DTOReqCommon {
+// Study Create, Update DTO
+public class StudyCUReq extends DTOReqCommon {
     @NotBlank(message = "스터디 이름은 반드시 있어야 합니다")
     @Schema(example = "모각코 스터디")
     private String studyName;
 
-    private List<ScheduleCreateReq> schedules;
+    private List<ScheduleCUReq> schedules;
 
-    public StudyCreateReq(String studyName,
-            String dbUrl, String dbUser, String dbPassword, List<ScheduleCreateReq> schedules) {
+    public StudyCUReq(String studyName,
+            String dbUrl, String dbUser, String dbPassword, List<ScheduleCUReq> schedules) {
         this.studyName = studyName;
         this.schedules = schedules;
     }

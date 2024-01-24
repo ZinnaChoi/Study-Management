@@ -28,7 +28,7 @@ public class StudyInfo {
     private String studyName;
 
     @Lob
-    @Column(nullable = true)
+    @Column(nullable = true, columnDefinition = "LONGBLOB")
     private byte[] studyLogo;
 
     @Column(nullable = false)

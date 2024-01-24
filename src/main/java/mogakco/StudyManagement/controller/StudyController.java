@@ -15,7 +15,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import mogakco.StudyManagement.dto.DTOResCommon;
-import mogakco.StudyManagement.dto.StudyCreateReq;
+import mogakco.StudyManagement.dto.StudyCUReq;
 import mogakco.StudyManagement.enums.ErrorCode;
 import mogakco.StudyManagement.service.common.LoggingService;
 import mogakco.StudyManagement.service.study.StudyService;
@@ -37,13 +37,13 @@ public class StudyController extends CommonController {
     @SecurityRequirement(name = "bearer-key")
     @PostMapping(value = "/study", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public DTOResCommon createStudy(HttpServletRequest request,
-            @Valid @RequestPart(value = "studyCreateReq") @Parameter(schema = @Schema(type = "string", format = "binary")) StudyCreateReq studyCreateReq,
+            @Valid @RequestPart(value = "studyCUReq") @Parameter(schema = @Schema(type = "string", format = "binary")) StudyCUReq studyCUReq,
             @Parameter(description = "이미지 파일") @RequestPart(name = "logo file", required = false) MultipartFile imageFile) {
         DTOResCommon result = new DTOResCommon();
 
         try {
-            startAPI(lo, studyCreateReq);
-            result = studyService.createStudy(studyCreateReq, imageFile, lo);
+            startAPI(lo, studyCUReq);
+            result = studyService.createStudy(studyCUReq, imageFile, lo);
         } catch (Exception e) {
             e.printStackTrace();
             result = new DTOResCommon(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
@@ -57,15 +57,15 @@ public class StudyController extends CommonController {
 
     @Operation(summary = "스터디 정보 수정", description = "스터디 정보(스터디 이름, 로고, 스케줄) 수정")
     @SecurityRequirement(name = "bearer-key")
-    @PostMapping(value = "/study/{studyId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/studyinfo", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public DTOResCommon updateStudy(HttpServletRequest request,
-            @Valid @RequestPart(value = "studyCreateReq") @Parameter(schema = @Schema(type = "string", format = "binary")) StudyCreateReq studyCreateReq,
+            @Valid @RequestPart(value = "studyCUReq") @Parameter(schema = @Schema(type = "string", format = "binary")) StudyCUReq studyCUReq,
             @Parameter(description = "이미지 파일") @RequestPart(name = "logo file", required = false) MultipartFile imageFile) {
         DTOResCommon result = new DTOResCommon();
 
         try {
-            startAPI(lo, studyCreateReq);
-            result = studyService.updateStudy(studyCreateReq, imageFile, lo);
+            startAPI(lo, studyCUReq);
+            result = studyService.updateStudy(studyCUReq, imageFile, lo);
         } catch (Exception e) {
             e.printStackTrace();
             result = new DTOResCommon(systemId, ErrorCode.INTERNAL_ERROR.getCode(),

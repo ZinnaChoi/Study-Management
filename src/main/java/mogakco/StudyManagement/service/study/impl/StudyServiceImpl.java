@@ -15,10 +15,10 @@ import java.util.stream.Collectors;
 import mogakco.StudyManagement.domain.Schedule;
 import mogakco.StudyManagement.domain.StudyInfo;
 import mogakco.StudyManagement.dto.DTOResCommon;
-import mogakco.StudyManagement.dto.ScheduleCreateReq;
-import mogakco.StudyManagement.dto.StudyCreateReq;
+import mogakco.StudyManagement.dto.ScheduleCUReq;
+import mogakco.StudyManagement.dto.StudyCUReq;
 import mogakco.StudyManagement.enums.ErrorCode;
-import mogakco.StudyManagement.exception.InvalidRequestException;
+import mogakco.StudyManagement.exception.NotFoundException;
 import mogakco.StudyManagement.repository.ScheduleRepository;
 import mogakco.StudyManagement.repository.StudyInfoRepository;
 import mogakco.StudyManagement.service.common.LoggingService;
@@ -53,17 +53,17 @@ public class StudyServiceImpl implements StudyService {
 
         @Override
         @Transactional
-        public DTOResCommon createStudy(StudyCreateReq studyCreateReq, MultipartFile imageFile, LoggingService lo)
+        public DTOResCommon createStudy(StudyCUReq studyCUReq, MultipartFile imageFile, LoggingService lo)
                         throws IOException {
                 DTOResCommon result = new DTOResCommon(systemId, ErrorCode.OK.getCode(), ErrorCode.OK.getMessage());
-                if (studyInfoRepository.existsByStudyName(studyCreateReq.getStudyName())) {
+                if (studyInfoRepository.existsByStudyName(studyCUReq.getStudyName())) {
                         return new DTOResCommon(systemId, ErrorCode.BAD_REQUEST.getCode(),
                                         ErrorCode.BAD_REQUEST.getMessage(
-                                                        studyCreateReq.getStudyName() + "스터디 이름이 이미 존재합니다."));
+                                                        studyCUReq.getStudyName() + "스터디 이름이 이미 존재합니다."));
                 }
-                List<ScheduleCreateReq> schedules = studyCreateReq.getSchedules();
+                List<ScheduleCUReq> schedules = studyCUReq.getSchedules();
                 List<String> scheduleNames = schedules.stream()
-                                .map(ScheduleCreateReq::getScheduleName)
+                                .map(ScheduleCUReq::getScheduleName)
                                 .collect(Collectors.toList());
 
                 List<Schedule> existSchedules = scheduleRepository.findAllByScheduleNameIn(scheduleNames);
@@ -76,7 +76,7 @@ public class StudyServiceImpl implements StudyService {
                                                         existScheduleNames.toString() + " schedule_name이 이미 존재합니다."));
                 }
                 byte[] studyLogoBytes = imageFile == null ? null : imageFile.getBytes();
-                StudyInfo studyInfo = StudyInfo.builder().studyName(studyCreateReq.getStudyName())
+                StudyInfo studyInfo = StudyInfo.builder().studyName(studyCUReq.getStudyName())
                                 .studyLogo(studyLogoBytes)
                                 .db_url(dbUrl).db_user(dbUser).db_password(bCryptPasswordEncoder.encode(dbPassword))
                                 .build();
@@ -84,7 +84,7 @@ public class StudyServiceImpl implements StudyService {
                 studyInfoRepository.save(studyInfo);
                 lo.setDBEnd();
 
-                for (ScheduleCreateReq scheduleCreateReq : studyCreateReq.getSchedules()) {
+                for (ScheduleCUReq scheduleCreateReq : studyCUReq.getSchedules()) {
                         Schedule schedule = Schedule.builder().scheduleName(scheduleCreateReq.getScheduleName())
                                         .startTime(scheduleCreateReq.getStartTime())
                                         .endTime(scheduleCreateReq.getEndTime())
@@ -99,59 +99,53 @@ public class StudyServiceImpl implements StudyService {
 
         @Override
         @Transactional
-        public DTOResCommon updateStudy(StudyCreateReq studyCreateReq, MultipartFile imageFile, LoggingService lo)
+        public DTOResCommon updateStudy(StudyCUReq studyCUReq, MultipartFile imageFile, LoggingService lo)
                         throws IOException {
 
-                // study_info 객체에 study_name, img set
+                List<String> scheduleNames = studyCUReq.getSchedules().stream()
+                                .map(ScheduleCUReq::getScheduleName).collect(Collectors.toList());
                 lo.setDBStart();
-                StudyInfo sInfo = studyInfoRepository.findByStudyName(studyCreateReq.getStudyName());
+                StudyInfo sInfo = studyInfoRepository.findByStudyName(studyCUReq.getStudyName());
+                List<Schedule> schedules = scheduleRepository.findAllByScheduleNameIn(scheduleNames);
                 lo.setDBEnd();
-                sInfo.updateStudyName(studyCreateReq.getStudyName());
+                // study_info 객체에 study_name, img set
+                if (sInfo == null) {
+                        return ExceptionUtil.handleException(new NotFoundException("등록된 스터디가 없어 수정할 수 없습니다"));
+                }
+                sInfo.updateStudyName(studyCUReq.getStudyName());
                 sInfo.updateStudyLogo(imageFile == null ? null : imageFile.getBytes());
 
-                // schedule 객체에 데이터 set
-                List<String> scheduleNames = studyCreateReq.getSchedules().stream()
-                                .map(ScheduleCreateReq::getScheduleName).collect(Collectors.toList());
-                // for (ScheduleCreateReq scheduleCreateReq : studyCreateReq.getSchedules()) {
-                // String scheduleName = scheduleCreateReq.getScheduleName();
-                // String startTime = scheduleCreateReq.getStartTime();
-                // String endTime = scheduleCreateReq.getEndTime();
-                // if (isStringNull(scheduleName)) {
-                // return ExceptionUtil.handleException(new InvalidRequestException("빈 값을 넣을 수
-                // 없습니다."));
-                // }
-                // Schedule schedule =
-                // Schedule.builder().scheduleName(scheduleCreateReq.getScheduleName())
-                // .startTime(scheduleCreateReq.getStartTime())
-                // .endTime(scheduleCreateReq.getEndTime())
-                // .build();
-
-                // updateCandidates.add(scheduleName);
-                // }
-                // do update
-                List<ScheduleCreateReq> req = studyCreateReq.getSchedules();
-                List<Schedule> schedules = scheduleRepository.findAllByScheduleNameIn(scheduleNames);
-                for (int i = 0; i < schedules.size(); i++) {
-                        if (schedules.get(i).getScheduleName() == req.get(i).getScheduleName()) {
-                                schedules.set(i, Schedule.builder().scheduleId(schedules.get(i).getScheduleId())
+                List<ScheduleCUReq> req = studyCUReq.getSchedules();
+                List<Schedule> upsertCandidates = new ArrayList<>();
+                int maxLoopSize = Math.max(req.size(), schedules.size());
+                for (int i = 0; i < maxLoopSize; i++) {
+                        // 업데이트 해야 한다면
+                        if ((i < schedules.size() && i < req.size())) {
+                                if (schedules.get(i).getScheduleName().equals(req.get(i).getScheduleName())) {
+                                        upsertCandidates.add(
+                                                        Schedule.builder().scheduleId(schedules.get(i).getScheduleId())
+                                                                        .scheduleName(req.get(i).getScheduleName())
+                                                                        .startTime(req.get(i).getStartTime())
+                                                                        .endTime(req.get(i).getEndTime())
+                                                                        .build());
+                                }
+                                // 새로운 것을 인서트 해야 한다면
+                        } else if ((i >= schedules.size() && i < req.size())) {
+                                upsertCandidates.add(Schedule.builder()
                                                 .scheduleName(req.get(i).getScheduleName())
                                                 .startTime(req.get(i).getStartTime()).endTime(req.get(i).getEndTime())
                                                 .build());
+                                // 인서트나 업데이트 둘다 안해도 된다면
+                        } else {
+                                break;
                         }
                 }
-                // schedules = schedules.stream()
-                // .filter(sc -> scheduleNames.contains(sc.getScheduleName()))
-                // .collect(Collectors.toList());
-                // 더티 체킹 해야함..
+                // do upsert
                 lo.setDBStart();
                 studyInfoRepository.save(sInfo);
-                scheduleRepository.saveAll(schedules);
+                scheduleRepository.saveAll(upsertCandidates);
                 lo.setDBEnd();
 
                 return new DTOResCommon(systemId, ErrorCode.OK.getCode(), ErrorCode.OK.getMessage());
-        }
-
-        private boolean isStringNull(String str) {
-                return str == null || str.isBlank();
         }
 }

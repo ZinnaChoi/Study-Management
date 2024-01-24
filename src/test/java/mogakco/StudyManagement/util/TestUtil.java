@@ -3,11 +3,15 @@ package mogakco.StudyManagement.util;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.List;
+
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 public class TestUtil {
@@ -34,6 +38,33 @@ public class TestUtil {
                 break;
             default:
                 throw new IllegalArgumentException("Invalid HTTP method: " + method);
+        }
+
+        resultActions = mockMvc.perform(requestBuilder);
+
+        if (expectedStatus == 200) {
+            resultActions.andExpect(status().isOk());
+        } else {
+            resultActions.andExpect(status().is(expectedStatus));
+        }
+
+        if (expectedRetCode != null) {
+            resultActions.andExpect(jsonPath("$.retCode").value(expectedRetCode));
+        }
+
+        return resultActions.andReturn();
+    }
+
+    public static MvcResult performFileRequest(MockMvc mockMvc, String url,
+            List<MockMultipartFile> files, int expectedStatus, Integer expectedRetCode) throws Exception {
+        ResultActions resultActions = null;
+        MockMultipartHttpServletRequestBuilder requestBuilder = null;
+
+        requestBuilder = (MockMultipartHttpServletRequestBuilder) MockMvcRequestBuilders.multipart(url)
+                .contentType(MediaType.MULTIPART_FORM_DATA);
+
+        for (int i = 0; i < files.size(); i++) {
+            requestBuilder.file(files.get(i));
         }
 
         resultActions = mockMvc.perform(requestBuilder);
