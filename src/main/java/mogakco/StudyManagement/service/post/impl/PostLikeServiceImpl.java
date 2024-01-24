@@ -2,6 +2,7 @@ package mogakco.StudyManagement.service.post.impl;
 
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import mogakco.StudyManagement.domain.Member;
 import mogakco.StudyManagement.domain.Post;
@@ -35,6 +36,7 @@ public class PostLikeServiceImpl implements PostLikeService {
     }
 
     @Override
+    @Transactional
     public DTOResCommon createPostLike(Long postId, LoggingService lo) {
 
         try {
@@ -68,6 +70,34 @@ public class PostLikeServiceImpl implements PostLikeService {
             return ExceptionUtil.handleException(e);
         }
 
+    }
+
+    @Override
+    @Transactional
+    public DTOResCommon deletePostLike(Long postId, LoggingService lo) {
+
+        try {
+            Specification<Post> postSpec = PostSpecification.withPostId(postId);
+            lo.setDBStart();
+            Post post = postRepository.findOne(postSpec)
+                    .orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND.getMessage("게시글")));
+
+            Member loginMember = memberRepository.findById(SecurityUtil.getLoginUserId());
+            lo.setDBEnd();
+
+            Specification<PostLike> postLikeSpec = PostLikeSpecification.withPostAndMember(post, loginMember);
+            lo.setDBStart();
+            PostLike postLike = postLikeRepository.findOne(postLikeSpec)
+                    .orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND.getMessage("게시글 좋아요")));
+
+            postLikeRepository.delete(postLike);
+            lo.setDBEnd();
+
+            return new DTOResCommon(null, ErrorCode.DELETED.getCode(), ErrorCode.DELETED.getMessage("게시글 좋아요"));
+
+        } catch (NotFoundException e) {
+            return ExceptionUtil.handleException(e);
+        }
     }
 
 }

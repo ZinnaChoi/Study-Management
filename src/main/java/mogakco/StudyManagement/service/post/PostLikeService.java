@@ -7,4 +7,6 @@ public interface PostLikeService {
 
     DTOResCommon createPostLike(Long postId, LoggingService lo);
 
+    DTOResCommon deletePostLike(Long postId, LoggingService lo);
+
 }
