@@ -6,27 +6,27 @@ import mogakco.StudyManagement.domain.Post;
 
 @Getter
 @Setter
-public class PostList {
+public class PostDetail {
+    private String memberName;
 
     private Integer likes;
 
     private String title;
 
-    private String memberName;
-
-    private Integer commentCnt;
+    private String content;
 
     private String createdAt;
 
     private String updatedAt;
 
-    public PostList(Post post, Integer likes, Integer commentCnt) {
-        this.title = post.getTitle();
+    public PostDetail(Post post, Integer likes) {
+
         this.memberName = post.getMember().getName();
+        this.title = post.getTitle();
+        this.content = post.getContent();
         this.createdAt = post.getCreatedAt();
         this.updatedAt = post.getUpdatedAt();
         this.likes = likes;
-        this.commentCnt = commentCnt;
-    }
 
+    }
 }

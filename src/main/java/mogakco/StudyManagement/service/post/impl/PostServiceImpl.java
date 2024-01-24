@@ -13,6 +13,7 @@ import mogakco.StudyManagement.domain.Member;
 import mogakco.StudyManagement.domain.Post;
 import mogakco.StudyManagement.dto.PostReq;
 import mogakco.StudyManagement.dto.DTOResCommon;
+import mogakco.StudyManagement.dto.PostDetail;
 import mogakco.StudyManagement.dto.PostDetailRes;
 import mogakco.StudyManagement.dto.PostList;
 import mogakco.StudyManagement.dto.PostListReq;
@@ -23,6 +24,8 @@ import mogakco.StudyManagement.enums.PostSearchType;
 import mogakco.StudyManagement.exception.NotFoundException;
 import mogakco.StudyManagement.exception.UnauthorizedAccessException;
 import mogakco.StudyManagement.repository.MemberRepository;
+import mogakco.StudyManagement.repository.PostCommentRepository;
+import mogakco.StudyManagement.repository.PostLikeRepository;
 import mogakco.StudyManagement.repository.PostRepository;
 import mogakco.StudyManagement.repository.PostSpecification;
 import mogakco.StudyManagement.service.common.LoggingService;
@@ -37,10 +40,15 @@ public class PostServiceImpl implements PostService {
 
     private final MemberRepository memberRepository;
     private final PostRepository postRepository;
+    private final PostCommentRepository postCommentRepository;
+    private final PostLikeRepository postLikeRepository;
 
-    public PostServiceImpl(MemberRepository memberRepository, PostRepository postRepository) {
+    public PostServiceImpl(MemberRepository memberRepository, PostRepository postRepository,
+            PostCommentRepository postCommentRepository, PostLikeRepository postLikeRepository) {
         this.memberRepository = memberRepository;
         this.postRepository = postRepository;
+        this.postCommentRepository = postCommentRepository;
+        this.postLikeRepository = postLikeRepository;
     }
 
     @Override
@@ -51,7 +59,7 @@ public class PostServiceImpl implements PostService {
         lo.setDBEnd();
 
         Post post = Post.builder().member(member).title(postCreateReq.getTitle()).content(postCreateReq.getContent())
-                .viewCnt(0).createdAt(DateUtil.getCurrentDateTime()).updatedAt(DateUtil.getCurrentDateTime())
+                .createdAt(DateUtil.getCurrentDateTime()).updatedAt(DateUtil.getCurrentDateTime())
                 .build();
 
         lo.setDBStart();
@@ -79,9 +87,14 @@ public class PostServiceImpl implements PostService {
         lo.setDBEnd();
 
         List<PostList> postLists = posts.getContent().stream()
-                .map(PostList::new)
+                .map(post -> {
+                    lo.setDBStart();
+                    Integer commentCount = postCommentRepository.countByPostPostId(post.getPostId());
+                    Integer likeCount = postLikeRepository.countByPostPostId(post.getPostId());
+                    lo.setDBEnd();
+                    return new PostList(post, likeCount, commentCount);
+                })
                 .collect(Collectors.toList());
-
         SimplePageable simplePageable = PageUtil.createSimplePageable(posts);
 
         return new PostListRes(null, ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), postLists, simplePageable);
@@ -95,9 +108,11 @@ public class PostServiceImpl implements PostService {
             lo.setDBStart();
             Post post = postRepository.findOne(spec)
                     .orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND.getMessage("게시글")));
+            Integer likeCount = postLikeRepository.countByPostPostId(postId);
             lo.setDBEnd();
 
-            return new PostDetailRes(null, ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), new PostList(post));
+            return new PostDetailRes(null, ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(),
+                    new PostDetail(post, likeCount));
         } catch (NotFoundException e) {
             DTOResCommon res = ExceptionUtil.handleException(e);
             return new PostDetailRes(res.getSystemId(), res.getRetCode(), res.getRetMsg(), null);

@@ -4,9 +4,8 @@ VALUES
 ('010-1111-1111', '20240112222007395', '20240112222007395', 'PostUser', 'PostUser', '$2a$10$LFyW8UyygbwOdyVODxN/lOMVo.Euubxgx9F7c7tX49bqHOgOXE/Z6', 'USER'),
 ('010-1111-1111', '20240112222007395', '20240112222007395', 'PostUser2', 'PostUser2', '$2a$10$LFyW8UyygbwOdyVODxN/lOMVo.Euubxgx9F7c7tX49bqHOgOXE/Z6', 'USER');
 
-INSERT INTO study.post (view_cnt, member_id, title, content, created_at, updated_at)
+INSERT INTO study.post (member_id, title, content, created_at, updated_at)
 SELECT
-    0,
     (SELECT member_id FROM member WHERE id = 'PostUser'),
     title,
     content,

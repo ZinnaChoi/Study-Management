@@ -1,5 +1,6 @@
 package mogakco.StudyManagement.controller;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.DisplayName;
@@ -172,7 +173,11 @@ public class PostControllerTest {
 
         for (JsonNode element : responseBody.path("content")) {
             String title = element.path("title").asText();
+            int likeCnt = element.path("likes").asInt();
+            int commentCnt = element.path("commentCnt").asInt();
             assertTrue(title.startsWith("post2"));
+            assertEquals(likeCnt, 1);
+            assertEquals(commentCnt, 1);
             break;
         }
     }
@@ -227,7 +232,7 @@ public class PostControllerTest {
                 null, "GET", 200, 200);
 
         JsonNode responseBody = objectMapper.readTree(result.getResponse().getContentAsString());
-        String title = responseBody.path("postList").path("title").asText();
+        String title = responseBody.path("postDetail").path("title").asText();
         assertTrue(title.startsWith("post"));
     }
 

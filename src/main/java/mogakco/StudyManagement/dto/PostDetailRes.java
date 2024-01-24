@@ -9,12 +9,11 @@ import lombok.Setter;
 @NoArgsConstructor
 public class PostDetailRes extends DTOResCommon {
 
-    private PostList postList;
+    private PostDetail postDetail;
 
-    public PostDetailRes(String systemId, Integer retCode, String retMsg, PostList postList) {
-
+    public PostDetailRes(String systemId, Integer retCode, String retMsg, PostDetail postDetail) {
         super(systemId, retCode, retMsg);
-        this.postList = postList;
+        this.postDetail = postDetail;
     }
 
 }

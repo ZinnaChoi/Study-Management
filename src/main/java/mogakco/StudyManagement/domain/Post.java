@@ -38,9 +38,6 @@ public class Post {
     @Column(length = 20000, nullable = false)
     private String content;
 
-    @Column(name = "view_cnt", nullable = false)
-    private Integer viewCnt;
-
     @Column(nullable = false)
     private String createdAt;
 

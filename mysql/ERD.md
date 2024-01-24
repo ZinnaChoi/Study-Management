@@ -49,7 +49,6 @@
 | member_id   | Foreign Key | Long          | 게시자 ID     |
 | title       |             | String(60)    | 게시글 제목   |
 | content     |             | String(20000) | 게시글 내용   |
-| view_cnt    |             | Integer       | 조회 수       |
 | created_at  |             | String        | 생성 날짜     |
 | updated_at  |             | String        | 업데이트 날짜 |
 
