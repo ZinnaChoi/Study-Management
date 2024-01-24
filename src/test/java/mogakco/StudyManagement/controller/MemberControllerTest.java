@@ -35,7 +35,6 @@ import org.springframework.security.test.context.support.WithMockUser;
 @ActiveProfiles("test")
 @AutoConfigureMockMvc
 @SpringBootTest
-@Transactional
 @DisplayName("계정 및 권한 테스트")
 public class MemberControllerTest {
 
@@ -61,7 +60,7 @@ public class MemberControllerTest {
     private static final String JOIN_URL = "/api/v1/join";
     private static final String ID_DUPLICATED_CHECK_URL = "/api/v1/id-duplicated";
     private static final String MEMBER_INFO_URL = "/api/v1/member";
-    private static final String MEMBERS_INFO_BY_SCHEDULE_URL = "/api/v1/members/joined-study";
+    private static final String MEMBERS_INFO_BY_SCHEDULE_URL = "/api/v1/members/schedule-name";
     private static final String MEMBERS_INFO_BY_WAKEUP_URL = "/api/v1/members/wakeup-time";
 
     @Test
@@ -111,6 +110,7 @@ public class MemberControllerTest {
     @Test
     @WithMockUser(authorities = "ADMIN")
     @DisplayName("회원가입 API 성공")
+    @Transactional
     @Sql("/member/MemberSetup.sql")
     void joinSuccess() throws Exception {
         MemberJoinReq req = new MemberJoinReq("user90919239", "password123!", "HongGilDong", "01011112222", "모각코 스터디",
@@ -239,6 +239,7 @@ public class MemberControllerTest {
 
     @Test
     @WithMockUser(username = "user1", authorities = { "USER" })
+    @Transactional
     @Sql("/member/MemberSetup.sql")
     @DisplayName("MyPage 회원 정보변경 성공")
     void setMemberInfo_Success() throws Exception {
@@ -253,6 +254,7 @@ public class MemberControllerTest {
 
     @Test
     @WithMockUser(username = "user1", authorities = { "USER" })
+    @Transactional
     @Sql("/member/MemberSetup.sql")
     @DisplayName("MyPage 회원 정보변경 실패_이름 빈 값")
     // 이름, 스케줄 이름, 비밀번호, 기상 시간 빈 값등은 다 똑같은 실패 케이스로 케이스마다 테스트 코드 추가하지는 않았음
@@ -268,6 +270,7 @@ public class MemberControllerTest {
 
     @Test
     @WithMockUser(username = "user1", authorities = { "USER" })
+    @Transactional
     @Sql("/member/MemberSetup.sql")
     @DisplayName("MyPage 회원 정보변경 실패_잘못된 비밀번호 형식")
     void setMemberInfo_WrongPwd() throws Exception {
@@ -284,6 +287,7 @@ public class MemberControllerTest {
     /////////////////////////////////////////////////////////////////
 
     @Test
+    @Transactional
     @Sql("/member/MemberSetup.sql")
     @WithMockUser(username = "user1", authorities = { "USER" })
     @DisplayName("운영 타입별 다수 회원 이름, 아이디 조회 성공")
@@ -302,6 +306,7 @@ public class MemberControllerTest {
     }
 
     @Test
+    @Transactional
     @Sql("/member/MemberSetup.sql")
     @WithMockUser(username = "user1", authorities = { "USER" })
     @DisplayName("운영 타입별 다수 회원 이름, 아이디 조회 실패_not include sendDate")
@@ -321,6 +326,7 @@ public class MemberControllerTest {
     /////////////////////////////////////////////////////////////////
 
     @Test
+    @Transactional
     @Sql("/member/MemberSetup.sql")
     @WithMockUser(username = "user1", authorities = { "USER" })
     @DisplayName("기상 시간별 다수 회원 이름, 아이디 조회 성공")
@@ -339,6 +345,7 @@ public class MemberControllerTest {
     }
 
     @Test
+    @Transactional
     @Sql("/member/MemberSetup.sql")
     @WithMockUser(username = "user1", authorities = { "USER" })
     @DisplayName("기상 시간별 다수 회원 이름, 아이디 조회 실패_not include sendDate")

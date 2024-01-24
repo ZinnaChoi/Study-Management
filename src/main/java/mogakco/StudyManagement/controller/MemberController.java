@@ -143,7 +143,7 @@ public class MemberController extends CommonController {
 
     @Operation(summary = "스케줄 이름 별 멤버 조회", description = "스케줄 이름을 통한 멤버 조회(schedule == null일 경우 스터디 참여 인원 전체 조회)")
     @SecurityRequirement(name = "bearer-key")
-    @GetMapping("/members/joined-study")
+    @GetMapping("/members/schedule-name")
     public StudyMembersRes getMembersBySchedule(
             HttpServletRequest request,
             @Parameter(name = "info", description = "요청 시 필수 값") @ModelAttribute @Valid DTOReqCommon info,

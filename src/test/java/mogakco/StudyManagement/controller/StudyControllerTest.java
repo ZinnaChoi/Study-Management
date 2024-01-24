@@ -3,6 +3,7 @@ package mogakco.StudyManagement.controller;
 import java.util.Collections;
 import java.util.List;
 
+import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -10,23 +11,22 @@ import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
+import org.springframework.http.HttpMethod;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import mogakco.StudyManagement.dto.ScheduleCreateReq;
-import mogakco.StudyManagement.dto.StudyCreateReq;
+import mogakco.StudyManagement.dto.ScheduleReq;
+import mogakco.StudyManagement.dto.StudyReq;
 import mogakco.StudyManagement.service.common.LoggingService;
 import mogakco.StudyManagement.service.study.StudyService;
 import mogakco.StudyManagement.util.DateUtil;
+import mogakco.StudyManagement.util.TestUtil;
 
 @ActiveProfiles("test")
 @AutoConfigureMockMvc
@@ -50,6 +50,7 @@ public class StudyControllerTest {
         private MockMvc mockMvc;
 
         private static final String CREATE_STUDY_API_URL = "/api/v1/study";
+        private static final String UPDATE_STUDY_API_URL = "/api/v1/studyinfo";
 
         @Test
         @WithMockUser(username = "admin", authorities = { "ADMIN" })
@@ -58,79 +59,114 @@ public class StudyControllerTest {
 
                 MockMultipartFile file = new MockMultipartFile("logo file", "logo.png", "image/png",
                                 "yourImageData".getBytes());
-                ScheduleCreateReq scheduleCreateReq = new ScheduleCreateReq("없는 스케줄 이름123123", "13:00", "14:00");
-                List<ScheduleCreateReq> schedules = Collections.singletonList(scheduleCreateReq);
+                ScheduleReq scheduleCreateReq = new ScheduleReq("없는 스케줄 이름123123", "13:00", "14:00");
+                List<ScheduleReq> schedules = Collections.singletonList(scheduleCreateReq);
 
-                StudyCreateReq studyCreateReq = new StudyCreateReq(
+                StudyReq studyReq = new StudyReq(
                                 "없는 스터디 이름123123", "10.10.10.110", "admin", "password", schedules);
-                studyCreateReq.setSendDate(DateUtil.getCurrentDateTime());
-                studyCreateReq.setSystemId("SYS_01");
-                String requestBodyJson = objectMapper.writeValueAsString(studyCreateReq);
+                studyReq.setSendDate(DateUtil.getCurrentDateTime());
+                studyReq.setSystemId("SYS_01");
+                String requestBodyJson = objectMapper.writeValueAsString(studyReq);
 
-                MockMultipartFile jsonFile = new MockMultipartFile("studyCreateReq", "", "application/json",
+                MockMultipartFile jsonFile = new MockMultipartFile("studyReq", "", "application/json",
                                 requestBodyJson.getBytes());
 
-                mockMvc.perform(MockMvcRequestBuilders.multipart(CREATE_STUDY_API_URL)
-                                .file(file) // 이미지(로고) 파일
-                                .file(jsonFile) // 바이너리 studyCreateReq 객체
-                                .contentType(MediaType.MULTIPART_FORM_DATA)) // Content-Type 설정
-                                .andExpect(MockMvcResultMatchers.status().isOk())
-                                .andExpect(MockMvcResultMatchers.jsonPath("$.retCode").value(200));
+                List<MockMultipartFile> files = Lists.list(file, jsonFile);
+                TestUtil.performFileRequest(mockMvc, CREATE_STUDY_API_URL, HttpMethod.POST, files, 200, 200);
         }
 
         @Test
         @WithMockUser(username = "admin", authorities = { "ADMIN" })
         @DisplayName("관리자 스터디 생성 실패_존재하는 스터디 이름")
-        @Sql("/ExistStudyNameSetup.sql")
+        @Sql("/study/StudySetup.sql")
         public void createStudyFailureExistStudyName() throws Exception {
 
                 MockMultipartFile file = new MockMultipartFile("logo file", "logo.png", "image/png",
                                 "yourImageData".getBytes());
-                ScheduleCreateReq scheduleCreateReq = new ScheduleCreateReq("없는 스케줄 이름123123", "13:00", "14:00");
-                List<ScheduleCreateReq> schedules = Collections.singletonList(scheduleCreateReq);
+                ScheduleReq scheduleCreateReq = new ScheduleReq("없는 스케줄 이름123123", "13:00", "14:00");
+                List<ScheduleReq> schedules = Collections.singletonList(scheduleCreateReq);
 
-                StudyCreateReq studyCreateReq = new StudyCreateReq(
+                StudyReq studyReq = new StudyReq(
                                 "없는 스터디 이름123123", "10.10.10.110", "admin", "password", schedules);
-                studyCreateReq.setSendDate(DateUtil.getCurrentDateTime());
-                studyCreateReq.setSystemId("SYS_01");
-                String requestBodyJson = objectMapper.writeValueAsString(studyCreateReq);
+                studyReq.setSendDate(DateUtil.getCurrentDateTime());
+                studyReq.setSystemId("SYS_01");
+                String requestBodyJson = objectMapper.writeValueAsString(studyReq);
 
-                MockMultipartFile jsonFile = new MockMultipartFile("studyCreateReq", "", "application/json",
+                MockMultipartFile jsonFile = new MockMultipartFile("studyReq", "", "application/json",
                                 requestBodyJson.getBytes());
 
-                mockMvc.perform(MockMvcRequestBuilders.multipart(CREATE_STUDY_API_URL)
-                                .file(file) // 이미지(로고) 파일
-                                .file(jsonFile) // 바이너리 studyCreateReq 객체
-                                .contentType(MediaType.MULTIPART_FORM_DATA)) // Content-Type 설정
-                                .andExpect(MockMvcResultMatchers.status().isOk())
-                                .andExpect(MockMvcResultMatchers.jsonPath("$.retCode").value(400));
+                List<MockMultipartFile> files = Lists.list(file, jsonFile);
+                TestUtil.performFileRequest(mockMvc, CREATE_STUDY_API_URL, HttpMethod.POST, files, 200, 400);
         }
 
         @Test
         @WithMockUser(username = "admin", authorities = { "ADMIN" })
         @DisplayName("관리자 스터디 생성 실패_존재하는 스케줄 이름")
-        @Sql("/ExistScheduleNameSetup.sql")
+        @Sql("/study/StudySetup.sql")
         public void createStudyFailureExistScheduleName() throws Exception {
 
                 MockMultipartFile file = new MockMultipartFile("logo file", "logo.png", "image/png",
                                 "yourImageData".getBytes());
-                ScheduleCreateReq scheduleCreateReq = new ScheduleCreateReq("없는 스케줄 이름123123", "13:00", "14:00");
-                List<ScheduleCreateReq> schedules = Collections.singletonList(scheduleCreateReq);
+                ScheduleReq scheduleCreateReq = new ScheduleReq("없는 스케줄 이름123123", "13:00", "14:00");
+                List<ScheduleReq> schedules = Collections.singletonList(scheduleCreateReq);
 
-                StudyCreateReq studyCreateReq = new StudyCreateReq(
+                StudyReq studyReq = new StudyReq(
                                 "없는 스터디 이름123123", "10.10.10.110", "admin", "password", schedules);
-                studyCreateReq.setSendDate(DateUtil.getCurrentDateTime());
-                studyCreateReq.setSystemId("SYS_01");
-                String requestBodyJson = objectMapper.writeValueAsString(studyCreateReq);
+                studyReq.setSendDate(DateUtil.getCurrentDateTime());
+                studyReq.setSystemId("SYS_01");
+                String requestBodyJson = objectMapper.writeValueAsString(studyReq);
 
-                MockMultipartFile jsonFile = new MockMultipartFile("studyCreateReq", "", "application/json",
+                MockMultipartFile jsonFile = new MockMultipartFile("studyReq", "", "application/json",
                                 requestBodyJson.getBytes());
 
-                mockMvc.perform(MockMvcRequestBuilders.multipart(CREATE_STUDY_API_URL)
-                                .file(file) // 이미지(로고) 파일
-                                .file(jsonFile) // 바이너리 studyCreateReq 객체
-                                .contentType(MediaType.MULTIPART_FORM_DATA)) // Content-Type 설정
-                                .andExpect(MockMvcResultMatchers.status().isOk())
-                                .andExpect(MockMvcResultMatchers.jsonPath("$.retCode").value(400));
+                List<MockMultipartFile> files = Lists.list(file, jsonFile);
+                TestUtil.performFileRequest(mockMvc, CREATE_STUDY_API_URL, HttpMethod.POST, files, 200, 400);
+        }
+
+        @Test
+        @WithMockUser(username = "admin", authorities = { "ADMIN" })
+        @DisplayName("관리자 스터디 정보 수정 성공")
+        @Sql("/study/StudySetup.sql")
+        public void createStudyInfoUpdate_Success() throws Exception {
+
+                MockMultipartFile file = new MockMultipartFile("logo file", "logo.png", "image/png",
+                                "yourImageData".getBytes());
+                ScheduleReq scheduleUpdateReq = new ScheduleReq("없는 스케줄 이름123123", "13:00", "14:00");
+                List<ScheduleReq> schedules = Collections.singletonList(scheduleUpdateReq);
+
+                StudyReq studyReq = new StudyReq(
+                                "없는 스터디 이름123123", "10.10.10.110", "admin", "password", schedules);
+                studyReq.setSendDate(DateUtil.getCurrentDateTime());
+                studyReq.setSystemId("SYS_01");
+                String requestBodyJson = objectMapper.writeValueAsString(studyReq);
+
+                MockMultipartFile jsonFile = new MockMultipartFile("studyReq", "", "application/json",
+                                requestBodyJson.getBytes());
+
+                List<MockMultipartFile> files = Lists.list(file, jsonFile);
+                TestUtil.performFileRequest(mockMvc, UPDATE_STUDY_API_URL, HttpMethod.PUT, files, 200, 200);
+        }
+
+        @Test
+        @WithMockUser(username = "admin", authorities = { "ADMIN" })
+        @DisplayName("관리자 스터디 정보 수정 실패(등록된 스터디 정보 없음)")
+        public void createStudyInfoUpdate_NotFoundStudy() throws Exception {
+
+                MockMultipartFile file = new MockMultipartFile("logo file", "logo.png", "image/png",
+                                "yourImageData".getBytes());
+                ScheduleReq scheduleUpdateReq = new ScheduleReq("없는 스케줄 이름123123", "13:00", "14:00");
+                List<ScheduleReq> schedules = Collections.singletonList(scheduleUpdateReq);
+
+                StudyReq studyReq = new StudyReq(
+                                "없는 스터디 이름123123", "10.10.10.110", "admin", "password", schedules);
+                studyReq.setSendDate(DateUtil.getCurrentDateTime());
+                studyReq.setSystemId("SYS_01");
+                String requestBodyJson = objectMapper.writeValueAsString(studyReq);
+
+                MockMultipartFile jsonFile = new MockMultipartFile("studyReq", "", "application/json",
+                                requestBodyJson.getBytes());
+
+                List<MockMultipartFile> files = Lists.list(file, jsonFile);
+                TestUtil.performFileRequest(mockMvc, UPDATE_STUDY_API_URL, HttpMethod.PUT, files, 200, 404);
         }
 }
