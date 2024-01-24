@@ -7,6 +7,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -16,10 +18,12 @@ import mogakco.StudyManagement.dto.DTOResCommon;
 import mogakco.StudyManagement.dto.ScheduleCreateReq;
 import mogakco.StudyManagement.dto.StudyCreateReq;
 import mogakco.StudyManagement.enums.ErrorCode;
+import mogakco.StudyManagement.exception.InvalidRequestException;
 import mogakco.StudyManagement.repository.ScheduleRepository;
 import mogakco.StudyManagement.repository.StudyInfoRepository;
 import mogakco.StudyManagement.service.common.LoggingService;
 import mogakco.StudyManagement.service.study.StudyService;
+import mogakco.StudyManagement.util.ExceptionUtil;
 
 @Service
 public class StudyServiceImpl implements StudyService {
@@ -98,18 +102,56 @@ public class StudyServiceImpl implements StudyService {
         public DTOResCommon updateStudy(StudyCreateReq studyCreateReq, MultipartFile imageFile, LoggingService lo)
                         throws IOException {
 
-                DTOResCommon result = new DTOResCommon(systemId, ErrorCode.OK.getCode(), ErrorCode.OK.getMessage());
-                // 스터디 인포 테이블에 study_name, img 업데이트
+                // study_info 객체에 study_name, img set
+                lo.setDBStart();
                 StudyInfo sInfo = studyInfoRepository.findByStudyName(studyCreateReq.getStudyName());
+                lo.setDBEnd();
                 sInfo.updateStudyName(studyCreateReq.getStudyName());
                 sInfo.updateStudyLogo(imageFile == null ? null : imageFile.getBytes());
+
+                // schedule 객체에 데이터 set
+                List<String> scheduleNames = studyCreateReq.getSchedules().stream()
+                                .map(ScheduleCreateReq::getScheduleName).collect(Collectors.toList());
+                // for (ScheduleCreateReq scheduleCreateReq : studyCreateReq.getSchedules()) {
+                // String scheduleName = scheduleCreateReq.getScheduleName();
+                // String startTime = scheduleCreateReq.getStartTime();
+                // String endTime = scheduleCreateReq.getEndTime();
+                // if (isStringNull(scheduleName)) {
+                // return ExceptionUtil.handleException(new InvalidRequestException("빈 값을 넣을 수
+                // 없습니다."));
+                // }
+                // Schedule schedule =
+                // Schedule.builder().scheduleName(scheduleCreateReq.getScheduleName())
+                // .startTime(scheduleCreateReq.getStartTime())
+                // .endTime(scheduleCreateReq.getEndTime())
+                // .build();
+
+                // updateCandidates.add(scheduleName);
+                // }
+                // do update
+                List<ScheduleCreateReq> req = studyCreateReq.getSchedules();
+                List<Schedule> schedules = scheduleRepository.findAllByScheduleNameIn(scheduleNames);
+                for (int i = 0; i < schedules.size(); i++) {
+                        if (schedules.get(i).getScheduleName() == req.get(i).getScheduleName()) {
+                                schedules.set(i, Schedule.builder().scheduleId(schedules.get(i).getScheduleId())
+                                                .scheduleName(req.get(i).getScheduleName())
+                                                .startTime(req.get(i).getStartTime()).endTime(req.get(i).getEndTime())
+                                                .build());
+                        }
+                }
+                // schedules = schedules.stream()
+                // .filter(sc -> scheduleNames.contains(sc.getScheduleName()))
+                // .collect(Collectors.toList());
+                // 더티 체킹 해야함..
                 lo.setDBStart();
                 studyInfoRepository.save(sInfo);
+                scheduleRepository.saveAll(schedules);
                 lo.setDBEnd();
 
-                // 멤버 스케줄 테이블, 엡센트 스케줄 테이블에 해당 스케줄이 둘 중 하나 존재한다
-                // true - 업데이트 못한다고 리턴
-                // false - 스케줄 테이블에 schedule(event_name, start_time, end_time) 업데이트
-                return new DTOResCommon();
+                return new DTOResCommon(systemId, ErrorCode.OK.getCode(), ErrorCode.OK.getMessage());
+        }
+
+        private boolean isStringNull(String str) {
+                return str == null || str.isBlank();
         }
 }
