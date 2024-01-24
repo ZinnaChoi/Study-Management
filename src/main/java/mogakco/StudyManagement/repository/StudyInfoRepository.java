@@ -8,4 +8,6 @@ import mogakco.StudyManagement.domain.StudyInfo;
 @Repository
 public interface StudyInfoRepository extends JpaRepository<StudyInfo, Long> {
     Boolean existsByStudyName(String studyName);
+
+    StudyInfo findByStudyName(String studyName);
 }

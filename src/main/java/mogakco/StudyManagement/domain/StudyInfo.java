@@ -28,7 +28,7 @@ public class StudyInfo {
     private String studyName;
 
     @Lob
-    @Column(nullable = true)
+    @Column(nullable = true, columnDefinition = "LONGBLOB")
     private byte[] studyLogo;
 
     @Column(nullable = false)
@@ -39,5 +39,13 @@ public class StudyInfo {
 
     @Column(nullable = false)
     private String db_password;
+
+    public void updateStudyName(String studyName) {
+        this.studyName = studyName;
+    }
+
+    public void updateStudyLogo(byte[] studyLogo) {
+        this.studyLogo = studyLogo;
+    }
 
 }
