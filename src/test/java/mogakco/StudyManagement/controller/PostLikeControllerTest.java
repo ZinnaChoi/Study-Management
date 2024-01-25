@@ -19,8 +19,6 @@ import mogakco.StudyManagement.service.common.LoggingService;
 import mogakco.StudyManagement.service.post.PostLikeService;
 import mogakco.StudyManagement.util.TestUtil;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 @ActiveProfiles("test")
 @AutoConfigureMockMvc
 @SpringBootTest
@@ -76,6 +74,37 @@ public class PostLikeControllerTest {
         String requestBodyJson = "{}";
         String url = POST_LIKE_API_URL.replace("{postId}", getLatestPostIdByMemberId("PostUser").toString());
         TestUtil.performRequest(mockMvc, url, requestBodyJson, "POST", 200, 409);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    @Test
+    @Sql("/post/PostLikeSetup.sql")
+    @WithMockUser(username = "PostUser2", authorities = { "USER" })
+    @DisplayName("게시글 좋아요 취소 성공")
+    public void cancelPostLikeSuccess() throws Exception {
+        String requestBodyJson = "{}";
+        String url = POST_LIKE_API_URL.replace("{postId}", getLatestPostIdByMemberId("PostUser").toString());
+        TestUtil.performRequest(mockMvc, url, requestBodyJson, "DELETE", 200, 204);
+    }
+
+    @Test
+    @Sql("/post/PostLikeSetup.sql")
+    @WithMockUser(username = "PostUser1", authorities = { "USER" })
+    @DisplayName("게시글 좋아요 취소 실패 - 존재하지 않는 좋아요")
+    public void cancelPostLikeFailLikeNotFound() throws Exception {
+        String requestBodyJson = "{}";
+        String url = POST_LIKE_API_URL.replace("{postId}", getLatestPostIdByMemberId("PostUser").toString());
+        TestUtil.performRequest(mockMvc, url, requestBodyJson, "DELETE", 200, 404);
+    }
+
+    @Test
+    @Sql("/post/PostLikeSetup.sql")
+    @WithMockUser(username = "PostUser1", authorities = { "USER" })
+    @DisplayName("게시글 좋아요 취소 실패 - 존재하지 않는 게시글")
+    public void cancelPostLikeFailPostNotFound() throws Exception {
+        String requestBodyJson = "{}";
+        String url = POST_LIKE_API_URL.replace("{postId}", "-1");
+        TestUtil.performRequest(mockMvc, url, requestBodyJson, "DELETE", 200, 404);
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

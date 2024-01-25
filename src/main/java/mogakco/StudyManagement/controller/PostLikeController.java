@@ -1,5 +1,6 @@
 package mogakco.StudyManagement.controller;
 
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,7 +31,7 @@ public class PostLikeController extends CommonController {
 
     @Operation(summary = "게시글 좋아요 등록", description = "게시글 좋아요 추가")
     @PostMapping("/{postId}/likes")
-    public DTOResCommon createPostComment(HttpServletRequest request,
+    public DTOResCommon createPostLike(HttpServletRequest request,
             @PathVariable(name = "postId", required = true) Long postId) {
 
         DTOResCommon result = new DTOResCommon();
@@ -45,6 +46,26 @@ public class PostLikeController extends CommonController {
         } finally {
             endAPI(request, findErrorCodeByCode(result.getRetCode()), lo, result);
         }
+        return result;
+    }
+
+    @Operation(summary = "게시글 좋아요 취소", description = "게시글 좋아요 삭제")
+    @DeleteMapping("/{postId}/likes")
+    public DTOResCommon deletePostLike(HttpServletRequest request,
+            @PathVariable(name = "postId", required = true) Long postId) {
+        DTOResCommon result = new DTOResCommon();
+        try {
+            startAPI(lo, null);
+            result = postLikeService.deletePostLike(postId, lo);
+            result.setSendDate(DateUtil.getCurrentDateTime());
+            result.setSystemId(systemId);
+        } catch (Exception e) {
+            result = new DTOResCommon(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
+                    ErrorCode.INTERNAL_ERROR.getMessage());
+        } finally {
+            endAPI(request, findErrorCodeByCode(result.getRetCode()), lo, result);
+        }
+
         return result;
     }
 
