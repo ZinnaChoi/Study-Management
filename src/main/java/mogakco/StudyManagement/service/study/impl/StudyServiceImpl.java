@@ -102,51 +102,64 @@ public class StudyServiceImpl implements StudyService {
         @Transactional
         public DTOResCommon updateStudy(StudyReq studyReq, MultipartFile imageFile, LoggingService lo) {
 
-                List<String> scheduleNames = studyReq.getSchedules().stream()
-                                .map(ScheduleReq::getScheduleName).collect(Collectors.toList());
+                List<Schedule> allSchedules = scheduleRepository.findAll();
+                List<Schedule> reqSchedules = studyReq.getSchedules().stream()
+                                .map(req -> Schedule.builder().scheduleName(req.getScheduleName())
+                                                .startTime(req.getStartTime()).endTime(req.getEndTime()).build())
+                                .collect(Collectors.toList());
+
+                // 삽입
+                List<Schedule> schedulesToInsert = reqSchedules.stream()
+                                .filter(reqSchedule -> allSchedules.stream()
+                                                .noneMatch(schedule -> schedule.getScheduleName()
+                                                                .equals(reqSchedule.getScheduleName())))
+                                .map(reqSchedule -> Schedule.builder().scheduleName(reqSchedule.getScheduleName())
+                                                .startTime(reqSchedule.getStartTime()).endTime(reqSchedule.getEndTime())
+                                                .build())
+                                .collect(Collectors.toList());
+
+                // 삭제
+                List<Schedule> schedulesToDelete = allSchedules.stream()
+                                .filter(schedule -> reqSchedules.stream()
+                                                .noneMatch(reqSchedule -> reqSchedule.getScheduleName()
+                                                                .equals(schedule.getScheduleName())))
+                                .collect(Collectors.toList());
+
+                // 업데이트
+                List<Schedule> schedulesToUpdate = new ArrayList<>();
+                for (Schedule aSchedule : allSchedules) {
+                        for (Schedule rSchedule : reqSchedules) {
+                                if (aSchedule.getScheduleName().equals(rSchedule.getScheduleName())) {
+                                        schedulesToUpdate.add(
+                                                        Schedule.builder()
+                                                                        .scheduleId(aSchedule.getScheduleId())
+                                                                        .scheduleName(rSchedule.getScheduleName())
+                                                                        .startTime(rSchedule.getStartTime())
+                                                                        .endTime(rSchedule.getEndTime())
+                                                                        .build());
+                                }
+                        }
+                }
+
                 lo.setDBStart();
                 StudyInfo sInfo = studyInfoRepository.findByStudyName(studyReq.getStudyName());
-                List<Schedule> schedules = scheduleRepository.findAllByScheduleNameIn(scheduleNames);
                 lo.setDBEnd();
                 // study_info 객체에 study_name, img set
                 try {
-                        sInfo.updateStudyName(studyReq.getStudyName());
+                        sInfo.updateStudyName(studyReq.getUpdateStudyName());
                         sInfo.updateStudyLogo(imageFile == null ? null : imageFile.getBytes());
                 } catch (NullPointerException e) {
+                        // 수정인데 등록된거 체크하면 안됨!! 바꿔라잉
                         return ExceptionUtil.handleException(new NotFoundException("등록된 스터디가 없어 수정할 수 없습니다"));
                 } catch (IOException e) {
                         return ExceptionUtil.handleException(new InvalidRequestException("이미지 파일을 변환 중 문제가 발생했습니다."));
                 }
-
-                List<ScheduleReq> req = studyReq.getSchedules();
-                List<Schedule> upsertCandidates = new ArrayList<>();
-                int maxLoopSize = Math.max(req.size(), schedules.size());
-                for (int i = 0; i < maxLoopSize; i++) {
-                        // 업데이트 해야 한다면
-                        if ((i < schedules.size() && i < req.size())) {
-                                if (schedules.get(i).getScheduleName().equals(req.get(i).getScheduleName())) {
-                                        upsertCandidates.add(
-                                                        Schedule.builder().scheduleId(schedules.get(i).getScheduleId())
-                                                                        .scheduleName(req.get(i).getScheduleName())
-                                                                        .startTime(req.get(i).getStartTime())
-                                                                        .endTime(req.get(i).getEndTime())
-                                                                        .build());
-                                }
-                                // 새로운 것을 인서트 해야 한다면
-                        } else if ((i >= schedules.size() && i < req.size())) {
-                                upsertCandidates.add(Schedule.builder()
-                                                .scheduleName(req.get(i).getScheduleName())
-                                                .startTime(req.get(i).getStartTime()).endTime(req.get(i).getEndTime())
-                                                .build());
-                                // 인서트나 업데이트 둘다 안해도 된다면
-                        } else {
-                                break;
-                        }
-                }
-                // do upsert
+                // do query
                 lo.setDBStart();
                 studyInfoRepository.save(sInfo);
-                scheduleRepository.saveAll(upsertCandidates);
+                scheduleRepository.deleteAll(schedulesToDelete);
+                scheduleRepository.saveAll(schedulesToUpdate);
+                scheduleRepository.saveAll(schedulesToInsert);
                 lo.setDBEnd();
 
                 return new DTOResCommon(systemId, ErrorCode.OK.getCode(), ErrorCode.OK.getMessage());
