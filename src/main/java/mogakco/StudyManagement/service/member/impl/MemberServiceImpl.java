@@ -32,6 +32,7 @@ import mogakco.StudyManagement.dto.MemberLoginReq;
 import mogakco.StudyManagement.dto.MemberLoginRes;
 import mogakco.StudyManagement.dto.RegistedSchedule;
 import mogakco.StudyManagement.dto.RegistedScheduleRes;
+import mogakco.StudyManagement.dto.RegistedWakeupRes;
 import mogakco.StudyManagement.dto.SimplePageable;
 import mogakco.StudyManagement.dto.StudyMembersRes;
 import mogakco.StudyManagement.enums.ErrorCode;
@@ -360,7 +361,9 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
     public RegistedScheduleRes getRegistedSchedule(LoggingService lo) {
 
         // 스케줄 테이블에서 전체 조회 후 set
+        lo.setDBStart();
         List<Schedule> schedules = scheduleRepository.findAll();
+        lo.setDBEnd();
 
         List<RegistedSchedule> result = new ArrayList<>();
         for (Schedule sch : schedules) {
@@ -374,6 +377,18 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
         }
 
         return new RegistedScheduleRes(systemId, ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), result);
+    }
+
+    @Override
+    public RegistedWakeupRes getRegistedWakeup(LoggingService lo) {
+        // 기상 시간 테이블에서 전체 조회 후 set
+        lo.setDBStart();
+        List<WakeUp> wakeUps = wakeUpRepository.findAll();
+        lo.setDBEnd();
+
+        Set<String> result = wakeUps.stream().map(WakeUp::getWakeupTime).collect(Collectors.toSet());
+
+        return new RegistedWakeupRes(systemId, ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), result);
     }
 
     private List<MemberSchedule> calculateInserts(List<Schedule> userSchedules, List<String> dbScheduleNames,

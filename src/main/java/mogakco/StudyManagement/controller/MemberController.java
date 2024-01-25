@@ -28,6 +28,7 @@ import mogakco.StudyManagement.dto.MemberJoinReq;
 import mogakco.StudyManagement.dto.MemberLoginReq;
 import mogakco.StudyManagement.dto.MemberLoginRes;
 import mogakco.StudyManagement.dto.RegistedScheduleRes;
+import mogakco.StudyManagement.dto.RegistedWakeupRes;
 import mogakco.StudyManagement.dto.StudyMembersRes;
 import mogakco.StudyManagement.enums.ErrorCode;
 import mogakco.StudyManagement.service.common.LoggingService;
@@ -208,6 +209,29 @@ public class MemberController extends CommonController {
         } catch (Exception e) {
             e.printStackTrace();
             result = new RegistedScheduleRes(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
+                    ErrorCode.INTERNAL_ERROR.getMessage(), null);
+        } finally {
+            endAPI(request, findErrorCodeByCode(result.getRetCode()), lo, result);
+        }
+        return result;
+    }
+
+    @Operation(summary = "등록 기상 시간 조희", description = "현재 등록되어 있는 기상 시간 정보를 조회")
+    @SecurityRequirement(name = "bearer-key")
+    @GetMapping("/members/wakeup-times")
+    public RegistedWakeupRes getRegistedWakeupTime(
+            HttpServletRequest request,
+            @Parameter(name = "info", description = "요청 시 필수 값") @ModelAttribute @Valid DTOReqCommon info) {
+
+        RegistedWakeupRes result = new RegistedWakeupRes();
+        try {
+            startAPI(lo, info);
+            result = memberService.getRegistedWakeup(lo);
+            result.setSendDate(DateUtil.getCurrentDateTime());
+            result.setSystemId(systemId);
+        } catch (Exception e) {
+            e.printStackTrace();
+            result = new RegistedWakeupRes(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
                     ErrorCode.INTERNAL_ERROR.getMessage(), null);
         } finally {
             endAPI(request, findErrorCodeByCode(result.getRetCode()), lo, result);

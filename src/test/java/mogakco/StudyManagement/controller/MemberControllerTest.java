@@ -62,6 +62,8 @@ public class MemberControllerTest {
     private static final String MEMBER_INFO_URL = "/api/v1/member";
     private static final String MEMBERS_INFO_BY_SCHEDULE_URL = "/api/v1/members/schedule-name";
     private static final String MEMBERS_INFO_BY_WAKEUP_URL = "/api/v1/members/wakeup-time";
+    private static final String GET_SCHEDULES_URL = "/api/v1/members/schedules";
+    private static final String GET_WAKEUPS_URL = "/api/v1/members/wakeup-times";
 
     @Test
     @WithMockUser(authorities = "ADMIN")
@@ -360,5 +362,63 @@ public class MemberControllerTest {
                 .queryParam("sort", "memberId,desc");
 
         TestUtil.performRequest(mockMvc, uriBuilder.toUriString(), null, "GET", 400, 400);
+    }
+
+    ////////////////////////////////////////////////////////////////////
+    @Test
+    @WithMockUser(username = "admin", authorities = { "ADMIN" })
+    @DisplayName("등록 스케줄 조회 성공")
+    public void getRegistedSchedules_Success() throws Exception {
+
+        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(GET_SCHEDULES_URL);
+
+        uriBuilder.queryParam("sendDate", DateUtil.getCurrentDateTime())
+                .queryParam("systemId", "SYS_01");
+
+        MvcResult result = TestUtil.performRequest(mockMvc, uriBuilder.toUriString(), null, "GET", 200, 200);
+        System.out.println(result.getResponse().getContentAsString());
+        assertEquals(200, result.getResponse().getStatus());
+    }
+
+    @Test
+    @WithMockUser(username = "admin", authorities = { "ADMIN" })
+    @DisplayName("등록 스케줄 조회 실패_not include sendDate")
+    public void getRegistedSchedules_NotIncludeSendDate() throws Exception {
+
+        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(GET_SCHEDULES_URL);
+
+        uriBuilder.queryParam("systemId", "SYS_01");
+
+        MvcResult result = TestUtil.performRequest(mockMvc, uriBuilder.toUriString(), null, "GET", 400, 400);
+        assertEquals(400, result.getResponse().getStatus());
+    }
+
+    ////////////////////////////////////////////////////////////////////
+    @Test
+    @WithMockUser(username = "admin", authorities = { "ADMIN" })
+    @DisplayName("등록 기상 시간 조회 성공")
+    public void getRegistedWakeup_Success() throws Exception {
+
+        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(GET_WAKEUPS_URL);
+
+        uriBuilder.queryParam("sendDate", DateUtil.getCurrentDateTime())
+                .queryParam("systemId", "SYS_01");
+
+        MvcResult result = TestUtil.performRequest(mockMvc, uriBuilder.toUriString(), null, "GET", 200, 200);
+        System.out.println(result.getResponse().getContentAsString());
+        assertEquals(200, result.getResponse().getStatus());
+    }
+
+    @Test
+    @WithMockUser(username = "admin", authorities = { "ADMIN" })
+    @DisplayName("등록 기상 시간 조회 실패_not include sendDate")
+    public void getRegistedWakeup_NotIncludeSendDate() throws Exception {
+
+        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(GET_WAKEUPS_URL);
+
+        uriBuilder.queryParam("systemId", "SYS_01");
+
+        MvcResult result = TestUtil.performRequest(mockMvc, uriBuilder.toUriString(), null, "GET", 400, 400);
+        assertEquals(400, result.getResponse().getStatus());
     }
 }
