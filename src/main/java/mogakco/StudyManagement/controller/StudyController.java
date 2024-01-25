@@ -60,7 +60,7 @@ public class StudyController extends CommonController {
 
     @Operation(summary = "스터디 정보 수정", description = "스터디 정보(스터디 이름, 로고, 스케줄) 수정")
     @SecurityRequirement(name = "bearer-key")
-    @PutMapping(value = "/studyinfo", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(value = "/study", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public DTOResCommon updateStudy(HttpServletRequest request,
             @Valid @RequestPart(value = "studyReq") @Parameter(schema = @Schema(type = "string", format = "binary")) StudyReq studyReq,
             @Parameter(description = "이미지 파일") @RequestPart(name = "logo file", required = false) MultipartFile imageFile) {

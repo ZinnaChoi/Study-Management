@@ -51,7 +51,7 @@ public class StudyControllerTest {
         private MockMvc mockMvc;
 
         private static final String CREATE_STUDY_API_URL = "/api/v1/study";
-        private static final String UPDATE_STUDY_API_URL = "/api/v1/studyinfo";
+        private static final String UPDATE_STUDY_API_URL = "/api/v1/study";
         private static final String DELETE_STUDY_API_URL = "/api/v1/study";
 
         @Test
