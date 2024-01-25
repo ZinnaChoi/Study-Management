@@ -15,6 +15,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import mogakco.StudyManagement.dto.NoticeReq;
+
+import java.util.Objects;
 
 @Entity
 @Builder
@@ -57,4 +60,27 @@ public class Notice {
         this.newPost = notice.getNewPost();
         this.linkShare = notice.getLinkShare();
     }
+
+    public boolean isNoticeChanged(NoticeReq noticeReq) {
+        return (!Objects.equals(wakeup, noticeReq.getWakeup()) || !Objects.equals(absent, noticeReq.getAbsent()) ||
+                !Objects.equals(newPost, noticeReq.getNewPost())
+                || !Objects.equals(linkShare, noticeReq.getLinkShare()));
+    }
+
+    public void updateWakeup(Boolean wakeup) {
+        this.wakeup = wakeup;
+    }
+
+    public void updateAbsent(Boolean absent) {
+        this.absent = absent;
+    }
+
+    public void updateNewPost(Boolean newPost) {
+        this.newPost = newPost;
+    }
+
+    public void updateLinkShare(Boolean linkShare) {
+        this.linkShare = linkShare;
+    }
+
 }
