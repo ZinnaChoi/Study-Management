@@ -1,6 +1,8 @@
 package mogakco.StudyManagement.controller;
 
 import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -58,7 +60,7 @@ public class StudyController extends CommonController {
 
     @Operation(summary = "스터디 정보 수정", description = "스터디 정보(스터디 이름, 로고, 스케줄) 수정")
     @SecurityRequirement(name = "bearer-key")
-    @PutMapping(value = "/studyinfo", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(value = "/study", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public DTOResCommon updateStudy(HttpServletRequest request,
             @Valid @RequestPart(value = "studyReq") @Parameter(schema = @Schema(type = "string", format = "binary")) StudyReq studyReq,
             @Parameter(description = "이미지 파일") @RequestPart(name = "logo file", required = false) MultipartFile imageFile) {
@@ -67,6 +69,27 @@ public class StudyController extends CommonController {
         try {
             startAPI(lo, studyReq);
             result = studyService.updateStudy(studyReq, imageFile, lo);
+        } catch (Exception e) {
+            e.printStackTrace();
+            result = new DTOResCommon(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
+                    ErrorCode.INTERNAL_ERROR.getMessage());
+        } finally {
+            endAPI(request, ErrorCode.OK, lo, result);
+        }
+
+        return result;
+    }
+
+    @Operation(summary = "스터디 정보 삭제", description = "스터디 정보(스터디 이름, 로고, 스케줄) 삭제")
+    @SecurityRequirement(name = "bearer-key")
+    @DeleteMapping(value = "/study/{studyid}")
+    public DTOResCommon deleteStudy(HttpServletRequest request,
+            @PathVariable(name = "studyid", required = true) Long studyId) {
+        DTOResCommon result = new DTOResCommon();
+
+        try {
+            startAPI(lo, null);
+            result = studyService.deleteStudy(studyId, lo);
         } catch (Exception e) {
             e.printStackTrace();
             result = new DTOResCommon(systemId, ErrorCode.INTERNAL_ERROR.getCode(),

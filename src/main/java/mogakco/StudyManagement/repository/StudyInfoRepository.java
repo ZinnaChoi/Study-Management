@@ -10,4 +10,6 @@ public interface StudyInfoRepository extends JpaRepository<StudyInfo, Long> {
     Boolean existsByStudyName(String studyName);
 
     StudyInfo findByStudyName(String studyName);
+
+    StudyInfo findByStudyId(Long studyId);
 }

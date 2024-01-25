@@ -24,7 +24,7 @@ public class StudyInfo {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long studyId;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String studyName;
 
     @Lob
