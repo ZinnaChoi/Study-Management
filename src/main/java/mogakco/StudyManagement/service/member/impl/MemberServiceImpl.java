@@ -30,6 +30,8 @@ import mogakco.StudyManagement.dto.MemberInfoUpdateReq;
 import mogakco.StudyManagement.dto.MemberJoinReq;
 import mogakco.StudyManagement.dto.MemberLoginReq;
 import mogakco.StudyManagement.dto.MemberLoginRes;
+import mogakco.StudyManagement.dto.RegistedSchedule;
+import mogakco.StudyManagement.dto.RegistedScheduleRes;
 import mogakco.StudyManagement.dto.SimplePageable;
 import mogakco.StudyManagement.dto.StudyMembersRes;
 import mogakco.StudyManagement.enums.ErrorCode;
@@ -352,6 +354,26 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
         SimplePageable simplePageable = PageUtil.createSimplePageable(pWakeUp);
         return new StudyMembersRes(systemId, ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), memberInfos,
                 simplePageable);
+    }
+
+    @Override
+    public RegistedScheduleRes getRegistedSchedule(LoggingService lo) {
+
+        // 스케줄 테이블에서 전체 조회 후 set
+        List<Schedule> schedules = scheduleRepository.findAll();
+
+        List<RegistedSchedule> result = new ArrayList<>();
+        for (Schedule sch : schedules) {
+            RegistedSchedule registedSchedule = new RegistedSchedule();
+            registedSchedule.setScheduleId(sch.getScheduleId());
+            registedSchedule.setScheduleName(sch.getScheduleName());
+            registedSchedule.setStartTime(sch.getStartTime());
+            registedSchedule.setEndTime(sch.getEndTime());
+
+            result.add(registedSchedule);
+        }
+
+        return new RegistedScheduleRes(systemId, ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), result);
     }
 
     private List<MemberSchedule> calculateInserts(List<Schedule> userSchedules, List<String> dbScheduleNames,
