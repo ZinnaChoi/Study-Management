@@ -80,7 +80,7 @@ public class StudyController extends CommonController {
         return result;
     }
 
-    @Operation(summary = "스터디 정보 수정", description = "스터디 정보(스터디 이름, 로고, 스케줄) 수정")
+    @Operation(summary = "스터디 정보 삭제", description = "스터디 정보(스터디 이름, 로고, 스케줄) 삭제")
     @SecurityRequirement(name = "bearer-key")
     @DeleteMapping(value = "/study/{studyname}")
     public DTOResCommon deleteStudy(HttpServletRequest request,
