@@ -82,14 +82,14 @@ public class StudyController extends CommonController {
 
     @Operation(summary = "스터디 정보 삭제", description = "스터디 정보(스터디 이름, 로고, 스케줄) 삭제")
     @SecurityRequirement(name = "bearer-key")
-    @DeleteMapping(value = "/study/{studyname}")
+    @DeleteMapping(value = "/study/{studyid}")
     public DTOResCommon deleteStudy(HttpServletRequest request,
-            @PathVariable(name = "studyname", required = true) String studyName) {
+            @PathVariable(name = "studyid", required = true) Long studyId) {
         DTOResCommon result = new DTOResCommon();
 
         try {
             startAPI(lo, null);
-            result = studyService.deleteStudy(studyName, lo);
+            result = studyService.deleteStudy(studyId, lo);
         } catch (Exception e) {
             e.printStackTrace();
             result = new DTOResCommon(systemId, ErrorCode.INTERNAL_ERROR.getCode(),

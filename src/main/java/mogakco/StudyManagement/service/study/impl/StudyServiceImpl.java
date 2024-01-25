@@ -167,14 +167,14 @@ public class StudyServiceImpl implements StudyService {
 
         @Override
         @Transactional
-        public DTOResCommon deleteStudy(String studyName, LoggingService lo) {
+        public DTOResCommon deleteStudy(Long studyId, LoggingService lo) {
 
                 lo.setDBStart();
-                StudyInfo studyInfo = studyInfoRepository.findByStudyName(studyName);
+                StudyInfo studyInfo = studyInfoRepository.findByStudyId(studyId);
                 lo.setDBEnd();
                 if (studyInfo == null) {
                         return ExceptionUtil.handleException(
-                                        new NotFoundException(studyName + " 이름으로 등록된 스터디가 존재하지 않아 삭제할 수 없습니다."));
+                                        new NotFoundException(studyId + " 아이디로 등록된 스터디가 존재하지 않아 삭제할 수 없습니다."));
                 }
 
                 // study_info 및 schedule 삭제(member_schedule, absent_schedule 테이블도 cascade 삭제됨)

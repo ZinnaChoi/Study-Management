@@ -15,6 +15,6 @@ public interface StudyService {
         DTOResCommon updateStudy(StudyReq studyCreateReq, MultipartFile imageFile, LoggingService lo)
                         throws IOException;
 
-        DTOResCommon deleteStudy(String studyName, LoggingService lo);
+        DTOResCommon deleteStudy(Long studyId, LoggingService lo);
 
 }
