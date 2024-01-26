@@ -2,6 +2,7 @@ package mogakco.StudyManagement.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -38,6 +39,8 @@ public class SecurityConfig {
                 .requestMatchers("/swagger-ui.html", "/v1/api-docs/**", "/swagger-ui/**", "/swagger-resources/**")
                 .permitAll() // swagger 경로
                 // 접근 허용
+                // /api/v1/study/** 요청 중 get 메소드만 모든 권한 접근 가능
+                .requestMatchers(HttpMethod.GET, "/api/v1/study/**").hasAnyAuthority("ADMIN", "USER")
                 .requestMatchers("/api/v1/study/**").hasAuthority("ADMIN") // admin 권한만 접근 가능!
                 .requestMatchers("/api/v1/**").hasAnyAuthority("ADMIN", "USER") // 모든 권한 api/user/** 접근 가능!
                 .anyRequest().authenticated()); // 그 외 요청들은 인증된 사용자(유효한 JWT를 가지고있는)만 접근 가능

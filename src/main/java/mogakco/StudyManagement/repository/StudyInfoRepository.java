@@ -14,5 +14,4 @@ public interface StudyInfoRepository extends JpaRepository<StudyInfo, Long> {
     StudyInfo findByStudyId(Long studyId);
 
     StudyInfo findTopBy();
-    // findFirstByOrderBySeatNumberAsc();
 }

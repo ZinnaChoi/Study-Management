@@ -58,18 +58,22 @@ public class StudyServiceImpl implements StudyService {
         @Transactional(readOnly = true)
         public StudyInfoRes getStudy(LoggingService lo) {
 
-                Long studyId = null;
-                String studyName = null;
-                byte[] logo = null;
                 // study_info 테이블에서 스터디 조회
                 lo.setDBStart();
+                // TODO: 중앙 - 스터디 DB 분리 시 알맞은 study_info 가져올 것
                 StudyInfo studyInfo = studyInfoRepository.findTopBy();
                 lo.setDBEnd();
-                if (studyInfo != null) {
-                        studyId = studyInfo.getStudyId();
-                        studyName = studyInfo.getStudyName();
-                        logo = studyInfo.getStudyLogo();
+                if (studyInfo == null) {
+                        DTOResCommon res = ExceptionUtil.handleException(
+                                        new NotFoundException("등록된 스터디가 없습니다."));
+                        return new StudyInfoRes(systemId, res.getRetCode(), res.getRetMsg(), null, null,
+                                        null, null);
                 }
+
+                Long studyId = studyInfo.getStudyId();
+                String studyName = studyInfo.getStudyName();
+                byte[] logo = studyInfo.getStudyLogo();
+
                 // schedule 테이블에서 전체 스케줄 조회
                 lo.setDBStart();
                 List<Schedule> schedules = scheduleRepository.findAll();

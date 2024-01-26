@@ -62,6 +62,7 @@ public class StudyControllerTest {
         @Test
         @WithMockUser(username = "admin", authorities = { "ADMIN" })
         @DisplayName("스터디 정보 조회 성공")
+        @Sql("/study/StudySetup.sql")
         public void getStudyInfo_Success() throws Exception {
 
                 UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(STUDY_API_URL);
@@ -87,15 +88,16 @@ public class StudyControllerTest {
 
         @Test
         @WithMockUser(username = "user1", authorities = { "USER" })
-        @DisplayName("스터디 정보 조회 실패_USER 권한 API 요청 시도")
+        @DisplayName("스터디 정보 조회 성공_USER 권한도 가능")
         @Sql("/study/StudySetup.sql")
-        public void getStudyInfo_AuthenticationFail() throws Exception {
+        public void getStudyInfo_AuthenticationSuccess() throws Exception {
 
                 UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(STUDY_API_URL);
-                uriBuilder.queryParam("systemId", "SYS_01");
+                uriBuilder.queryParam("sendDate", DateUtil.getCurrentDateTime())
+                                .queryParam("systemId", "SYS_01");
 
-                MvcResult result = TestUtil.performRequest(mockMvc, uriBuilder.toUriString(), null, "GET", 403, null);
-                assertEquals(403, result.getResponse().getStatus());
+                MvcResult result = TestUtil.performRequest(mockMvc, uriBuilder.toUriString(), null, "GET", 200, null);
+                assertEquals(200, result.getResponse().getStatus());
         }
 
         /////////////////////////////////////////////////////////////////
