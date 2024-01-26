@@ -77,6 +77,27 @@ public class PostCommentController extends CommonController {
         return result;
     }
 
+    @Operation(summary = "게시판 답글 조회", description = "답글 조회")
+    @GetMapping("/{postId}/comments/{commentId}/replies")
+    public PostCommentReplyRes getCommentReply(HttpServletRequest request,
+            @PathVariable(name = "postId", required = true) Long postId,
+            @PathVariable(name = "commentId", required = true) Long commentId) {
+
+        PostCommentReplyRes result = new PostCommentReplyRes();
+        try {
+            startAPI(lo, null);
+            result = postCommentService.getCommentReply(postId, commentId, lo);
+            result.setSendDate(DateUtil.getCurrentDateTime());
+            result.setSystemId(systemId);
+        } catch (Exception e) {
+            result = new PostCommentReplyRes(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
+                    ErrorCode.INTERNAL_ERROR.getMessage(), null);
+        } finally {
+            endAPI(request, findErrorCodeByCode(result.getRetCode()), lo, result);
+        }
+        return result;
+    }
+
     @Operation(summary = "게시판 댓글 및 답글 수정", description = "게시판의 댓글 및 답글 수정")
     @PatchMapping("/{postId}/comments/{commentId}")
     public DTOResCommon updateComment(HttpServletRequest request,
@@ -93,27 +114,6 @@ public class PostCommentController extends CommonController {
         } catch (Exception e) {
             result = new DTOResCommon(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
                     ErrorCode.INTERNAL_ERROR.getMessage());
-        } finally {
-            endAPI(request, findErrorCodeByCode(result.getRetCode()), lo, result);
-        }
-        return result;
-    }
-
-    @Operation(summary = "게시판 답글 조회", description = "답글 조회")
-    @GetMapping("/{postId}/comments/{commentId}/replies")
-    public PostCommentReplyRes getCommentReply(HttpServletRequest request,
-            @PathVariable(name = "postId", required = true) Long postId,
-            @PathVariable(name = "commentId", required = true) Long commentId) {
-
-        PostCommentReplyRes result = new PostCommentReplyRes();
-        try {
-            startAPI(lo, null);
-            result = postCommentService.getCommentReply(postId, commentId, lo);
-            result.setSendDate(DateUtil.getCurrentDateTime());
-            result.setSystemId(systemId);
-        } catch (Exception e) {
-            result = new PostCommentReplyRes(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
-                    ErrorCode.INTERNAL_ERROR.getMessage(), null);
         } finally {
             endAPI(request, findErrorCodeByCode(result.getRetCode()), lo, result);
         }
