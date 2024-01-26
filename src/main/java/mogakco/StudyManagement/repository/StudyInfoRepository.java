@@ -12,4 +12,6 @@ public interface StudyInfoRepository extends JpaRepository<StudyInfo, Long> {
     StudyInfo findByStudyName(String studyName);
 
     StudyInfo findByStudyId(Long studyId);
+
+    StudyInfo findTopBy();
 }

@@ -16,6 +16,8 @@ import mogakco.StudyManagement.domain.Schedule;
 import mogakco.StudyManagement.domain.StudyInfo;
 import mogakco.StudyManagement.dto.DTOResCommon;
 import mogakco.StudyManagement.dto.ScheduleReq;
+import mogakco.StudyManagement.dto.ScheduleRes;
+import mogakco.StudyManagement.dto.StudyInfoRes;
 import mogakco.StudyManagement.dto.StudyReq;
 import mogakco.StudyManagement.enums.ErrorCode;
 import mogakco.StudyManagement.exception.InvalidRequestException;
@@ -51,6 +53,37 @@ public class StudyServiceImpl implements StudyService {
 
         @Value("${study.systemId}")
         protected String systemId;
+
+        @Override
+        @Transactional(readOnly = true)
+        public StudyInfoRes getStudy(LoggingService lo) {
+
+                // study_info 테이블에서 스터디 조회
+                lo.setDBStart();
+                // TODO: 중앙 - 스터디 DB 분리 시 알맞은 study_info 가져올 것
+                StudyInfo studyInfo = studyInfoRepository.findTopBy();
+                lo.setDBEnd();
+                if (studyInfo == null) {
+                        DTOResCommon res = ExceptionUtil.handleException(
+                                        new NotFoundException("등록된 스터디가 없습니다."));
+                        return new StudyInfoRes(systemId, res.getRetCode(), res.getRetMsg(), null, null,
+                                        null, null);
+                }
+
+                Long studyId = studyInfo.getStudyId();
+                String studyName = studyInfo.getStudyName();
+                byte[] logo = studyInfo.getStudyLogo();
+
+                // schedule 테이블에서 전체 스케줄 조회
+                lo.setDBStart();
+                List<Schedule> schedules = scheduleRepository.findAll();
+                lo.setDBEnd();
+                List<ScheduleRes> scheduleResList = schedules.stream().map(s -> new ScheduleRes(s.getScheduleId(),
+                                s.getScheduleName(), s.getStartTime(), s.getEndTime())).collect(Collectors.toList());
+
+                return new StudyInfoRes(systemId, ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), studyId, studyName,
+                                logo, scheduleResList);
+        }
 
         @Override
         @Transactional
