@@ -67,20 +67,12 @@ public class Notice {
                 || !Objects.equals(linkShare, noticeReq.getLinkShare()));
     }
 
-    public void updateWakeup(Boolean wakeup) {
-        this.wakeup = wakeup;
-    }
-
-    public void updateAbsent(Boolean absent) {
-        this.absent = absent;
-    }
-
-    public void updateNewPost(Boolean newPost) {
-        this.newPost = newPost;
-    }
-
-    public void updateLinkShare(Boolean linkShare) {
-        this.linkShare = linkShare;
+    public Notice updateNotice(NoticeReq noticeReq) {
+        this.wakeup = noticeReq.getWakeup();
+        this.absent = noticeReq.getAbsent();
+        this.newPost = noticeReq.getNewPost();
+        this.linkShare = noticeReq.getLinkShare();
+        return this;
     }
 
 }
