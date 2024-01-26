@@ -111,7 +111,7 @@ public class PostCommentServiceImpl implements PostCommentService {
             Specification<PostComment> replySpec = PostCommentSpecification.withParentCommentId(commentId);
 
             lo.setDBStart();
-            Post post = postRepository.findOne(postSpec)
+            postRepository.findOne(postSpec)
                     .orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND.getMessage("게시글")));
             PostComment parentComment = postCommentRepository.findOne(commentSpec)
                     .orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND.getMessage("게시판 댓글")));
