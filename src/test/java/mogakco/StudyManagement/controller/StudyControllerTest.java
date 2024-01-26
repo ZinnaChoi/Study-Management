@@ -1,5 +1,7 @@
 package mogakco.StudyManagement.controller;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import java.util.Collections;
 import java.util.List;
 
@@ -18,6 +20,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -55,6 +58,47 @@ public class StudyControllerTest {
         private JdbcTemplate jdbcTemplate;
 
         private static final String STUDY_API_URL = "/api/v1/study";
+
+        @Test
+        @WithMockUser(username = "admin", authorities = { "ADMIN" })
+        @DisplayName("스터디 정보 조회 성공")
+        public void getStudyInfo_Success() throws Exception {
+
+                UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(STUDY_API_URL);
+                uriBuilder.queryParam("sendDate", DateUtil.getCurrentDateTime())
+                                .queryParam("systemId", "SYS_01");
+
+                MvcResult result = TestUtil.performRequest(mockMvc, uriBuilder.toUriString(), null, "GET", 200, 200);
+                System.out.println(result.getResponse().getContentAsString());
+                assertEquals(200, result.getResponse().getStatus());
+        }
+
+        @Test
+        @WithMockUser(username = "admin", authorities = { "ADMIN" })
+        @DisplayName("스터디 정보 조회 실패_not include sendDate")
+        public void getStudyInfo_NotIncludeSendDate() throws Exception {
+
+                UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(STUDY_API_URL);
+                uriBuilder.queryParam("systemId", "SYS_01");
+
+                MvcResult result = TestUtil.performRequest(mockMvc, uriBuilder.toUriString(), null, "GET", 400, 400);
+                assertEquals(400, result.getResponse().getStatus());
+        }
+
+        @Test
+        @WithMockUser(username = "user1", authorities = { "USER" })
+        @DisplayName("스터디 정보 조회 실패_USER 권한 API 요청 시도")
+        @Sql("/study/StudySetup.sql")
+        public void getStudyInfo_AuthenticationFail() throws Exception {
+
+                UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(STUDY_API_URL);
+                uriBuilder.queryParam("systemId", "SYS_01");
+
+                MvcResult result = TestUtil.performRequest(mockMvc, uriBuilder.toUriString(), null, "GET", 403, null);
+                assertEquals(403, result.getResponse().getStatus());
+        }
+
+        /////////////////////////////////////////////////////////////////
 
         @Test
         @WithMockUser(username = "admin", authorities = { "ADMIN" })
@@ -127,6 +171,8 @@ public class StudyControllerTest {
                 TestUtil.performFileRequest(mockMvc, STUDY_API_URL, HttpMethod.POST, files, 200, 400);
         }
 
+        /////////////////////////////////////////////////////////////////
+
         @Test
         @WithMockUser(username = "admin", authorities = { "ADMIN" })
         @DisplayName("관리자 스터디 정보 수정 성공")
@@ -174,6 +220,8 @@ public class StudyControllerTest {
                 TestUtil.performFileRequest(mockMvc, STUDY_API_URL, HttpMethod.PUT, files, 200, 404);
         }
 
+        /////////////////////////////////////////////////////////////////
+
         @Test
         @WithMockUser(username = "admin", authorities = { "ADMIN" })
         @DisplayName("관리자 스터디 삭제 성공")
@@ -215,4 +263,6 @@ public class StudyControllerTest {
                                 "SELECT study_id FROM study_info",
                                 Long.class);
         }
+
+        /////////////////////////////////////////////////////////////////
 }

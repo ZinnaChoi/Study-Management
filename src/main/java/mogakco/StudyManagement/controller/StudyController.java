@@ -43,15 +43,16 @@ public class StudyController extends CommonController {
     @Operation(summary = "스터디 정보 조회", description = "등록 스터디 정보 조회")
     @SecurityRequirement(name = "bearer-key")
     @GetMapping(value = "/study")
-    public StudyInfoRes getStudy(HttpServletRequest request, @Valid @ModelAttribute DTOReqCommon info) {
+    public StudyInfoRes getStudy(HttpServletRequest request,
+            @Parameter(name = "info", description = "요청 시 필수 값") @Valid @ModelAttribute DTOReqCommon info) {
         StudyInfoRes result = new StudyInfoRes();
 
         try {
             startAPI(lo, info);
-            // result = studyService.createStudy(studyReq, imageFile, lo);
+            result = studyService.getStudy(lo);
         } catch (Exception e) {
             result = new StudyInfoRes(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
-                    ErrorCode.INTERNAL_ERROR.getMessage(), null, null, null);
+                    ErrorCode.INTERNAL_ERROR.getMessage(), null, null, null, null);
         } finally {
             endAPI(request, findErrorCodeByCode(result.getRetCode()), lo, result);
         }
