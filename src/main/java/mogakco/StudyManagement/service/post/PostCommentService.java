@@ -9,8 +9,7 @@ public interface PostCommentService {
 
     DTOResCommon createPostComment(Long postId, PostCommentReq postCommentReq, LoggingService lo);
 
-    PostCommentReplyRes getCommentReply(Long postId, Long commentId, LoggingService lo);
-
     DTOResCommon createPostCommentReply(Long postId, Long commentId, PostCommentReq postCommentReq, LoggingService lo);
 
+    PostCommentReplyRes getCommentReply(Long postId, Long commentId, LoggingService lo);
 }
