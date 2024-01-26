@@ -243,9 +243,8 @@ public class AbsentServiceImpl implements AbsentService {
                 addedScheduleNames.removeAll(existScheduleNames);
 
                 for (AbsentSchedule schedule : absentScheduleList) {
-                    schedule.updateUpdatedAt(DateUtil.getCurrentDateTime());
                     if (isDescriptionChanged) {
-                        schedule.updateDescription(absentReq.getDescription());
+                        schedule.updateAbsentSchedule(absentReq);
                         lo.setDBStart();
                         absentScheduleRepository.save(schedule);
                         lo.setDBEnd();

@@ -1,5 +1,7 @@
 package mogakco.StudyManagement.domain;
 
+import java.util.Objects;
+
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
@@ -16,6 +18,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import mogakco.StudyManagement.dto.PostCommentReq;
+import mogakco.StudyManagement.util.DateUtil;
 
 @Entity
 @Builder
@@ -51,4 +55,13 @@ public class PostComment {
 
     @Column(nullable = false)
     private String updatedAt;
+
+    public void updatePostComment(PostCommentReq postCommentReq) {
+        this.content = postCommentReq.getContent();
+        this.updatedAt = DateUtil.getCurrentDateTime();
+    }
+
+    public boolean isPostCommentChanged(PostCommentReq postCommentReq) {
+        return (!Objects.equals(content, postCommentReq.getContent()));
+    }
 }
