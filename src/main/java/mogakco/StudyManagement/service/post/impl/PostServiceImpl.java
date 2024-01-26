@@ -1,6 +1,7 @@
 package mogakco.StudyManagement.service.post.impl;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
@@ -11,9 +12,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import mogakco.StudyManagement.domain.Member;
 import mogakco.StudyManagement.domain.Post;
+import mogakco.StudyManagement.domain.PostComment;
 import mogakco.StudyManagement.dto.PostReq;
 import mogakco.StudyManagement.dto.DTOResCommon;
 import mogakco.StudyManagement.dto.PostDetail;
+import mogakco.StudyManagement.dto.PostDetailComment;
 import mogakco.StudyManagement.dto.PostDetailRes;
 import mogakco.StudyManagement.dto.PostList;
 import mogakco.StudyManagement.dto.PostListReq;
@@ -25,6 +28,7 @@ import mogakco.StudyManagement.exception.NotFoundException;
 import mogakco.StudyManagement.exception.UnauthorizedAccessException;
 import mogakco.StudyManagement.repository.MemberRepository;
 import mogakco.StudyManagement.repository.PostCommentRepository;
+import mogakco.StudyManagement.repository.PostCommentSpecification;
 import mogakco.StudyManagement.repository.PostLikeRepository;
 import mogakco.StudyManagement.repository.PostRepository;
 import mogakco.StudyManagement.repository.PostSpecification;
@@ -102,17 +106,33 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public PostDetailRes getPostDetail(Long postId, LoggingService lo) {
-
         try {
-            Specification<Post> spec = PostSpecification.withPostId(postId);
+            Specification<Post> postSpec = PostSpecification.withPostId(postId);
+            Specification<PostComment> postCommentSpec = PostCommentSpecification
+                    .withPostIdAndParentCommentIdIsNull(postId);
             lo.setDBStart();
-            Post post = postRepository.findOne(spec)
+            Post post = postRepository.findOne(postSpec)
                     .orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND.getMessage("게시글")));
             Integer likeCount = postLikeRepository.countByPostPostId(postId);
+            List<PostComment> commentEntities = postCommentRepository.findAll(postCommentSpec);
+            Map<Long, Integer> replyCountMap = commentEntities.stream()
+                    .collect(Collectors.toMap(PostComment::getCommentId,
+                            c -> postCommentRepository.countByParentCommentCommentId(c.getCommentId())));
             lo.setDBEnd();
 
+            List<PostDetailComment> postCommentList = commentEntities.stream().map(entity -> {
+                PostDetailComment dto = new PostDetailComment();
+                dto.setCommnetId(entity.getCommentId());
+                dto.setMemeberName(entity.getMember().getName());
+                dto.setContent(entity.getContent());
+                dto.setCreatedAt(entity.getCreatedAt());
+                dto.setUpdatedAt(entity.getUpdatedAt());
+                dto.setReplyCnt(replyCountMap.getOrDefault(entity.getCommentId(), 0));
+                return dto;
+            }).collect(Collectors.toList());
+
             return new PostDetailRes(null, ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(),
-                    new PostDetail(post, likeCount));
+                    new PostDetail(post, likeCount, postCommentList));
         } catch (NotFoundException e) {
             DTOResCommon res = ExceptionUtil.handleException(e);
             return new PostDetailRes(res.getSystemId(), res.getRetCode(), res.getRetMsg(), null);

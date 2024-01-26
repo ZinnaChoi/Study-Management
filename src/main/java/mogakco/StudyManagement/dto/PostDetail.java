@@ -1,5 +1,7 @@
 package mogakco.StudyManagement.dto;
 
+import java.util.List;
+
 import lombok.Getter;
 import lombok.Setter;
 import mogakco.StudyManagement.domain.Post;
@@ -19,13 +21,15 @@ public class PostDetail {
 
     private String updatedAt;
 
-    public PostDetail(Post post, Integer likes) {
+    private List<PostDetailComment> comments;
+
+    public PostDetail(Post post, Integer likes, List<PostDetailComment> comments) {
         this.memberName = post.getMember().getName();
         this.title = post.getTitle();
         this.content = post.getContent();
         this.createdAt = post.getCreatedAt();
         this.updatedAt = post.getUpdatedAt();
         this.likes = likes;
-
+        this.comments = comments;
     }
 }
