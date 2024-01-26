@@ -18,4 +18,10 @@ public class PostCommentSpecification {
             return criteriaBuilder.and(postPredicate, parentCommentPredicate);
         };
     }
+
+    public static Specification<PostComment> withParentCommentId(Long parentCommentId) {
+        return (root, query, criteriaBuilder) -> {
+            return criteriaBuilder.equal(root.join("parentComment").get("commentId"), parentCommentId);
+        };
+    }
 }
