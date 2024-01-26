@@ -177,7 +177,7 @@ public class PostControllerTest {
             int commentCnt = element.path("commentCnt").asInt();
             assertTrue(title.startsWith("post2"));
             assertEquals(likeCnt, 1);
-            assertEquals(commentCnt, 1);
+            assertEquals(commentCnt, 2);
             break;
         }
     }
@@ -224,7 +224,7 @@ public class PostControllerTest {
 
     @Test
     @Sql("/post/PostSetup.sql")
-    @WithMockUser(username = "PostUser", authorities = { "USER" })
+    @WithMockUser(username = "PostUser2", authorities = { "USER" })
     @DisplayName("게시글 상세 정보 조회 성공")
     public void getPostDetailSuccess() throws Exception {
 
@@ -234,6 +234,11 @@ public class PostControllerTest {
         JsonNode responseBody = objectMapper.readTree(result.getResponse().getContentAsString());
         String title = responseBody.path("postDetail").path("title").asText();
         assertTrue(title.startsWith("post"));
+
+        JsonNode comments = responseBody.path("postDetail").path("comments").get(0);
+
+        assertEquals("comment1", comments.path("content").asText());
+        assertEquals(1, comments.path("replyCnt").asInt());
     }
 
     @Test
@@ -276,7 +281,6 @@ public class PostControllerTest {
         String requestBodyJson = objectMapper.writeValueAsString(
                 new PostReq(DateUtil.getCurrentDateTime(), systemId, "Updated Title", "Updated Content"));
 
-        // Not Exist postId -1
         TestUtil.performRequest(mockMvc,
                 POST_API_URL + "/" + -1, requestBodyJson, "PATCH", 200, 404);
     }
@@ -328,7 +332,7 @@ public class PostControllerTest {
 
     public Long getLatestPostIdByMemberId(String memberId) {
         return jdbcTemplate.queryForObject(
-                "SELECT post_id FROM post WHERE member_id = (SELECT member_id FROM member WHERE id = ?) ORDER BY created_at DESC LIMIT 1",
+                "SELECT post_id FROM post WHERE member_id = (SELECT member_id FROM member WHERE id = ?) AND title = 'post2'",
                 Long.class,
                 memberId);
     }
