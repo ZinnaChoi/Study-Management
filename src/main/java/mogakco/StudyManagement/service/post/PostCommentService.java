@@ -10,4 +10,6 @@ public interface PostCommentService {
 
     DTOResCommon createPostCommentReply(Long postId, Long commentId, PostCommentReq postCommentReq, LoggingService lo);
 
+    DTOResCommon updatePostComment(Long postId, Long commentId, PostCommentReq postCommentReq, LoggingService lo);
+
 }
