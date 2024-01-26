@@ -99,7 +99,7 @@ public class PostCommentController extends CommonController {
         return result;
     }
 
-    @Operation(summary = "게시판 댓글 및 답글 수정", description = "게시판의 댓글 및 답글 수정")
+    @Operation(summary = "게시판 댓글(답글) 수정", description = "게시판의 댓글(답글) 수정")
     @PatchMapping("/{postId}/comments/{commentId}")
     public DTOResCommon updateComment(HttpServletRequest request,
             @PathVariable(name = "postId", required = true) Long postId,
