@@ -58,12 +58,12 @@ public class MemberControllerTest {
 
     private static final String LOGIN_URL = "/api/v1/login";
     private static final String JOIN_URL = "/api/v1/join";
-    private static final String ID_DUPLICATED_CHECK_URL = "/api/v1/id-duplicated";
+    private static final String ID_DUPLICATED_CHECK_URL = "/api/v1/check-id";
     private static final String MEMBER_INFO_URL = "/api/v1/member";
     private static final String MEMBERS_INFO_BY_SCHEDULE_URL = "/api/v1/members/schedule-name";
     private static final String MEMBERS_INFO_BY_WAKEUP_URL = "/api/v1/members/wakeup-time";
-    private static final String GET_SCHEDULES_URL = "/api/v1/members/schedules";
-    private static final String GET_WAKEUPS_URL = "/api/v1/members/wakeup-times";
+    private static final String GET_SCHEDULES_URL = "/api/v1/registed/schedules";
+    private static final String GET_WAKEUPS_URL = "/api/v1/registed/wakeup-times";
 
     @Test
     @WithMockUser(authorities = "ADMIN")

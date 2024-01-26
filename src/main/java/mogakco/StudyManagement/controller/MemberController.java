@@ -85,7 +85,7 @@ public class MemberController extends CommonController {
     }
 
     @Operation(summary = "중복 아이디 확인", description = "회원가입시 사용자가 입력한 아이디 중복 검증 true: 중복 false: 사용 가능")
-    @PostMapping("/id-duplicated")
+    @PostMapping("/check-id")
     public MemberIdDuplRes checkIdDuplicated(HttpServletRequest request, @Valid @RequestBody MemberIdDuplReq idInfo) {
         MemberIdDuplRes result = new MemberIdDuplRes();
 
@@ -195,7 +195,7 @@ public class MemberController extends CommonController {
 
     @Operation(summary = "등록 스케줄 조희", description = "현재 등록되어 있는 스케줄 정보를 조회")
     @SecurityRequirement(name = "bearer-key")
-    @GetMapping("/members/schedules")
+    @GetMapping("/registed/schedules")
     public RegistedScheduleRes getRegistedSchedule(
             HttpServletRequest request,
             @Parameter(name = "info", description = "요청 시 필수 값") @ModelAttribute @Valid DTOReqCommon info) {
@@ -218,7 +218,7 @@ public class MemberController extends CommonController {
 
     @Operation(summary = "등록 기상 시간 조희", description = "현재 등록되어 있는 기상 시간 정보를 조회")
     @SecurityRequirement(name = "bearer-key")
-    @GetMapping("/members/wakeup-times")
+    @GetMapping("/registed/wakeup-times")
     public RegistedWakeupRes getRegistedWakeupTime(
             HttpServletRequest request,
             @Parameter(name = "info", description = "요청 시 필수 값") @ModelAttribute @Valid DTOReqCommon info) {
