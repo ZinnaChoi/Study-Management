@@ -19,6 +19,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import mogakco.StudyManagement.dto.PostCommentReq;
+import mogakco.StudyManagement.util.DateUtil;
 
 @Entity
 @Builder
@@ -55,12 +56,9 @@ public class PostComment {
     @Column(nullable = false)
     private String updatedAt;
 
-    public void updateContent(String content) {
-        this.content = content;
-    }
-
-    public void updateUpdatedAt(String updatedAt) {
-        this.updatedAt = updatedAt;
+    public void updatePostComment(PostCommentReq postCommentReq) {
+        this.content = postCommentReq.getContent();
+        this.updatedAt = DateUtil.getCurrentDateTime();
     }
 
     public boolean isPostCommentChanged(PostCommentReq postCommentReq) {

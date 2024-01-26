@@ -163,8 +163,7 @@ public class PostCommentServiceImpl implements PostCommentService {
             }
 
             if (comment.isPostCommentChanged(postCommentReq)) {
-                comment.updateContent(postCommentReq.getContent());
-                comment.updateUpdatedAt(DateUtil.getCurrentDateTime());
+                comment.updatePostComment(postCommentReq);
                 lo.setDBStart();
                 postCommentRepository.save(comment);
                 lo.setDBEnd();

@@ -14,6 +14,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import mogakco.StudyManagement.dto.PostReq;
+import mogakco.StudyManagement.util.DateUtil;
+
 import java.util.Objects;
 
 @Entity
@@ -44,16 +46,10 @@ public class Post {
     @Column(nullable = false)
     private String updatedAt;
 
-    public void updateTitle(String title) {
-        this.title = title;
-    }
-
-    public void updateContent(String content) {
-        this.content = content;
-    }
-
-    public void updateUpdatedAt(String updatedAt) {
-        this.updatedAt = updatedAt;
+    public void updatePost(PostReq postReq) {
+        this.title = postReq.getTitle();
+        this.content = postReq.getContent();
+        this.updatedAt = DateUtil.getCurrentDateTime();
     }
 
     public boolean isPostChanged(PostReq postReq) {
