@@ -1,12 +1,14 @@
 package mogakco.StudyManagement.controller;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -20,8 +22,10 @@ import org.springframework.transaction.annotation.Transactional;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import mogakco.StudyManagement.dto.NoticeReq;
 import mogakco.StudyManagement.service.common.LoggingService;
 import mogakco.StudyManagement.service.notice.NoticeService;
+import mogakco.StudyManagement.util.DateUtil;
 import mogakco.StudyManagement.util.TestUtil;
 
 @ActiveProfiles("test")
@@ -47,6 +51,9 @@ public class NoticeControllerTest {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
+
+    @Value("${study.systemId}")
+    private String systemId;
 
     private static final String GET_NOTICE_API_URL = "/api/v1/notice";
 
@@ -82,5 +89,40 @@ public class NoticeControllerTest {
                 "SELECT member_id FROM member WHERE id = ?",
                 Long.class,
                 Id);
+    }
+    /////////////////////////////////////////////////////////////////////////////////////////
+
+    @Test
+    @Sql("/notice/NoticeListSetup.sql")
+    @WithMockUser(username = "noticeUser1", authorities = { "USER" })
+    @DisplayName("알림 상태 변경 성공")
+    public void updateNoticeSuccess() throws Exception {
+
+        String requestBodyJson = objectMapper.writeValueAsString(
+                new NoticeReq(DateUtil.getCurrentDateTime(), systemId, Boolean.TRUE.booleanValue(), Boolean.FALSE,
+                        Boolean.FALSE, Boolean.TRUE.booleanValue()));
+
+        MvcResult result = TestUtil.performRequest(mockMvc,
+                GET_NOTICE_API_URL + "/" + getMemberIdByMemberName("noticeUser1"), requestBodyJson, "PATCH", 200, 200);
+        JsonNode responseBody = objectMapper.readTree(result.getResponse().getContentAsString());
+
+        int retCode = responseBody.path("retCode").asInt();
+
+        assertEquals(200, retCode);
+    }
+
+    @Test
+    @Sql("/notice/NoticeListSetup.sql")
+    @WithMockUser(username = "noticeUser2", authorities = { "USER" })
+    @DisplayName("알림 상태 변경 실패 - 변경 사항 없음")
+    public void updateNoticeFailNoChanges() throws Exception {
+
+        String requestBodyJson = objectMapper.writeValueAsString(
+                new NoticeReq(DateUtil.getCurrentDateTime(), systemId, Boolean.TRUE, Boolean.TRUE,
+                        Boolean.TRUE, Boolean.TRUE));
+
+        TestUtil.performRequest(mockMvc,
+                GET_NOTICE_API_URL + "/" + getMemberIdByMemberName("noticeUser2"), requestBodyJson, "PATCH", 200, 204);
+
     }
 }
