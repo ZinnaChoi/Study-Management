@@ -16,6 +16,7 @@ import mogakco.StudyManagement.dto.PostCommentReq;
 import mogakco.StudyManagement.enums.ErrorCode;
 import mogakco.StudyManagement.exception.InvalidRequestException;
 import mogakco.StudyManagement.exception.NotFoundException;
+import mogakco.StudyManagement.exception.UnauthorizedAccessException;
 import mogakco.StudyManagement.repository.MemberRepository;
 import mogakco.StudyManagement.repository.PostCommentRepository;
 import mogakco.StudyManagement.repository.PostCommentSpecification;
@@ -74,7 +75,7 @@ public class PostCommentServiceImpl implements PostCommentService {
             LoggingService lo) {
         try {
             Specification<Post> postSpec = PostSpecification.withPostId(postId);
-            Specification<PostComment> commentSpec = PostCommentSpecification.withCommentId(commentId);
+            Specification<PostComment> commentSpec = PostCommentSpecification.withPostIdAndCommentId(postId, commentId);
 
             lo.setDBStart();
             Member member = memberRepository.findById(SecurityUtil.getLoginUserId());
@@ -107,7 +108,7 @@ public class PostCommentServiceImpl implements PostCommentService {
     public PostCommentReplyRes getCommentReply(Long postId, Long commentId, LoggingService lo) {
         try {
             Specification<Post> postSpec = PostSpecification.withPostId(postId);
-            Specification<PostComment> commentSpec = PostCommentSpecification.withCommentId(commentId);
+            Specification<PostComment> commentSpec = PostCommentSpecification.withPostIdAndCommentId(postId, commentId);
             Specification<PostComment> replySpec = PostCommentSpecification.withParentCommentId(commentId);
 
             lo.setDBStart();
@@ -137,4 +138,81 @@ public class PostCommentServiceImpl implements PostCommentService {
             return new PostCommentReplyRes(res.getSystemId(), res.getRetCode(), res.getRetMsg(), null);
         }
     }
+
+    @Override
+    @Transactional
+    public DTOResCommon updatePostComment(Long postId, Long commentId, PostCommentReq postCommentReq,
+            LoggingService lo) {
+
+        try {
+            DTOResCommon result = new DTOResCommon();
+
+            Specification<Post> postSpec = PostSpecification.withPostId(postId);
+            Specification<PostComment> commentSpec = PostCommentSpecification.withPostIdAndCommentId(postId, commentId);
+
+            lo.setDBStart();
+            Member loginMember = memberRepository.findById(SecurityUtil.getLoginUserId());
+            postRepository.findOne(postSpec)
+                    .orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND.getMessage("게시글")));
+            PostComment comment = postCommentRepository.findOne(commentSpec)
+                    .orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND.getMessage("게시판 댓글")));
+            lo.setDBEnd();
+            if (!comment.getMember().equals(loginMember)) {
+                throw new UnauthorizedAccessException(
+                        ErrorCode.BAD_REQUEST.getMessage("작성하지 않은 댓글은 수정할 수 없습니다."));
+            }
+
+            if (comment.isPostCommentChanged(postCommentReq)) {
+                comment.updatePostComment(postCommentReq);
+                lo.setDBStart();
+                postCommentRepository.save(comment);
+                lo.setDBEnd();
+                result.setRetCode(ErrorCode.OK.getCode());
+                result.setRetMsg(ErrorCode.OK.getMessage("게시판 댓글"));
+            } else {
+                result.setRetCode(ErrorCode.UNCHANGED.getCode());
+                result.setRetMsg(ErrorCode.UNCHANGED.getMessage("게시판 댓글"));
+            }
+
+            return result;
+
+        } catch (NotFoundException | UnauthorizedAccessException e) {
+            return ExceptionUtil.handleException(e);
+        }
+
+    }
+
+    @Override
+    @Transactional
+    public DTOResCommon deletePostComment(Long postId, Long commentId, LoggingService lo) {
+
+        try {
+            Specification<Post> postSpec = PostSpecification.withPostId(postId);
+            Specification<PostComment> commentSpec = PostCommentSpecification.withPostIdAndCommentId(postId, commentId);
+
+            lo.setDBStart();
+            Member loginMember = memberRepository.findById(SecurityUtil.getLoginUserId());
+            postRepository.findOne(postSpec)
+                    .orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND.getMessage("게시글")));
+            PostComment comment = postCommentRepository.findOne(commentSpec)
+                    .orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND.getMessage("게시판 댓글(답글)")));
+            lo.setDBEnd();
+
+            if (!comment.getMember().equals(loginMember)) {
+                throw new UnauthorizedAccessException(
+                        ErrorCode.BAD_REQUEST.getMessage("작성하지 않은 댓글(답글)은 삭제할 수 없습니다."));
+            }
+            lo.setDBStart();
+            postCommentRepository.delete(comment);
+            lo.setDBEnd();
+
+            return new DTOResCommon(null, ErrorCode.DELETED.getCode(),
+                    ErrorCode.DELETED.getMessage("게시판 댓글(답글)"));
+
+        } catch (NotFoundException | UnauthorizedAccessException e) {
+            return ExceptionUtil.handleException(e);
+        }
+
+    }
+
 }

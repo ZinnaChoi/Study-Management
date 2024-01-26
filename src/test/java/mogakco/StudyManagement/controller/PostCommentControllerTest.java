@@ -55,8 +55,9 @@ public class PostCommentControllerTest {
         @Value("${study.systemId}")
         private String systemId;
 
-        private static final String POST_COMMENT_API_URL = "/api/v1/posts/{postId}/comments";
-        private static final String COMMENT_REPLY_API_URL = "/api/v1/posts/{postId}/comments/{commentId}/replies";
+        private static final String POST_COMMENT_CREATE_API_URL = "/api/v1/posts/{postId}/comments";
+        private static final String POST_COMMENT_UPDATE_DELETE_API_URL = "/api/v1/posts/{postId}/comments/{commentId}";
+        private static final String POST_COMMENT_REPLY_API_URL = "/api/v1/posts/{postId}/comments/{commentId}/replies";
 
         @Test
         @Sql("/post/PostCommentSetup.sql")
@@ -66,7 +67,8 @@ public class PostCommentControllerTest {
                 String requestBodyJson = objectMapper
                                 .writeValueAsString(new PostCommentReq(DateUtil.getCurrentDateTime(), systemId,
                                                 "Thank you"));
-                String url = POST_COMMENT_API_URL.replace("{postId}", getLatestPostIdByMemberId("PostUser").toString());
+                String url = POST_COMMENT_CREATE_API_URL.replace("{postId}",
+                                getLatestPostIdByMemberId("PostUser").toString());
                 TestUtil.performRequest(mockMvc, url, requestBodyJson, "POST", 200, 201);
         }
 
@@ -78,7 +80,7 @@ public class PostCommentControllerTest {
                 String requestBodyJson = objectMapper
                                 .writeValueAsString(new PostCommentReq(DateUtil.getCurrentDateTime(), systemId,
                                                 "Thank you"));
-                String url = POST_COMMENT_API_URL.replace("{postId}", "-1");
+                String url = POST_COMMENT_CREATE_API_URL.replace("{postId}", "-1");
                 TestUtil.performRequest(mockMvc, url, requestBodyJson, "POST", 200, 404);
         }
 
@@ -89,7 +91,8 @@ public class PostCommentControllerTest {
         public void registerPostCommentFailEmptyContent() throws Exception {
                 String requestBodyJson = objectMapper
                                 .writeValueAsString(new PostCommentReq(DateUtil.getCurrentDateTime(), systemId, ""));
-                String url = POST_COMMENT_API_URL.replace("{postId}", getLatestPostIdByMemberId("PostUser").toString());
+                String url = POST_COMMENT_CREATE_API_URL.replace("{postId}",
+                                getLatestPostIdByMemberId("PostUser").toString());
                 TestUtil.performRequest(mockMvc, url, requestBodyJson, "POST", 400, 400);
         }
 
@@ -103,7 +106,7 @@ public class PostCommentControllerTest {
                 String requestBodyJson = objectMapper
                                 .writeValueAsString(
                                                 new PostCommentReq(DateUtil.getCurrentDateTime(), systemId, "Good~!"));
-                String url = COMMENT_REPLY_API_URL
+                String url = POST_COMMENT_REPLY_API_URL
                                 .replace("{postId}", getLatestPostIdByMemberId("PostUser").toString())
                                 .replace("{commentId}", getLatestCommentIdByContentAndMemberId("comment1", "PostUser")
                                                 .toString());
@@ -119,7 +122,7 @@ public class PostCommentControllerTest {
                 String requestBodyJson = objectMapper
                                 .writeValueAsString(
                                                 new PostCommentReq(DateUtil.getCurrentDateTime(), systemId, "Good~!"));
-                String url = COMMENT_REPLY_API_URL.replace("{postId}", "-1")
+                String url = POST_COMMENT_REPLY_API_URL.replace("{postId}", "-1")
                                 .replace("{commentId}", getLatestCommentIdByContentAndMemberId("comment1", "PostUser")
                                                 .toString());
 
@@ -135,7 +138,7 @@ public class PostCommentControllerTest {
                 String requestBodyJson = objectMapper
                                 .writeValueAsString(
                                                 new PostCommentReq(DateUtil.getCurrentDateTime(), systemId, "Good~!"));
-                String url = COMMENT_REPLY_API_URL
+                String url = POST_COMMENT_REPLY_API_URL
                                 .replace("{postId}", getLatestPostIdByMemberId("PostUser").toString())
                                 .replace("{commentId}", "-1");
 
@@ -150,7 +153,7 @@ public class PostCommentControllerTest {
                 String requestBodyJson = objectMapper
                                 .writeValueAsString(
                                                 new PostCommentReq(DateUtil.getCurrentDateTime(), systemId, "Good~!"));
-                String url = COMMENT_REPLY_API_URL
+                String url = POST_COMMENT_REPLY_API_URL
                                 .replace("{postId}", getLatestPostIdByMemberId("PostUser").toString())
                                 .replace("{commentId}", getLatestCommentIdByContentAndMemberId("reply1", "PostUser")
                                                 .toString());
@@ -160,12 +163,9 @@ public class PostCommentControllerTest {
 
         ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        @Test
-        @Sql("/post/PostCommentSetup.sql")
-        @WithMockUser(username = "PostUser", authorities = { "USER" })
         @DisplayName("게시판 답글 조회 성공")
         public void getPostCommentReplySuccess() throws Exception {
-                String url = COMMENT_REPLY_API_URL
+                String url = POST_COMMENT_REPLY_API_URL
                                 .replace("{postId}", getLatestPostIdByMemberId("PostUser").toString())
                                 .replace("{commentId}", getLatestCommentIdByContentAndMemberId("comment1", "PostUser")
                                                 .toString());
@@ -178,39 +178,152 @@ public class PostCommentControllerTest {
 
         }
 
-        @Test
-        @Sql("/post/PostCommentSetup.sql")
-        @WithMockUser(username = "PostUser", authorities = { "USER" })
         @DisplayName("게시판 답글 조회 실패 - 존재하지 않는 게시글 번호")
         public void getPostCommentReplyFailPostNotFound() throws Exception {
-                String url = COMMENT_REPLY_API_URL
+                String url = POST_COMMENT_REPLY_API_URL
                                 .replace("{postId}", "-1")
                                 .replace("{commentId}", getLatestCommentIdByContentAndMemberId("comment1", "PostUser")
                                                 .toString());
                 TestUtil.performRequest(mockMvc, url, null, "GET", 200, 404);
         }
 
-        @Test
-        @Sql("/post/PostCommentSetup.sql")
-        @WithMockUser(username = "PostUser", authorities = { "USER" })
         @DisplayName("게시판 답글 조회 실패 - 존재하지 않는 댓글 번호")
         public void getPostCommentReplyFailCommentNotFound() throws Exception {
-                String url = COMMENT_REPLY_API_URL
+                String url = POST_COMMENT_REPLY_API_URL
                                 .replace("{postId}", getLatestPostIdByMemberId("PostUser").toString())
                                 .replace("{commentId}", "-1");
                 TestUtil.performRequest(mockMvc, url, null, "GET", 200, 404);
         }
 
-        @Test
-        @Sql("/post/PostCommentSetup.sql")
         @WithMockUser(username = "PostUser", authorities = { "USER" })
         @DisplayName("게시판 답글 조회 실패 - 답글의 답글 조회 요청")
         public void getPostCommentReplyFailInvalidComment() throws Exception {
-                String url = COMMENT_REPLY_API_URL
+                String url = POST_COMMENT_REPLY_API_URL
                                 .replace("{postId}", getLatestPostIdByMemberId("PostUser").toString())
                                 .replace("{commentId}", getLatestCommentIdByContentAndMemberId("reply1", "PostUser")
                                                 .toString());
                 TestUtil.performRequest(mockMvc, url, null, "GET", 200, 400);
+        }
+        ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        @Test
+        @Sql("/post/PostCommentSetup.sql")
+        @WithMockUser(username = "PostUser", authorities = { "USER" })
+        @DisplayName("게시판 댓글(답글) 수정 성공")
+        public void updatePostCommentSuccess() throws Exception {
+                String requestBodyJson = objectMapper.writeValueAsString(
+                                new PostCommentReq(DateUtil.getCurrentDateTime(), systemId, "Updated Content"));
+
+                String url = POST_COMMENT_UPDATE_DELETE_API_URL
+                                .replace("{postId}", getLatestPostIdByMemberId("PostUser").toString())
+                                .replace("{commentId}", getLatestCommentIdByContentAndMemberId("comment1", "PostUser")
+                                                .toString());
+
+                TestUtil.performRequest(mockMvc, url, requestBodyJson, "PATCH", 200, 200);
+        }
+
+        @Test
+        @Sql("/post/PostCommentSetup.sql")
+        @WithMockUser(username = "PostUser", authorities = { "USER" })
+        @DisplayName("게시판 댓글(답글) 수정 실패 - 존재하지 않는 게시글")
+        public void updatePostCommentFailPostNotFound() throws Exception {
+                String requestBodyJson = objectMapper.writeValueAsString(
+                                new PostCommentReq(DateUtil.getCurrentDateTime(), systemId, "Updated Content"));
+
+                String url = POST_COMMENT_UPDATE_DELETE_API_URL
+                                .replace("{postId}", "-1")
+                                .replace("{commentId}", getLatestCommentIdByContentAndMemberId("comment1", "PostUser")
+                                                .toString());
+
+                TestUtil.performRequest(mockMvc, url, requestBodyJson, "PATCH", 200, 404);
+        }
+
+        @Test
+        @Sql("/post/PostCommentSetup.sql")
+        @WithMockUser(username = "PostUser", authorities = { "USER" })
+        @DisplayName("게시판 댓글(답글) 수정 실패 - 존재하지 않는 댓글")
+        public void updatePostCommentFailCommentNotFound() throws Exception {
+                String requestBodyJson = objectMapper.writeValueAsString(
+                                new PostCommentReq(DateUtil.getCurrentDateTime(), systemId, "Updated Content"));
+
+                String url = POST_COMMENT_UPDATE_DELETE_API_URL
+                                .replace("{postId}", getLatestPostIdByMemberId("PostUser").toString())
+                                .replace("{commentId}", "-1");
+
+                TestUtil.performRequest(mockMvc, url, requestBodyJson, "PATCH", 200, 404);
+        }
+
+        @Test
+        @Sql("/post/PostCommentSetup.sql")
+        @WithMockUser(username = "PostUser2", authorities = { "USER" })
+        @DisplayName("게시판 댓글(답글) 수정 실패 - 작성하지 않은 댓글(답글)")
+        public void updatePostCommentFailInvalidMember() throws Exception {
+                String requestBodyJson = objectMapper.writeValueAsString(
+                                new PostCommentReq(DateUtil.getCurrentDateTime(), systemId, "Updated Content"));
+
+                String url = POST_COMMENT_UPDATE_DELETE_API_URL
+                                .replace("{postId}", getLatestPostIdByMemberId("PostUser").toString())
+                                .replace("{commentId}", getLatestCommentIdByContentAndMemberId("comment1", "PostUser")
+                                                .toString());
+
+                TestUtil.performRequest(mockMvc, url, requestBodyJson, "PATCH", 200, 400);
+
+        }
+
+        ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        @Test
+        @Sql("/post/PostCommentSetup.sql")
+        @WithMockUser(username = "PostUser", authorities = { "USER" })
+        @DisplayName("게시판 댓글(답글) 삭제 성공")
+        public void deletePostCommentSuccess() throws Exception {
+
+                String url = POST_COMMENT_UPDATE_DELETE_API_URL
+                                .replace("{postId}", getLatestPostIdByMemberId("PostUser").toString())
+                                .replace("{commentId}", getLatestCommentIdByContentAndMemberId("comment1", "PostUser")
+                                                .toString());
+                TestUtil.performRequest(mockMvc, url, null, "DELETE", 200, 204);
+
+        }
+
+        @Test
+        @Sql("/post/PostCommentSetup.sql")
+        @WithMockUser(username = "PostUser", authorities = { "USER" })
+        @DisplayName("게시판 댓글(답글) 삭제 실패 - 존재하지 않는 게시글 번호")
+        public void deletePostCommentFailPostNotFound() throws Exception {
+
+                String url = POST_COMMENT_UPDATE_DELETE_API_URL
+                                .replace("{postId}", "-1")
+                                .replace("{commentId}", getLatestCommentIdByContentAndMemberId("comment1", "PostUser")
+                                                .toString());
+                TestUtil.performRequest(mockMvc, url, null, "DELETE", 200, 404);
+
+        }
+
+        @Test
+        @Sql("/post/PostCommentSetup.sql")
+        @WithMockUser(username = "PostUser", authorities = { "USER" })
+        @DisplayName("게시판 댓글(답글) 삭제 실패 - 존재하지 않는 댓글(답글) 번호")
+        public void deletePostCommentFailCommentNotFound() throws Exception {
+
+                String url = POST_COMMENT_UPDATE_DELETE_API_URL
+                                .replace("{postId}", getLatestPostIdByMemberId("PostUser").toString())
+                                .replace("{commentId}", "-1");
+                TestUtil.performRequest(mockMvc, url, null, "DELETE", 200, 404);
+        }
+
+        @Test
+        @Sql("/post/PostCommentSetup.sql")
+        @WithMockUser(username = "PostUser2", authorities = { "USER" })
+        @DisplayName("게시판 댓글(답글) 삭제 실패 - 잘못된 사용자 ")
+        public void deletePostCommentFailInvalidMember() throws Exception {
+
+                String url = POST_COMMENT_UPDATE_DELETE_API_URL
+                                .replace("{postId}", getLatestPostIdByMemberId("PostUser").toString())
+                                .replace("{commentId}", getLatestCommentIdByContentAndMemberId("comment1", "PostUser")
+                                                .toString());
+                TestUtil.performRequest(mockMvc, url, null, "DELETE", 200, 400);
+
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

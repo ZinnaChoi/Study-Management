@@ -156,9 +156,7 @@ public class PostServiceImpl implements PostService {
                         ErrorCode.BAD_REQUEST.getMessage("작성하지 않은 게시글은 수정할 수 없습니다."));
             }
             if (post.isPostChanged(postUpdateReq)) {
-                post.updateTitle(postUpdateReq.getTitle());
-                post.updateContent(postUpdateReq.getContent());
-                post.updateUpdatedAt(DateUtil.getCurrentDateTime());
+                post.updatePost(postUpdateReq);
                 lo.setDBStart();
                 postRepository.save(post);
                 lo.setDBEnd();

@@ -19,6 +19,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import mogakco.StudyManagement.dto.AbsentReq;
+import mogakco.StudyManagement.util.DateUtil;
 
 @Entity
 @Builder
@@ -53,12 +54,9 @@ public class AbsentSchedule {
     @Column(nullable = false)
     private String updatedAt;
 
-    public void updateDescription(String description) {
-        this.description = description;
-    }
-
-    public void updateUpdatedAt(String updatedAt) {
-        this.updatedAt = updatedAt;
+    public void updateAbsentSchedule(AbsentReq absentReq) {
+        this.description = absentReq.getDescription();
+        this.updatedAt = DateUtil.getCurrentDateTime();
     }
 
     public boolean isDescriptionChanged(AbsentReq absentReq) {
