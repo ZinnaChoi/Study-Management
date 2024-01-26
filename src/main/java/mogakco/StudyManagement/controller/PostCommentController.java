@@ -1,5 +1,6 @@
 package mogakco.StudyManagement.controller;
 
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -109,6 +110,26 @@ public class PostCommentController extends CommonController {
         try {
             startAPI(lo, postCommentReq);
             result = postCommentService.updatePostComment(postId, commentId, postCommentReq, lo);
+            result.setSendDate(DateUtil.getCurrentDateTime());
+            result.setSystemId(systemId);
+        } catch (Exception e) {
+            result = new DTOResCommon(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
+                    ErrorCode.INTERNAL_ERROR.getMessage());
+        } finally {
+            endAPI(request, findErrorCodeByCode(result.getRetCode()), lo, result);
+        }
+        return result;
+    }
+
+    @Operation(summary = "게시판 댓글(답글) 삭제", description = "특정 게시판 댓글(답글) 삭제")
+    @DeleteMapping("/{postId}/comments/{commentId}")
+    public DTOResCommon deleteComment(HttpServletRequest request,
+            @PathVariable(name = "postId", required = true) Long postId,
+            @PathVariable(name = "commentId", required = true) Long commentId) {
+        DTOResCommon result = new DTOResCommon();
+        try {
+            startAPI(lo, null);
+            result = postCommentService.deletePostComment(postId, commentId, lo);
             result.setSendDate(DateUtil.getCurrentDateTime());
             result.setSystemId(systemId);
         } catch (Exception e) {

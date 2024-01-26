@@ -15,4 +15,5 @@ public interface PostCommentService {
 
     DTOResCommon updatePostComment(Long postId, Long commentId, PostCommentReq postCommentReq, LoggingService lo);
 
+    DTOResCommon deletePostComment(Long postId, Long commentId, LoggingService lo);
 }

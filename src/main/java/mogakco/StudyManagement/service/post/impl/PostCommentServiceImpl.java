@@ -75,7 +75,7 @@ public class PostCommentServiceImpl implements PostCommentService {
             LoggingService lo) {
         try {
             Specification<Post> postSpec = PostSpecification.withPostId(postId);
-            Specification<PostComment> commentSpec = PostCommentSpecification.withCommentId(commentId);
+            Specification<PostComment> commentSpec = PostCommentSpecification.withPostIdAndCommentId(postId, commentId);
 
             lo.setDBStart();
             Member member = memberRepository.findById(SecurityUtil.getLoginUserId());
@@ -108,11 +108,11 @@ public class PostCommentServiceImpl implements PostCommentService {
     public PostCommentReplyRes getCommentReply(Long postId, Long commentId, LoggingService lo) {
         try {
             Specification<Post> postSpec = PostSpecification.withPostId(postId);
-            Specification<PostComment> commentSpec = PostCommentSpecification.withCommentId(commentId);
+            Specification<PostComment> commentSpec = PostCommentSpecification.withPostIdAndCommentId(postId, commentId);
             Specification<PostComment> replySpec = PostCommentSpecification.withParentCommentId(commentId);
 
             lo.setDBStart();
-            Post post = postRepository.findOne(postSpec)
+            postRepository.findOne(postSpec)
                     .orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND.getMessage("게시글")));
             PostComment parentComment = postCommentRepository.findOne(commentSpec)
                     .orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND.getMessage("게시판 댓글")));
@@ -148,7 +148,7 @@ public class PostCommentServiceImpl implements PostCommentService {
             DTOResCommon result = new DTOResCommon();
 
             Specification<Post> postSpec = PostSpecification.withPostId(postId);
-            Specification<PostComment> commentSpec = PostCommentSpecification.withCommentId(commentId);
+            Specification<PostComment> commentSpec = PostCommentSpecification.withPostIdAndCommentId(postId, commentId);
 
             lo.setDBStart();
             Member loginMember = memberRepository.findById(SecurityUtil.getLoginUserId());
@@ -176,6 +176,39 @@ public class PostCommentServiceImpl implements PostCommentService {
             }
 
             return result;
+
+        } catch (NotFoundException | UnauthorizedAccessException e) {
+            return ExceptionUtil.handleException(e);
+        }
+
+    }
+
+    @Override
+    @Transactional
+    public DTOResCommon deletePostComment(Long postId, Long commentId, LoggingService lo) {
+
+        try {
+            Specification<Post> postSpec = PostSpecification.withPostId(postId);
+            Specification<PostComment> commentSpec = PostCommentSpecification.withPostIdAndCommentId(postId, commentId);
+
+            lo.setDBStart();
+            Member loginMember = memberRepository.findById(SecurityUtil.getLoginUserId());
+            postRepository.findOne(postSpec)
+                    .orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND.getMessage("게시글")));
+            PostComment comment = postCommentRepository.findOne(commentSpec)
+                    .orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND.getMessage("게시판 댓글(답글)")));
+            lo.setDBEnd();
+
+            if (!comment.getMember().equals(loginMember)) {
+                throw new UnauthorizedAccessException(
+                        ErrorCode.BAD_REQUEST.getMessage("작성하지 않은 댓글(답글)은 삭제할 수 없습니다."));
+            }
+            lo.setDBStart();
+            postCommentRepository.delete(comment);
+            lo.setDBEnd();
+
+            return new DTOResCommon(null, ErrorCode.DELETED.getCode(),
+                    ErrorCode.DELETED.getMessage("게시판 댓글(답글)"));
 
         } catch (NotFoundException | UnauthorizedAccessException e) {
             return ExceptionUtil.handleException(e);
