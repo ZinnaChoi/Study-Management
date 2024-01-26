@@ -20,7 +20,6 @@ public class PostDetail {
     private String updatedAt;
 
     public PostDetail(Post post, Integer likes) {
-
         this.memberName = post.getMember().getName();
         this.title = post.getTitle();
         this.content = post.getContent();

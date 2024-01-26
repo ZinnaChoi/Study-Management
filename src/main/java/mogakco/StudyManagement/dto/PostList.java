@@ -8,6 +8,8 @@ import mogakco.StudyManagement.domain.Post;
 @Setter
 public class PostList {
 
+    private Long postId;
+
     private Integer likes;
 
     private String title;
@@ -21,6 +23,7 @@ public class PostList {
     private String updatedAt;
 
     public PostList(Post post, Integer likes, Integer commentCnt) {
+        this.postId = post.getPostId();
         this.title = post.getTitle();
         this.memberName = post.getMember().getName();
         this.createdAt = post.getCreatedAt();
