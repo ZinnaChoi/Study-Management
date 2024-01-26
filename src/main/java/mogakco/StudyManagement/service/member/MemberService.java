@@ -11,6 +11,8 @@ import mogakco.StudyManagement.dto.MemberInfoUpdateReq;
 import mogakco.StudyManagement.dto.MemberJoinReq;
 import mogakco.StudyManagement.dto.MemberLoginReq;
 import mogakco.StudyManagement.dto.MemberLoginRes;
+import mogakco.StudyManagement.dto.RegistedScheduleRes;
+import mogakco.StudyManagement.dto.RegistedWakeupRes;
 import mogakco.StudyManagement.dto.StudyMembersRes;
 import mogakco.StudyManagement.service.common.LoggingService;
 
@@ -30,4 +32,8 @@ public interface MemberService {
     StudyMembersRes getMembersBySchedule(LoggingService lo, String schedule, Pageable pageable);
 
     StudyMembersRes getMembersByWakeupTime(LoggingService lo, String time, Pageable pageable);
+
+    RegistedScheduleRes getRegistedSchedule(LoggingService lo);
+
+    RegistedWakeupRes getRegistedWakeup(LoggingService lo);
 }
