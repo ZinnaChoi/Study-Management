@@ -4,6 +4,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -12,6 +13,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
+import mogakco.StudyManagement.dto.DTOResCommon;
 import mogakco.StudyManagement.dto.StatGetRes;
 import mogakco.StudyManagement.enums.ErrorCode;
 import mogakco.StudyManagement.enums.LogType;
@@ -26,9 +28,10 @@ public class StatController extends CommonController {
 
     private final StatService statService;
 
-    public StatController(StatService statService, LoggingService lo) {
+    public StatController(LoggingService lo, StatService statService) {
         super(lo);
         this.statService = statService;
+
     }
 
     @Operation(summary = "통계 조회", description = "출석률 통계 조회, 기상률 조회")
@@ -56,4 +59,20 @@ public class StatController extends CommonController {
 
         return result;
     }
+
+    @Operation(summary = "부재 일정 저장", description = "통계 생성을 위한 부재 일정 일일 업데이트")
+    @PostMapping("/stat/absent")
+    public DTOResCommon checkAbsentSchedulesAndLog(HttpServletRequest request) {
+
+        DTOResCommon result = new DTOResCommon();
+        try {
+            startAPI(lo, null);
+            result = statService.checkAbsentSchedulesAndLog(lo);
+        } catch (Exception e) {
+            result = new DTOResCommon(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
+                    ErrorCode.INTERNAL_ERROR.getMessage());
+        }
+        return result;
+    }
+
 }

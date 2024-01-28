@@ -17,4 +17,5 @@ public interface MemberScheduleRepository extends JpaRepository<MemberSchedule, 
 
     Page<MemberSchedule> findAllBySchedule(Schedule schedule, Pageable pageable);
 
+    long countByMember(Member member);
 }
