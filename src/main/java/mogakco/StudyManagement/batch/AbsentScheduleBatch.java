@@ -3,14 +3,12 @@ package mogakco.StudyManagement.batch;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import mogakco.StudyManagement.service.stat.StatService;
 
 @Configuration
 @EnableBatchProcessing
-@Component
 @Service
 public class AbsentScheduleBatch {
     private final StatService statService;
