@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import org.springframework.transaction.annotation.Transactional;
@@ -27,6 +28,7 @@ import mogakco.StudyManagement.domain.AbsentSchedule;
 import mogakco.StudyManagement.domain.Member;
 import mogakco.StudyManagement.dto.DTOResCommon;
 import mogakco.StudyManagement.repository.AbsentScheduleRepository;
+import mogakco.StudyManagement.repository.spec.AbsentScheduleSpecification;
 import mogakco.StudyManagement.repository.DailyLogRepository;
 import mogakco.StudyManagement.repository.MemberRepository;
 import mogakco.StudyManagement.repository.MemberScheduleRepository;
@@ -87,24 +89,31 @@ public class StatServiceImpl implements StatService {
 
             for (Member member : allMembers) {
 
-                long totalScoreForMember = memberScheduleRepository.countByMember(member);
+                lo.setDBStart();
+                Integer totalScoreForMember = memberScheduleRepository.countByMember(member);
+                lo.setDBEnd();
 
                 if (totalScoreForMember != 0) {
 
-                    List<AbsentSchedule> todayAbsentSchedules = absentScheduleRepository
-                            .findAbsentSchedulesByMember_MemberIdAndAbsentDate(member.getMemberId(),
-                                    DateUtil.getCurrentDate());
+                    Specification<AbsentSchedule> spec = AbsentScheduleSpecification
+                            .withAbsentDateAndMember(DateUtil.getCurrentDate(), member);
+
+                    lo.setDBStart();
+                    List<AbsentSchedule> todayAbsentSchedules = absentScheduleRepository.findAll(spec);
+                    lo.setDBEnd();
 
                     if (todayAbsentSchedules.size() == 0) {
                         newLog = new DailyLog(member, DateUtil.getCurrentDate(), LogType.ABSENT,
-                                (int) totalScoreForMember,
+                                totalScoreForMember,
                                 DateUtil.getCurrentDateTime());
                     }
                     int todayScore = (int) (totalScoreForMember - todayAbsentSchedules.size());
                     newLog = new DailyLog(member, DateUtil.getCurrentDate(), LogType.ABSENT, todayScore,
                             DateUtil.getCurrentDateTime());
 
+                    lo.setDBStart();
                     dailyLogRepository.save(newLog);
+                    lo.setDBEnd();
                 }
 
             }
