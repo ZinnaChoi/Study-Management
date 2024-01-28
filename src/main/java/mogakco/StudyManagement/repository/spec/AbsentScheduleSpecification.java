@@ -1,4 +1,4 @@
-package mogakco.StudyManagement.repository;
+package mogakco.StudyManagement.repository.spec;
 
 import java.util.List;
 
