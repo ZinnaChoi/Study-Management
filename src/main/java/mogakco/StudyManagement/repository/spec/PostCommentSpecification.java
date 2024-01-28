@@ -1,4 +1,4 @@
-package mogakco.StudyManagement.repository;
+package mogakco.StudyManagement.repository.spec;
 
 import org.springframework.data.jpa.domain.Specification;
 
