@@ -8,6 +8,5 @@ import mogakco.StudyManagement.domain.AbsentSchedule;
 
 @Repository
 public interface AbsentScheduleRepository
-        extends JpaRepository<AbsentSchedule, Long>, JpaSpecificationExecutor<AbsentSchedule> {
-
+                extends JpaRepository<AbsentSchedule, Long>, JpaSpecificationExecutor<AbsentSchedule> {
 }
