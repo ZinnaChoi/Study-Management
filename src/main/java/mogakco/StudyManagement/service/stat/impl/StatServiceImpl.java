@@ -84,7 +84,9 @@ public class StatServiceImpl implements StatService {
     public DTOResCommon createAbsentLog(LoggingService lo) {
 
         try {
+            lo.setDBStart();
             List<Member> allMembers = memberRepository.findAll();
+            lo.setDBEnd();
             DailyLog newLog = new DailyLog();
 
             for (Member member : allMembers) {
