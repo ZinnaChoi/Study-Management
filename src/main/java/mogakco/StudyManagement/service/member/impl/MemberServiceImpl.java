@@ -141,12 +141,12 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
 
     @Override
     public DTOResCommon logout(LoggingService lo) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String loginUserId = SecurityUtil.getLoginUserId();
 
         lo.setDBStart();
         // redis에 접속한 아이디 정보가 있다면 삭제(정보가 있다는 것은 아직 로그아웃 하지 않은 것)
-        if (redisTemplate.opsForValue().get("JWT:" + authentication.getName()) != null) {
-            redisTemplate.delete("JWT:" + authentication.getName()); // redis 내 Token 삭제
+        if (redisTemplate.opsForValue().get("JWT:" + loginUserId) != null) {
+            redisTemplate.delete("JWT:" + loginUserId); // redis 내 Token 삭제
         }
         lo.setDBEnd();
 

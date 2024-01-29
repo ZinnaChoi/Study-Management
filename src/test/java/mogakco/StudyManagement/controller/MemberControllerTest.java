@@ -66,8 +66,6 @@ public class MemberControllerTest {
     private static final String GET_SCHEDULES_URL = "/api/v1/schedules";
     private static final String GET_WAKEUPS_URL = "/api/v1/wakeup-times";
 
-    private static final String STUDY_API_URL = "/api/v1/study";
-
     @Test
     @WithMockUser(authorities = "ADMIN")
     @DisplayName("로그인 API 성공")
