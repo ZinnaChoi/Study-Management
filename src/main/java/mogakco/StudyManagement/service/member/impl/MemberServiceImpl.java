@@ -3,11 +3,15 @@ package mogakco.StudyManagement.service.member.impl;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.domain.Page;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -15,6 +19,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import mogakco.StudyManagement.exception.InvalidRequestException;
+
 import org.springframework.transaction.annotation.Transactional;
 import mogakco.StudyManagement.domain.Member;
 import mogakco.StudyManagement.domain.MemberSchedule;
@@ -60,6 +65,7 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
     private final StudyInfoRepository studyInfoRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final JWTUtil jwtUtil;
+    private final RedisTemplate<String, Object> redisTemplate;
 
     @Value("${jwt.expired.time}")
     private Long expiredTime;
@@ -73,7 +79,8 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
             ScheduleRepository scheduleRepository,
             StudyInfoRepository studyInfoRepository,
             BCryptPasswordEncoder bCryptPasswordEncoder,
-            JWTUtil jwtUtil) {
+            JWTUtil jwtUtil,
+            RedisTemplate<String, Object> redisTemplate) {
         this.memberRepository = memberRepository;
         this.memberScheduleRepository = memberScheduleRepository;
         this.wakeUpRepository = wakeUpRepository;
@@ -81,6 +88,7 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
         this.studyInfoRepository = studyInfoRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.jwtUtil = jwtUtil;
+        this.redisTemplate = redisTemplate;
     }
 
     @Override
@@ -116,10 +124,33 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
             return response;
         }
 
+        String token = jwtUtil.createJwt(member.getId(), member.getRole().toString(), expiredTime);
+        try {
+            // redis에 JWT:admin(key) / 23jijiofj2io3hi32hiongiodsninioda(value) 형태로 저장
+            redisTemplate.opsForValue().set("JWT:" + member.getId(), token, jwtUtil.getExpiration(token),
+                    TimeUnit.MILLISECONDS);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         response.setRetMsg(ErrorCode.OK.getMessage());
         response.setRetCode(ErrorCode.OK.getCode());
-        response.setToken(jwtUtil.createJwt(member.getId(), member.getRole().toString(), expiredTime));
+        response.setToken(token);
         return response;
+    }
+
+    @Override
+    public DTOResCommon logout(LoggingService lo) {
+        String loginUserId = SecurityUtil.getLoginUserId();
+
+        lo.setDBStart();
+        // redis에 접속한 아이디 정보가 있다면 삭제(정보가 있다는 것은 아직 로그아웃 하지 않은 것)
+        if (redisTemplate.opsForValue().get("JWT:" + loginUserId) != null) {
+            redisTemplate.delete("JWT:" + loginUserId); // redis 내 Token 삭제
+        }
+        lo.setDBEnd();
+
+        return new DTOResCommon(systemId, ErrorCode.OK.getCode(), ErrorCode.OK.getMessage());
     }
 
     @Override

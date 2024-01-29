@@ -58,14 +58,14 @@ npm install
 npm start
 ```
 
-#### DataBase Setup
+#### Docker Setup
 
 ```
-cd mysql
+cd docker
 docker-compose up -d
 ```
 
-#### JDBC URL
+##### JDBC URL
 
 ```
 jdbc:mysql://localhost:3307/study

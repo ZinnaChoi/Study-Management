@@ -66,6 +66,24 @@ public class MemberController extends CommonController {
         return result;
     }
 
+    @Operation(summary = "로그아웃", description = "로그아웃 통해 JWT 토큰 만료 처리")
+    @SecurityRequirement(name = "bearer-key")
+    @PostMapping("/logout")
+    public DTOResCommon doLogout(HttpServletRequest request, @Valid @RequestBody DTOReqCommon info) {
+        DTOResCommon result = new DTOResCommon();
+
+        try {
+            startAPI(lo, info);
+            result = memberService.logout(lo);
+        } catch (Exception e) {
+            result = new MemberLoginRes(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
+                    ErrorCode.INTERNAL_ERROR.getMessage(), "");
+        } finally {
+            endAPI(request, findErrorCodeByCode(result.getRetCode()), lo, result);
+        }
+        return result;
+    }
+
     @Operation(summary = "회원가입", description = "회원가입을 통해 사용자 정보 등록")
     @PostMapping("/join")
     public DTOResCommon doJoin(HttpServletRequest request, @Valid @RequestBody MemberJoinReq joinInfo) {

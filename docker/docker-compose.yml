@@ -1,0 +1,42 @@
+version: "3.1"
+
+services:
+  mysql:
+    image: mysql:8.2.0
+    restart: always
+    container_name: study_mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: mysql123!
+      MYSQL_DATABASE: study
+      MYSQL_USER: mysql
+      MYSQL_PASSWORD: mysql123!
+    ports:
+      - "3307:3306"
+    volumes:
+      - MYDATA:/var/lib/mysql
+
+  redis:
+    image: redis:latest
+    command: redis-server --port 6379
+    container_name: study_redis
+    # hostname: redis
+    labels:
+      - "name=redis"
+      - "mode=standalone"
+    ports:
+      - 6379:6379
+  #     extra_hosts:
+  #       - host.docker.internal:host-gateway
+  #     networks:
+  #       - app-tier
+  # networks:
+  #   app-tier:
+  #     driver: bridge
+
+  # 주석 처리한 설정은 추후 배포된 Spring App과의 연동에 필요한 설정으로 제거 금지
+
+  # redis cli 접근 명령어
+  # docker exec -it study_redis redis-cli
+
+volumes:
+  MYDATA:
