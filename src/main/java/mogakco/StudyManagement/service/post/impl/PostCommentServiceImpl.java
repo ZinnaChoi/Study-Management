@@ -101,8 +101,7 @@ public class PostCommentServiceImpl implements PostCommentService {
         try {
             Specification<PostComment> replySpec = PostCommentSpecification.withParentCommentId(commentId);
             lo.setDBStart();
-            if (postRepository.countByPostId(postId) == 0)
-                throw new NotFoundException(ErrorCode.NOT_FOUND.getMessage("게시글"));
+            isPostExistById(postId);
             PostComment postComment = getCommentByPostIdAndCommentId(postId, commentId);
             lo.setDBEnd();
 
@@ -133,9 +132,8 @@ public class PostCommentServiceImpl implements PostCommentService {
         DTOResCommon result = new DTOResCommon();
         try {
             lo.setDBStart();
+            isPostExistById(postId);
             Member loginMember = getLoginMember();
-            if (postRepository.countByPostId(postId) == 0)
-                throw new NotFoundException(ErrorCode.NOT_FOUND.getMessage("게시글"));
             PostComment postComment = getCommentByPostIdAndCommentId(postId, commentId);
             lo.setDBEnd();
 
@@ -167,9 +165,8 @@ public class PostCommentServiceImpl implements PostCommentService {
     public DTOResCommon deletePostComment(Long postId, Long commentId, LoggingService lo) {
         try {
             lo.setDBStart();
+            isPostExistById(postId);
             Member loginMember = getLoginMember();
-            if (postRepository.countByPostId(postId) == 0)
-                throw new NotFoundException(ErrorCode.NOT_FOUND.getMessage("게시글"));
             PostComment postComment = getCommentByPostIdAndCommentId(postId, commentId);
             lo.setDBEnd();
 
@@ -198,6 +195,11 @@ public class PostCommentServiceImpl implements PostCommentService {
         Specification<Post> spec = PostSpecification.withPostId(postId);
         return postRepository.findOne(spec)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND.getMessage("게시글")));
+    }
+
+    private void isPostExistById(Long postId) {
+        if (!postRepository.existsById(postId))
+            throw new NotFoundException(ErrorCode.NOT_FOUND.getMessage("게시글"));
     }
 
     private PostComment getCommentByPostIdAndCommentId(Long postId, Long commentId) {

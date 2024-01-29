@@ -40,16 +40,12 @@ public class PostLikeServiceImpl implements PostLikeService {
     public DTOResCommon createPostLike(Long postId, LoggingService lo) {
 
         try {
-            Specification<Post> postSpec = PostSpecification.withPostId(postId);
-
             lo.setDBStart();
-            Member member = memberRepository.findById(SecurityUtil.getLoginUserId());
-            Post post = postRepository.findOne(postSpec)
-                    .orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND.getMessage("게시글")));
+            Member member = getLoginMember();
+            Post post = getPostById(postId);
             lo.setDBEnd();
 
             Specification<PostLike> postLikeSpec = PostLikeSpecification.withMemberId(member);
-
             lo.setDBStart();
             long count = postLikeRepository.count(postLikeSpec);
             lo.setDBEnd();
@@ -77,19 +73,15 @@ public class PostLikeServiceImpl implements PostLikeService {
     public DTOResCommon deletePostLike(Long postId, LoggingService lo) {
 
         try {
-            Specification<Post> postSpec = PostSpecification.withPostId(postId);
             lo.setDBStart();
-            Post post = postRepository.findOne(postSpec)
-                    .orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND.getMessage("게시글")));
-
-            Member loginMember = memberRepository.findById(SecurityUtil.getLoginUserId());
+            Member member = getLoginMember();
+            Post post = getPostById(postId);
             lo.setDBEnd();
 
-            Specification<PostLike> postLikeSpec = PostLikeSpecification.withPostAndMember(post, loginMember);
+            Specification<PostLike> postLikeSpec = PostLikeSpecification.withPostAndMember(post, member);
             lo.setDBStart();
             PostLike postLike = postLikeRepository.findOne(postLikeSpec)
                     .orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND.getMessage("게시글 좋아요")));
-
             postLikeRepository.delete(postLike);
             lo.setDBEnd();
 
@@ -98,6 +90,16 @@ public class PostLikeServiceImpl implements PostLikeService {
         } catch (NotFoundException e) {
             return ExceptionUtil.handleException(e);
         }
+    }
+
+    private Member getLoginMember() {
+        return memberRepository.findById(SecurityUtil.getLoginUserId());
+    }
+
+    private Post getPostById(Long postId) {
+        Specification<Post> spec = PostSpecification.withPostId(postId);
+        return postRepository.findOne(spec)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND.getMessage("게시글")));
     }
 
 }

@@ -20,12 +20,4 @@ public class PostCommentSpecification {
             return criteriaBuilder.equal(root.join("parentComment").get("commentId"), parentCommentId);
         };
     }
-
-    public static Specification<PostComment> withPostIdAndParentCommentIdIsNull(Long postId) {
-        return (root, query, criteriaBuilder) -> {
-            Predicate postPredicate = criteriaBuilder.equal(root.get("post").get("id"), postId);
-            Predicate parentCommentPredicate = criteriaBuilder.isNull(root.get("parentComment"));
-            return criteriaBuilder.and(postPredicate, parentCommentPredicate);
-        };
-    }
 }
