@@ -103,7 +103,7 @@ public class PostServiceImpl extends PostCommonService implements PostService {
             lo.setDBStart();
             Post post = getPostById(postId);
             Integer likeCount = postLikeRepository.countByPostPostId(postId);
-            List<PostComment> commentEntities = postCommentRepository.findTopLevelCommentsByPostId(postId);
+            List<PostComment> commentEntities = postCommentRepository.findByPostPostIdAndParentCommentIsNull(postId);
             List<Object[]> replyCntByPostId = postCommentRepository.countRepliesByPostId(postId);
             lo.setDBEnd();
 

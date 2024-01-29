@@ -13,8 +13,7 @@ import mogakco.StudyManagement.domain.PostComment;
 @Repository
 public interface PostCommentRepository extends JpaRepository<PostComment, Long>, JpaSpecificationExecutor<PostComment> {
 
-    @Query("SELECT pc FROM PostComment pc WHERE pc.post.postId = :postId AND pc.parentComment IS NULL")
-    List<PostComment> findTopLevelCommentsByPostId(@Param("postId") Long postId);
+    List<PostComment> findByPostPostIdAndParentCommentIsNull(Long postId);
 
     Integer countByPostPostId(Long postId);
 
