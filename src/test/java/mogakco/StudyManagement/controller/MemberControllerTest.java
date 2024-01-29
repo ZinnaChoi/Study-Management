@@ -57,6 +57,7 @@ public class MemberControllerTest {
     private String password;
 
     private static final String LOGIN_URL = "/api/v1/login";
+    private static final String LOGOUT_URL = "/api/v1/logout";
     private static final String JOIN_URL = "/api/v1/join";
     private static final String ID_DUPLICATED_CHECK_URL = "/api/v1/join/check-id";
     private static final String MEMBER_INFO_URL = "/api/v1/member";
@@ -105,6 +106,28 @@ public class MemberControllerTest {
         String requestBodyJson = objectMapper.writeValueAsString(req);
 
         TestUtil.performRequest(mockMvc, LOGIN_URL, requestBodyJson, "POST", 200, 400);
+    }
+
+    /////////////////////////////////////////////////////////////////
+
+    @Test
+    @WithMockUser(authorities = "ADMIN")
+    @DisplayName("로그아웃 API 성공")
+    void logoutSuccess() throws Exception {
+        MemberLoginReq req = new MemberLoginReq(DateUtil.getCurrentDateTime(), "SYS_01", adminId, password);
+        String requestBodyJson = objectMapper.writeValueAsString(req);
+
+        TestUtil.performRequest(mockMvc, LOGOUT_URL, requestBodyJson, "POST", 200, 200);
+    }
+
+    @Test
+    @WithMockUser(authorities = "ADMIN")
+    @DisplayName("로그아웃 API 실패_not include sendDate")
+    void logoutFail_NotIncludeSendDate() throws Exception {
+        MemberLoginReq req = new MemberLoginReq(null, "SYS_01", adminId, password);
+        String requestBodyJson = objectMapper.writeValueAsString(req);
+
+        TestUtil.performRequest(mockMvc, LOGOUT_URL, requestBodyJson, "POST", 400, 400);
     }
 
     /////////////////////////////////////////////////////////////////

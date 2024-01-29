@@ -21,6 +21,8 @@ public interface MemberService {
 
     MemberLoginRes login(MemberLoginReq loginInfo, LoggingService lo);
 
+    DTOResCommon logout(LoggingService lo);
+
     DTOResCommon join(MemberJoinReq joinInfo, LoggingService lo);
 
     boolean isIdDuplicated(MemberIdDuplReq idInfo, LoggingService lo);

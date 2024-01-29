@@ -48,8 +48,6 @@ public class Member {
   @Column(nullable = false)
   private String updatedAt;
 
-  private String expiredAt;
-
   public void updateName(String name) {
     this.name = name;
   }

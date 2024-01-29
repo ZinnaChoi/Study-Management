@@ -27,7 +27,6 @@
 | role        |             | String | 사용자 역할        |
 | created_at  |             | String | 생성 날짜          |
 | updated_at  |             | String | 정보 업데이트 날짜 |
-| expired_at  |             | String | 계정 만료 날짜     |
 
 ## wakeup
 
