@@ -159,7 +159,7 @@ public class StatControllerTest {
 
         absentScheduleBatch.executeDailyBatch();
 
-        verify(statServiceMock, times(1)).checkAbsentSchedulesAndLog(null);
+        verify(statServiceMock, times(1)).createAbsentLog(null);
     }
 
 }

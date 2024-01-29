@@ -20,7 +20,7 @@ public class AbsentScheduleBatch {
     @Scheduled(cron = "0 59 23 * * ?")
     public void executeDailyBatch() {
         try {
-            statService.checkAbsentSchedulesAndLog(null);
+            statService.createAbsentLog(null);
             System.out.println("매일 23시 59분에 실행되는 배치 작업이 완료되었습니다.");
         } catch (Exception e) {
             System.err.println("배치 작업 도중 오류가 발생했습니다: " + e.getMessage());

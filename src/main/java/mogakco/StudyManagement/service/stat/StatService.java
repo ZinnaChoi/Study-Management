@@ -10,5 +10,5 @@ import mogakco.StudyManagement.service.common.LoggingService;
 public interface StatService {
     StatGetRes getStat(LogType type, LoggingService lo, Pageable pageable);
 
-    DTOResCommon checkAbsentSchedulesAndLog(LoggingService lo);
+    DTOResCommon createAbsentLog(LoggingService lo);
 }

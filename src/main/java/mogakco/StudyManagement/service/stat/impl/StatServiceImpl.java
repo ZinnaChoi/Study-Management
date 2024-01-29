@@ -81,7 +81,7 @@ public class StatServiceImpl implements StatService {
 
     @Override
     @Transactional
-    public DTOResCommon checkAbsentSchedulesAndLog(LoggingService lo) {
+    public DTOResCommon createAbsentLog(LoggingService lo) {
 
         try {
             List<Member> allMembers = memberRepository.findAll();

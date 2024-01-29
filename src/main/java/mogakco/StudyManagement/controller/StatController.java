@@ -62,12 +62,12 @@ public class StatController extends CommonController {
 
     @Operation(summary = "부재 일정 저장", description = "통계 생성을 위한 부재 일정 일일 업데이트")
     @PostMapping("/stat/absent")
-    public DTOResCommon checkAbsentSchedulesAndLog(HttpServletRequest request) {
+    public DTOResCommon createAbsentLog(HttpServletRequest request) {
 
         DTOResCommon result = new DTOResCommon();
         try {
             startAPI(lo, null);
-            result = statService.checkAbsentSchedulesAndLog(lo);
+            result = statService.createAbsentLog(lo);
         } catch (Exception e) {
             result = new DTOResCommon(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
                     ErrorCode.INTERNAL_ERROR.getMessage());
