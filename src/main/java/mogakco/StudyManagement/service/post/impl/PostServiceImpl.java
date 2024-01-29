@@ -21,7 +21,6 @@ import mogakco.StudyManagement.dto.PostDetailRes;
 import mogakco.StudyManagement.dto.PostList;
 import mogakco.StudyManagement.dto.PostListReq;
 import mogakco.StudyManagement.dto.PostListRes;
-import mogakco.StudyManagement.dto.SimplePageable;
 import mogakco.StudyManagement.enums.ErrorCode;
 import mogakco.StudyManagement.enums.PostSearchType;
 import mogakco.StudyManagement.exception.NotFoundException;
@@ -30,27 +29,23 @@ import mogakco.StudyManagement.repository.MemberRepository;
 import mogakco.StudyManagement.repository.PostCommentRepository;
 import mogakco.StudyManagement.repository.PostLikeRepository;
 import mogakco.StudyManagement.repository.PostRepository;
-import mogakco.StudyManagement.repository.spec.PostCommentSpecification;
 import mogakco.StudyManagement.repository.spec.PostSpecification;
 import mogakco.StudyManagement.service.common.LoggingService;
+import mogakco.StudyManagement.service.post.PostCommonService;
 import mogakco.StudyManagement.service.post.PostService;
 import mogakco.StudyManagement.util.DateUtil;
 import mogakco.StudyManagement.util.ExceptionUtil;
 import mogakco.StudyManagement.util.PageUtil;
-import mogakco.StudyManagement.util.SecurityUtil;
 
 @Service
-public class PostServiceImpl implements PostService {
+public class PostServiceImpl extends PostCommonService implements PostService {
 
-    private final MemberRepository memberRepository;
-    private final PostRepository postRepository;
     private final PostCommentRepository postCommentRepository;
     private final PostLikeRepository postLikeRepository;
 
     public PostServiceImpl(MemberRepository memberRepository, PostRepository postRepository,
             PostCommentRepository postCommentRepository, PostLikeRepository postLikeRepository) {
-        this.memberRepository = memberRepository;
-        this.postRepository = postRepository;
+        super(memberRepository, postRepository);
         this.postCommentRepository = postCommentRepository;
         this.postLikeRepository = postLikeRepository;
     }
@@ -189,16 +184,6 @@ public class PostServiceImpl implements PostService {
         } catch (NotFoundException | UnauthorizedAccessException e) {
             return ExceptionUtil.handleException(e);
         }
-    }
-
-    private Member getLoginMember() {
-        return memberRepository.findById(SecurityUtil.getLoginUserId());
-    }
-
-    private Post getPostById(Long postId) {
-        Specification<Post> spec = PostSpecification.withPostId(postId);
-        return postRepository.findOne(spec)
-                .orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND.getMessage("게시글")));
     }
 
 }

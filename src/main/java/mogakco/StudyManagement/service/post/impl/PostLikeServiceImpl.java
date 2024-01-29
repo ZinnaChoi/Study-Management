@@ -15,23 +15,19 @@ import mogakco.StudyManagement.repository.MemberRepository;
 import mogakco.StudyManagement.repository.PostLikeRepository;
 import mogakco.StudyManagement.repository.PostRepository;
 import mogakco.StudyManagement.repository.spec.PostLikeSpecification;
-import mogakco.StudyManagement.repository.spec.PostSpecification;
 import mogakco.StudyManagement.service.common.LoggingService;
+import mogakco.StudyManagement.service.post.PostCommonService;
 import mogakco.StudyManagement.service.post.PostLikeService;
 import mogakco.StudyManagement.util.ExceptionUtil;
-import mogakco.StudyManagement.util.SecurityUtil;
 
 @Service
-public class PostLikeServiceImpl implements PostLikeService {
+public class PostLikeServiceImpl extends PostCommonService implements PostLikeService {
 
-    private final MemberRepository memberRepository;
-    private final PostRepository postRepository;
     private final PostLikeRepository postLikeRepository;
 
     public PostLikeServiceImpl(MemberRepository memberRepository, PostRepository postRepository,
             PostLikeRepository postLikeRepository) {
-        this.memberRepository = memberRepository;
-        this.postRepository = postRepository;
+        super(memberRepository, postRepository);
         this.postLikeRepository = postLikeRepository;
     }
 
@@ -71,7 +67,6 @@ public class PostLikeServiceImpl implements PostLikeService {
     @Override
     @Transactional
     public DTOResCommon deletePostLike(Long postId, LoggingService lo) {
-
         try {
             lo.setDBStart();
             Member member = getLoginMember();
@@ -91,15 +86,4 @@ public class PostLikeServiceImpl implements PostLikeService {
             return ExceptionUtil.handleException(e);
         }
     }
-
-    private Member getLoginMember() {
-        return memberRepository.findById(SecurityUtil.getLoginUserId());
-    }
-
-    private Post getPostById(Long postId) {
-        Specification<Post> spec = PostSpecification.withPostId(postId);
-        return postRepository.findOne(spec)
-                .orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND.getMessage("게시글")));
-    }
-
 }
