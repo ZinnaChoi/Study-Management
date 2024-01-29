@@ -106,10 +106,11 @@ public class StatServiceImpl implements StatService {
                         newLog = new DailyLog(member, DateUtil.getCurrentDate(), LogType.ABSENT,
                                 totalScoreForMember,
                                 DateUtil.getCurrentDateTime());
+                    } else {
+                        int todayScore = (int) (totalScoreForMember - todayAbsentSchedules.size());
+                        newLog = new DailyLog(member, DateUtil.getCurrentDate(), LogType.ABSENT, todayScore,
+                                DateUtil.getCurrentDateTime());
                     }
-                    int todayScore = (int) (totalScoreForMember - todayAbsentSchedules.size());
-                    newLog = new DailyLog(member, DateUtil.getCurrentDate(), LogType.ABSENT, todayScore,
-                            DateUtil.getCurrentDateTime());
 
                     lo.setDBStart();
                     dailyLogRepository.save(newLog);
