@@ -2,6 +2,6 @@
 
 docker-compose down
 
-docker volume rm mysql_MYDATA
+docker volume rm docker_MYDATA
 
 docker-compose up -d
