@@ -1,12 +1,16 @@
 package mogakco.StudyManagement.controller;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -16,6 +20,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import mogakco.StudyManagement.batch.AbsentScheduleBatch;
+import mogakco.StudyManagement.dto.DTOReqCommon;
 import mogakco.StudyManagement.enums.LogType;
 import mogakco.StudyManagement.service.common.LoggingService;
 import mogakco.StudyManagement.service.stat.StatService;
@@ -26,6 +32,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.springframework.transaction.annotation.Transactional;
+
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 @ActiveProfiles("test")
 @AutoConfigureMockMvc
@@ -48,7 +57,11 @@ public class StatControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
+    @Value("${study.systemId}")
+    private String systemId;
+
     private static final String GET_STAT_API_URL = "/api/v1/stat";
+    private static final String PATCH_ABSENT_STAT_API_URL = "/api/v1/stat/absent";
 
     @Test
     @Sql("/stat/StatListSetup.sql")
@@ -59,7 +72,7 @@ public class StatControllerTest {
         UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(GET_STAT_API_URL);
 
         uriBuilder.queryParam("sendDate", DateUtil.getCurrentDateTime())
-                .queryParam("systemId", "SYS_01")
+                .queryParam("systemId", systemId)
                 .queryParam("type", LogType.WAKEUP)
                 .queryParam("page", 0)
                 .queryParam("size", 1)
@@ -82,7 +95,7 @@ public class StatControllerTest {
         UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(GET_STAT_API_URL);
 
         uriBuilder.queryParam("sendDate", DateUtil.getCurrentDateTime())
-                .queryParam("systemId", "SYS_02")
+                .queryParam("systemId", systemId)
                 .queryParam("type", LogType.WAKEUP)
                 .queryParam("page", 1)
                 .queryParam("size", 2)
@@ -105,7 +118,7 @@ public class StatControllerTest {
         UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(GET_STAT_API_URL);
 
         uriBuilder.queryParam("sendDate", DateUtil.getCurrentDateTime())
-                .queryParam("systemId", "SYS_03")
+                .queryParam("systemId", systemId)
                 .queryParam("type", LogType.ABSENT)
                 .queryParam("page", 0)
                 .queryParam("size", 1)
@@ -117,6 +130,36 @@ public class StatControllerTest {
         int contentCount = responseBody.path("content").size();
         assertTrue(contentCount == 0);
 
+    }
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+
+    @Test
+    @Sql("/stat/StatAbsentScheduleSetup.sql")
+    @WithMockUser(username = "User1", authorities = { "USER" })
+    @DisplayName("부재 일정 저장 성공")
+    public void createAbsentDailyLogSuccess() throws Exception {
+        String requestBodyJson = objectMapper.writeValueAsString(
+                new DTOReqCommon(DateUtil.getCurrentDateTime(), systemId));
+        MvcResult result = TestUtil.performRequest(mockMvc,
+                PATCH_ABSENT_STAT_API_URL, requestBodyJson, "POST", 200, 200);
+
+        JsonNode responseBody = objectMapper.readTree(result.getResponse().getContentAsString());
+        int retCode = responseBody.path("retCode").asInt();
+
+        assertEquals(200, retCode);
+
+    }
+
+    @Test
+    @DisplayName("배치 작업 성공")
+    public void executeDailyBatch() {
+        StatService statServiceMock = Mockito.mock(StatService.class);
+
+        AbsentScheduleBatch absentScheduleBatch = new AbsentScheduleBatch(statServiceMock);
+
+        absentScheduleBatch.executeDailyBatch();
+
+        verify(statServiceMock, times(1)).createAbsentLog(null);
     }
 
 }
