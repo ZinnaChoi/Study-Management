@@ -56,4 +56,12 @@ public class DailyLog {
         this.createdAt = dailyLog.getCreatedAt();
     }
 
+    public DailyLog(Member member, String date, LogType type, int score, String createdAt) {
+        this.member = member;
+        this.date = date;
+        this.type = type;
+        this.score = score;
+        this.createdAt = createdAt;
+    }
+
 }
