@@ -2,6 +2,8 @@ package mogakco.StudyManagement.config;
 
 import java.io.IOException;
 
+import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -17,12 +19,16 @@ import mogakco.StudyManagement.enums.MemberRole;
 import mogakco.StudyManagement.util.JWTUtil;
 
 // JWT 인증 및 인가 관련 필터
+@Configuration
 public class JWTConfig extends OncePerRequestFilter {
 
     private final JWTUtil jwtUtil;
 
-    public JWTConfig(JWTUtil jwtUtil) {
+    private final RedisTemplate<String, Object> redisTemplate;
+
+    public JWTConfig(JWTUtil jwtUtil, RedisTemplate<String, Object> redisTemplate) {
         this.jwtUtil = jwtUtil;
+        this.redisTemplate = redisTemplate;
     }
 
     @Override
@@ -50,22 +56,29 @@ public class JWTConfig extends OncePerRequestFilter {
             return;
         }
 
-        // 토큰에서 id와 role 획득
-        String id = jwtUtil.getUserId(token);
-        MemberRole role = MemberRole.fromString(jwtUtil.getRole(token));
+        String key = "JWT:" + jwtUtil.getUserId(token);
+        String storedToken = (String) redisTemplate.opsForValue().get(key);
 
-        // member를 생성하여 값 set
-        Member member = Member.builder().id(id).role(role).build();
+        // 로그아웃을 하지 않은 경우 정상 동작
+        if (redisTemplate.hasKey(key) && storedToken != null) {
+            // 토큰에서 id와 role 획득
+            String id = jwtUtil.getUserId(token);
+            MemberRole role = MemberRole.fromString(jwtUtil.getRole(token));
 
-        // UserDetails에 회원 정보 객체 담기
-        MemberDetails memberDetails = new MemberDetails(member);
+            // member를 생성하여 값 set
+            Member member = Member.builder().id(id).role(role).build();
 
-        // 스프링 시큐리티 인증 토큰 생성
-        Authentication authToken = new UsernamePasswordAuthenticationToken(memberDetails, null,
-                memberDetails.getAuthorities());
+            // UserDetails에 회원 정보 객체 담기
+            MemberDetails memberDetails = new MemberDetails(member);
 
-        // 세션에 사용자 등록
-        SecurityContextHolder.getContext().setAuthentication(authToken);
+            // 스프링 시큐리티 인증 토큰 생성
+            Authentication authToken = new UsernamePasswordAuthenticationToken(memberDetails, null,
+                    memberDetails.getAuthorities());
+
+            // 세션에 사용자 등록
+            SecurityContextHolder.getContext().setAuthentication(authToken);
+        }
+
         // 다음 필터 실행
         filterChain.doFilter(request, response);
     }

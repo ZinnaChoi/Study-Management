@@ -33,6 +33,15 @@ public class JWTUtil {
                 String.class);
     }
 
+    // 토큰 만료 기간 조회 메소드
+    public Long getExpiration(String token) {
+        Date expiration = Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload()
+                .getExpiration();
+        long now = new Date().getTime();
+
+        return (expiration.getTime() - now);
+    }
+
     // 토큰 내용(Payload) 인증 메소드
     public Boolean isExpired(String token) {
         return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().getExpiration()
