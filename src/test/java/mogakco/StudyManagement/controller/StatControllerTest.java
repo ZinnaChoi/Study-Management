@@ -61,7 +61,8 @@ public class StatControllerTest {
     private String systemId;
 
     private static final String GET_STAT_API_URL = "/api/v1/stat";
-    private static final String PATCH_ABSENT_STAT_API_URL = "/api/v1/stat/absent";
+    private static final String POST_ABSENT_STAT_API_URL = "/api/v1/stat/absent";
+    private static final String POST_WAKEUP_STAT_API_URL = "/api/v1/stat/wakeup";
 
     @Test
     @Sql("/stat/StatListSetup.sql")
@@ -135,13 +136,13 @@ public class StatControllerTest {
 
     @Test
     @Sql("/stat/StatAbsentScheduleSetup.sql")
-    @WithMockUser(username = "User1", authorities = { "USER" })
-    @DisplayName("부재 일정 저장 성공")
+    @WithMockUser(username = "absentUser1", authorities = { "USER" })
+    @DisplayName("부재 로그 저장 성공")
     public void createAbsentDailyLogSuccess() throws Exception {
         String requestBodyJson = objectMapper.writeValueAsString(
                 new DTOReqCommon(DateUtil.getCurrentDateTime(), systemId));
         MvcResult result = TestUtil.performRequest(mockMvc,
-                PATCH_ABSENT_STAT_API_URL, requestBodyJson, "POST", 200, 200);
+                POST_ABSENT_STAT_API_URL, requestBodyJson, "POST", 200, 200);
 
         JsonNode responseBody = objectMapper.readTree(result.getResponse().getContentAsString());
         int retCode = responseBody.path("retCode").asInt();
@@ -151,7 +152,7 @@ public class StatControllerTest {
     }
 
     @Test
-    @DisplayName("배치 작업 성공")
+    @DisplayName("부재 로그 배치 작업 성공")
     public void executeDailyBatch() {
         StatService statServiceMock = Mockito.mock(StatService.class);
 
@@ -160,6 +161,41 @@ public class StatControllerTest {
         absentScheduleBatch.executeDailyBatch();
 
         verify(statServiceMock, times(1)).createAbsentLog(null);
+    }
+    ////////////////////////////////////////////////////////
+
+    @Test
+    @Sql("/stat/StatWakeupScheduleSetup.sql")
+    @WithMockUser(username = "wakeupUser1", authorities = { "USER" })
+    @DisplayName("기상 로그 저장 성공")
+    public void createWakeupDailyLogSuccess() throws Exception {
+
+        MvcResult result = TestUtil.performRequest(mockMvc,
+                POST_WAKEUP_STAT_API_URL, "{}", "POST", 200,
+                200);
+
+        JsonNode responseBody = objectMapper.readTree(result.getResponse().getContentAsString());
+        int retCode = responseBody.path("retCode").asInt();
+
+        assertEquals(200, retCode);
+
+    }
+
+    @Test
+    @Sql("/stat/StatWakeupScheduleSetup.sql")
+    @WithMockUser(username = "wakeupUser3", authorities = { "USER" })
+    @DisplayName("기상 로그 저장 실패 - 기상 정보가 없는 사용자")
+    public void createWakeupDailyLogFail() throws Exception {
+
+        MvcResult result = TestUtil.performRequest(mockMvc,
+                POST_WAKEUP_STAT_API_URL, "{}", "POST", 200,
+                404);
+
+        JsonNode responseBody = objectMapper.readTree(result.getResponse().getContentAsString());
+        int retCode = responseBody.path("retCode").asInt();
+
+        assertEquals(404, retCode);
+
     }
 
 }
