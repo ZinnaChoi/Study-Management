@@ -21,7 +21,6 @@ import mogakco.StudyManagement.dto.PostDetailRes;
 import mogakco.StudyManagement.dto.PostList;
 import mogakco.StudyManagement.dto.PostListReq;
 import mogakco.StudyManagement.dto.PostListRes;
-import mogakco.StudyManagement.dto.SimplePageable;
 import mogakco.StudyManagement.enums.ErrorCode;
 import mogakco.StudyManagement.enums.PostSearchType;
 import mogakco.StudyManagement.exception.NotFoundException;
@@ -30,27 +29,23 @@ import mogakco.StudyManagement.repository.MemberRepository;
 import mogakco.StudyManagement.repository.PostCommentRepository;
 import mogakco.StudyManagement.repository.PostLikeRepository;
 import mogakco.StudyManagement.repository.PostRepository;
-import mogakco.StudyManagement.repository.spec.PostCommentSpecification;
 import mogakco.StudyManagement.repository.spec.PostSpecification;
 import mogakco.StudyManagement.service.common.LoggingService;
+import mogakco.StudyManagement.service.post.PostCommonService;
 import mogakco.StudyManagement.service.post.PostService;
 import mogakco.StudyManagement.util.DateUtil;
 import mogakco.StudyManagement.util.ExceptionUtil;
 import mogakco.StudyManagement.util.PageUtil;
-import mogakco.StudyManagement.util.SecurityUtil;
 
 @Service
-public class PostServiceImpl implements PostService {
+public class PostServiceImpl extends PostCommonService implements PostService {
 
-    private final MemberRepository memberRepository;
-    private final PostRepository postRepository;
     private final PostCommentRepository postCommentRepository;
     private final PostLikeRepository postLikeRepository;
 
     public PostServiceImpl(MemberRepository memberRepository, PostRepository postRepository,
             PostCommentRepository postCommentRepository, PostLikeRepository postLikeRepository) {
-        this.memberRepository = memberRepository;
-        this.postRepository = postRepository;
+        super(memberRepository, postRepository);
         this.postCommentRepository = postCommentRepository;
         this.postLikeRepository = postLikeRepository;
     }
@@ -59,7 +54,7 @@ public class PostServiceImpl implements PostService {
     @Transactional
     public void createPost(PostReq postCreateReq, LoggingService lo) {
         lo.setDBStart();
-        Member member = memberRepository.findById(SecurityUtil.getLoginUserId());
+        Member member = getLoginMember();
         lo.setDBEnd();
 
         Post post = Post.builder().member(member).title(postCreateReq.getTitle()).content(postCreateReq.getContent())
@@ -74,20 +69,19 @@ public class PostServiceImpl implements PostService {
     @Override
     public PostListRes getPostList(PostListReq postListReq, LoggingService lo, Pageable pageable) {
 
-        Page<Post> posts;
         String searchKeyWord = postListReq.getSearchKeyWord().trim();
         Specification<Post> spec;
 
-        lo.setDBStart();
         if (postListReq.getSearchType() == PostSearchType.TITLE) {
             spec = PostSpecification.withTitleContaining(searchKeyWord);
         } else {
             lo.setDBStart();
             List<Member> members = memberRepository.findByNameContaining(searchKeyWord);
-            spec = PostSpecification.withMemberIn(members);
             lo.setDBEnd();
+            spec = PostSpecification.withMemberIn(members);
         }
-        posts = postRepository.findAll(spec, pageable);
+        lo.setDBStart();
+        Page<Post> posts = postRepository.findAll(spec, pageable);
         lo.setDBEnd();
 
         List<PostList> postLists = posts.getContent().stream()
@@ -99,26 +93,24 @@ public class PostServiceImpl implements PostService {
                     return new PostList(post, likeCount, commentCount);
                 })
                 .collect(Collectors.toList());
-        SimplePageable simplePageable = PageUtil.createSimplePageable(posts);
-
-        return new PostListRes(null, ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), postLists, simplePageable);
+        return new PostListRes(null, ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), postLists,
+                PageUtil.createSimplePageable(posts));
     }
 
     @Override
     public PostDetailRes getPostDetail(Long postId, LoggingService lo) {
         try {
-            Specification<Post> postSpec = PostSpecification.withPostId(postId);
-            Specification<PostComment> postCommentSpec = PostCommentSpecification
-                    .withPostIdAndParentCommentIdIsNull(postId);
             lo.setDBStart();
-            Post post = postRepository.findOne(postSpec)
-                    .orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND.getMessage("게시글")));
+            Post post = getPostById(postId);
             Integer likeCount = postLikeRepository.countByPostPostId(postId);
-            List<PostComment> commentEntities = postCommentRepository.findAll(postCommentSpec);
-            Map<Long, Integer> replyCountMap = commentEntities.stream()
-                    .collect(Collectors.toMap(PostComment::getCommentId,
-                            c -> postCommentRepository.countByParentCommentCommentId(c.getCommentId())));
+            List<PostComment> commentEntities = postCommentRepository.findByPostPostIdAndParentCommentIsNull(postId);
+            List<Object[]> replyCntByPostId = postCommentRepository.countRepliesByPostId(postId);
             lo.setDBEnd();
+
+            Map<Long, Integer> replyCountMap = replyCntByPostId.stream()
+                    .collect(Collectors.toMap(
+                            result -> ((Number) result[0]).longValue(),
+                            result -> ((Number) result[1]).intValue()));
 
             List<PostDetailComment> postCommentList = commentEntities.stream().map(entity -> {
                 PostDetailComment dto = new PostDetailComment();
@@ -144,12 +136,9 @@ public class PostServiceImpl implements PostService {
     public DTOResCommon updatePost(Long postId, PostReq postUpdateReq, LoggingService lo) {
         try {
             DTOResCommon result = new DTOResCommon();
-            Specification<Post> spec = PostSpecification.withPostId(postId);
             lo.setDBStart();
-            Post post = postRepository.findOne(spec)
-                    .orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND.getMessage("게시글")));
-
-            Member loginMember = memberRepository.findById(SecurityUtil.getLoginUserId());
+            Post post = getPostById(postId);
+            Member loginMember = getLoginMember();
             lo.setDBEnd();
             if (!post.getMember().equals(loginMember)) {
                 throw new UnauthorizedAccessException(
@@ -177,12 +166,9 @@ public class PostServiceImpl implements PostService {
     @Transactional
     public DTOResCommon deletePost(Long postId, LoggingService lo) {
         try {
-            Specification<Post> spec = PostSpecification.withPostId(postId);
             lo.setDBStart();
-            Post post = postRepository.findOne(spec)
-                    .orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND.getMessage("게시글")));
-
-            Member loginMember = memberRepository.findById(SecurityUtil.getLoginUserId());
+            Post post = getPostById(postId);
+            Member loginMember = getLoginMember();
             lo.setDBEnd();
 
             if (!post.getMember().equals(loginMember)) {
@@ -199,4 +185,5 @@ public class PostServiceImpl implements PostService {
             return ExceptionUtil.handleException(e);
         }
     }
+
 }

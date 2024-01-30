@@ -9,10 +9,6 @@ import mogakco.StudyManagement.domain.Member;
 
 public class PostSpecification {
 
-    public static Specification<Post> withPostId(Long postId) {
-        return (root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("postId"), postId);
-    }
-
     public static Specification<Post> withTitleContaining(String title) {
         return (root, query, criteriaBuilder) -> {
             if (title == null || title.isEmpty()) {
