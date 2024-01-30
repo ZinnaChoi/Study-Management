@@ -16,6 +16,7 @@ import mogakco.StudyManagement.dto.SimplePageable;
 import mogakco.StudyManagement.dto.StatGetRes;
 import mogakco.StudyManagement.dto.StatList;
 import mogakco.StudyManagement.enums.ErrorCode;
+import mogakco.StudyManagement.exception.InvalidRequestException;
 import mogakco.StudyManagement.exception.NotFoundException;
 import mogakco.StudyManagement.enums.LogType;
 import mogakco.StudyManagement.repository.StatRepository;
@@ -36,6 +37,7 @@ import mogakco.StudyManagement.repository.DailyLogRepository;
 import mogakco.StudyManagement.repository.MemberRepository;
 import mogakco.StudyManagement.repository.WakeUpRepository;
 import mogakco.StudyManagement.repository.MemberScheduleRepository;
+import mogakco.StudyManagement.util.SecurityUtil;
 
 @Service
 public class StatServiceImpl implements StatService {
@@ -57,6 +59,10 @@ public class StatServiceImpl implements StatService {
         this.memberScheduleRepository = memberScheduleRepository;
         this.memberRepository = memberRepository;
         this.wakeUpRepository = wakeUpRepository;
+    }
+
+    protected Member getLoginMember() {
+        return memberRepository.findById(SecurityUtil.getLoginUserId());
     }
 
     @Value("${study.systemId}")
@@ -137,33 +143,27 @@ public class StatServiceImpl implements StatService {
 
     @Override
     @Transactional
-    public DTOResCommon createWakeUpLog(Long memberId, String success, LoggingService lo) {
+    public DTOResCommon createWakeUpLog(LoggingService lo) {
         try {
-            lo.setDBStart();
-            Member member = memberRepository.findById(memberId)
-                    .orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND.getMessage("memberId")));
-            lo.setDBEnd();
-
+            Member member = getLoginMember();
             lo.setDBStart();
             WakeUp wakeUpMember = wakeUpRepository.findByMember(member);
             lo.setDBEnd();
 
             if (wakeUpMember == null) {
-                return new DTOResCommon(systemId, ErrorCode.NOT_FOUND.getCode(),
-                        ErrorCode.NOT_FOUND.getMessage("member의 목표 기상 시간"));
-
+                throw new NotFoundException(ErrorCode.NOT_FOUND.getMessage("member의 목표 기상 시간"));
             }
 
             DailyLog newLog;
-            if ("success".equals(success)) {
+
+            String currentTime = DateUtil.getCurrentDateTime().substring(8, 12);
+
+            if (currentTime.compareTo(wakeUpMember.getWakeupTime()) < 0) {
                 newLog = new DailyLog(wakeUpMember.getMember(), DateUtil.getCurrentDate(), LogType.WAKEUP, 1,
                         DateUtil.getCurrentDateTime());
-            } else if ("fail".equals(success)) {
+            } else {
                 newLog = new DailyLog(wakeUpMember.getMember(), DateUtil.getCurrentDate(), LogType.WAKEUP, 0,
                         DateUtil.getCurrentDateTime());
-            } else {
-                return new DTOResCommon(systemId, ErrorCode.BAD_REQUEST.getCode(),
-                        ErrorCode.BAD_REQUEST.getMessage("success의 값은 'success'또는 'fail'만 허용됩니다."));
             }
 
             lo.setDBStart();
@@ -171,7 +171,7 @@ public class StatServiceImpl implements StatService {
             lo.setDBEnd();
 
             return new DTOResCommon(systemId, ErrorCode.OK.getCode(), "기상 로그 업데이트가 성공적으로 완료되었습니다.");
-        } catch (NotFoundException e) {
+        } catch (NotFoundException | InvalidRequestException e) {
             return ExceptionUtil.handleException(e);
         }
     }

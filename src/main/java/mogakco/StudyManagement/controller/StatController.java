@@ -80,14 +80,12 @@ public class StatController extends CommonController {
 
     @Operation(summary = "기상 로그 저장", description = "통계 생성을 위한 기상 로그 업데이트")
     @PostMapping("/stat/wakeup")
-    public DTOResCommon createWakeUpLog(HttpServletRequest request,
-            @RequestParam("memberId") Long memberId,
-            @RequestParam("success") String success) {
+    public DTOResCommon createWakeUpLog(HttpServletRequest request) {
 
         DTOResCommon result = new DTOResCommon();
         try {
             startAPI(lo, null);
-            result = statService.createWakeUpLog(memberId, success, lo);
+            result = statService.createWakeUpLog(lo);
         } catch (Exception e) {
             result = new DTOResCommon(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
                     ErrorCode.INTERNAL_ERROR.getMessage());

@@ -12,5 +12,5 @@ public interface StatService {
 
     DTOResCommon createAbsentLog(LoggingService lo);
 
-    DTOResCommon createWakeUpLog(Long memberId, String success, LoggingService lo);
+    DTOResCommon createWakeUpLog(LoggingService lo);
 }
