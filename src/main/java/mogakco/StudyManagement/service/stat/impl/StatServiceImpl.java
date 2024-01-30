@@ -16,22 +16,28 @@ import mogakco.StudyManagement.dto.SimplePageable;
 import mogakco.StudyManagement.dto.StatGetRes;
 import mogakco.StudyManagement.dto.StatList;
 import mogakco.StudyManagement.enums.ErrorCode;
+import mogakco.StudyManagement.exception.InvalidRequestException;
+import mogakco.StudyManagement.exception.NotFoundException;
 import mogakco.StudyManagement.enums.LogType;
 import mogakco.StudyManagement.repository.StatRepository;
 import mogakco.StudyManagement.service.common.LoggingService;
 import mogakco.StudyManagement.service.stat.StatService;
 import mogakco.StudyManagement.util.DateUtil;
+import mogakco.StudyManagement.util.ExceptionUtil;
 import mogakco.StudyManagement.util.PageUtil;
 
 import mogakco.StudyManagement.domain.AbsentSchedule;
 
 import mogakco.StudyManagement.domain.Member;
+import mogakco.StudyManagement.domain.WakeUp;
 import mogakco.StudyManagement.dto.DTOResCommon;
 import mogakco.StudyManagement.repository.AbsentScheduleRepository;
 import mogakco.StudyManagement.repository.spec.AbsentScheduleSpecification;
 import mogakco.StudyManagement.repository.DailyLogRepository;
 import mogakco.StudyManagement.repository.MemberRepository;
+import mogakco.StudyManagement.repository.WakeUpRepository;
 import mogakco.StudyManagement.repository.MemberScheduleRepository;
+import mogakco.StudyManagement.util.SecurityUtil;
 
 @Service
 public class StatServiceImpl implements StatService {
@@ -41,15 +47,22 @@ public class StatServiceImpl implements StatService {
     private final DailyLogRepository dailyLogRepository;
     private final MemberScheduleRepository memberScheduleRepository;
     private final MemberRepository memberRepository;
+    private final WakeUpRepository wakeUpRepository;
 
     public StatServiceImpl(StatRepository statRepository, AbsentScheduleRepository absentScheduleRepository,
             DailyLogRepository dailyLogRepository,
-            MemberScheduleRepository memberScheduleRepository, MemberRepository memberRepository) {
+            MemberScheduleRepository memberScheduleRepository, MemberRepository memberRepository,
+            WakeUpRepository wakeUpRepository) {
         this.statRepository = statRepository;
         this.absentScheduleRepository = absentScheduleRepository;
         this.dailyLogRepository = dailyLogRepository;
         this.memberScheduleRepository = memberScheduleRepository;
         this.memberRepository = memberRepository;
+        this.wakeUpRepository = wakeUpRepository;
+    }
+
+    protected Member getLoginMember() {
+        return memberRepository.findById(SecurityUtil.getLoginUserId());
     }
 
     @Value("${study.systemId}")
@@ -128,4 +141,38 @@ public class StatServiceImpl implements StatService {
         }
     }
 
+    @Override
+    @Transactional
+    public DTOResCommon createWakeUpLog(LoggingService lo) {
+        try {
+            Member member = getLoginMember();
+            lo.setDBStart();
+            WakeUp wakeUpMember = wakeUpRepository.findByMember(member);
+            lo.setDBEnd();
+
+            if (wakeUpMember == null) {
+                throw new NotFoundException(ErrorCode.NOT_FOUND.getMessage("member의 목표 기상 시간"));
+            }
+
+            DailyLog newLog;
+
+            String currentTime = DateUtil.getCurrentDateTime().substring(8, 12);
+
+            if (currentTime.compareTo(wakeUpMember.getWakeupTime()) < 0) {
+                newLog = new DailyLog(wakeUpMember.getMember(), DateUtil.getCurrentDate(), LogType.WAKEUP, 1,
+                        DateUtil.getCurrentDateTime());
+            } else {
+                newLog = new DailyLog(wakeUpMember.getMember(), DateUtil.getCurrentDate(), LogType.WAKEUP, 0,
+                        DateUtil.getCurrentDateTime());
+            }
+
+            lo.setDBStart();
+            dailyLogRepository.save(newLog);
+            lo.setDBEnd();
+
+            return new DTOResCommon(systemId, ErrorCode.OK.getCode(), "기상 로그 업데이트가 성공적으로 완료되었습니다.");
+        } catch (NotFoundException | InvalidRequestException e) {
+            return ExceptionUtil.handleException(e);
+        }
+    }
 }

@@ -15,23 +15,19 @@ import mogakco.StudyManagement.repository.MemberRepository;
 import mogakco.StudyManagement.repository.PostLikeRepository;
 import mogakco.StudyManagement.repository.PostRepository;
 import mogakco.StudyManagement.repository.spec.PostLikeSpecification;
-import mogakco.StudyManagement.repository.spec.PostSpecification;
 import mogakco.StudyManagement.service.common.LoggingService;
+import mogakco.StudyManagement.service.post.PostCommonService;
 import mogakco.StudyManagement.service.post.PostLikeService;
 import mogakco.StudyManagement.util.ExceptionUtil;
-import mogakco.StudyManagement.util.SecurityUtil;
 
 @Service
-public class PostLikeServiceImpl implements PostLikeService {
+public class PostLikeServiceImpl extends PostCommonService implements PostLikeService {
 
-    private final MemberRepository memberRepository;
-    private final PostRepository postRepository;
     private final PostLikeRepository postLikeRepository;
 
     public PostLikeServiceImpl(MemberRepository memberRepository, PostRepository postRepository,
             PostLikeRepository postLikeRepository) {
-        this.memberRepository = memberRepository;
-        this.postRepository = postRepository;
+        super(memberRepository, postRepository);
         this.postLikeRepository = postLikeRepository;
     }
 
@@ -40,16 +36,12 @@ public class PostLikeServiceImpl implements PostLikeService {
     public DTOResCommon createPostLike(Long postId, LoggingService lo) {
 
         try {
-            Specification<Post> postSpec = PostSpecification.withPostId(postId);
-
             lo.setDBStart();
-            Member member = memberRepository.findById(SecurityUtil.getLoginUserId());
-            Post post = postRepository.findOne(postSpec)
-                    .orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND.getMessage("게시글")));
+            Member member = getLoginMember();
+            Post post = getPostById(postId);
             lo.setDBEnd();
 
             Specification<PostLike> postLikeSpec = PostLikeSpecification.withMemberId(member);
-
             lo.setDBStart();
             long count = postLikeRepository.count(postLikeSpec);
             lo.setDBEnd();
@@ -75,21 +67,16 @@ public class PostLikeServiceImpl implements PostLikeService {
     @Override
     @Transactional
     public DTOResCommon deletePostLike(Long postId, LoggingService lo) {
-
         try {
-            Specification<Post> postSpec = PostSpecification.withPostId(postId);
             lo.setDBStart();
-            Post post = postRepository.findOne(postSpec)
-                    .orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND.getMessage("게시글")));
-
-            Member loginMember = memberRepository.findById(SecurityUtil.getLoginUserId());
+            Member member = getLoginMember();
+            Post post = getPostById(postId);
             lo.setDBEnd();
 
-            Specification<PostLike> postLikeSpec = PostLikeSpecification.withPostAndMember(post, loginMember);
+            Specification<PostLike> postLikeSpec = PostLikeSpecification.withPostAndMember(post, member);
             lo.setDBStart();
             PostLike postLike = postLikeRepository.findOne(postLikeSpec)
                     .orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND.getMessage("게시글 좋아요")));
-
             postLikeRepository.delete(postLike);
             lo.setDBEnd();
 
@@ -99,5 +86,4 @@ public class PostLikeServiceImpl implements PostLikeService {
             return ExceptionUtil.handleException(e);
         }
     }
-
 }

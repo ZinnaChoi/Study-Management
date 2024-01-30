@@ -9,6 +9,5 @@ import mogakco.StudyManagement.domain.Post;
 @Repository
 public interface PostRepository extends JpaRepository<Post, Long>, JpaSpecificationExecutor<Post> {
 
-    Integer countByPostId(Long postId);
-
+    boolean existsById(Long postId);
 }

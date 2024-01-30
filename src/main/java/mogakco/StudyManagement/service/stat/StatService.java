@@ -11,4 +11,6 @@ public interface StatService {
     StatGetRes getStat(LogType type, LoggingService lo, Pageable pageable);
 
     DTOResCommon createAbsentLog(LoggingService lo);
+
+    DTOResCommon createWakeUpLog(LoggingService lo);
 }
