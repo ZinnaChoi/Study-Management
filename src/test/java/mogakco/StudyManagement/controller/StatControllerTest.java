@@ -13,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
@@ -57,9 +56,6 @@ public class StatControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
-
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
 
     @Value("${study.systemId}")
     private String systemId;
@@ -140,7 +136,7 @@ public class StatControllerTest {
 
     @Test
     @Sql("/stat/StatAbsentScheduleSetup.sql")
-    @WithMockUser(username = "User1", authorities = { "USER" })
+    @WithMockUser(username = "absentUser1", authorities = { "USER" })
     @DisplayName("부재 로그 저장 성공")
     public void createAbsentDailyLogSuccess() throws Exception {
         String requestBodyJson = objectMapper.writeValueAsString(
@@ -170,15 +166,12 @@ public class StatControllerTest {
 
     @Test
     @Sql("/stat/StatWakeupScheduleSetup.sql")
-    @WithMockUser(username = "WakeupUser1", authorities = { "USER" })
+    @WithMockUser(username = "wakeupUser1", authorities = { "USER" })
     @DisplayName("기상 로그 저장 성공")
     public void createWakeupDailyLogSuccess() throws Exception {
 
-        String memberId = String.valueOf(getMemberIdByMemberName("WakeupUser1"));
-
-        String requestBodyJson = "{ \"memberId\": " + memberId + ", \"success\": \"success\" }";
         MvcResult result = TestUtil.performRequest(mockMvc,
-                POST_WAKEUP_STAT_API_URL + "?memberId=" + memberId + "&success=success", requestBodyJson, "POST", 200,
+                POST_WAKEUP_STAT_API_URL, "{}", "POST", 200,
                 200);
 
         JsonNode responseBody = objectMapper.readTree(result.getResponse().getContentAsString());
@@ -190,17 +183,12 @@ public class StatControllerTest {
 
     @Test
     @Sql("/stat/StatWakeupScheduleSetup.sql")
-    @WithMockUser(username = "WakeupUser3", authorities = { "USER" })
+    @WithMockUser(username = "wakeupUser3", authorities = { "USER" })
     @DisplayName("기상 로그 저장 실패 - 기상 정보가 없는 사용자")
     public void createWakeupDailyLogFail() throws Exception {
 
-        String memberId = String.valueOf(getMemberIdByMemberName("WakeupUser3"));
-
-        System.out.println(memberId);
-
-        String requestBodyJson = "{ \"memberId\": " + memberId + ", \"success\": \"success\" }";
         MvcResult result = TestUtil.performRequest(mockMvc,
-                POST_WAKEUP_STAT_API_URL + "?memberId=" + memberId + "&success=success", requestBodyJson, "POST", 200,
+                POST_WAKEUP_STAT_API_URL, "{}", "POST", 200,
                 404);
 
         JsonNode responseBody = objectMapper.readTree(result.getResponse().getContentAsString());
@@ -208,14 +196,6 @@ public class StatControllerTest {
 
         assertEquals(404, retCode);
 
-    }
-    ////////////////////////////////////////////////////////
-
-    public Long getMemberIdByMemberName(String Id) {
-        return jdbcTemplate.queryForObject(
-                "SELECT member_id FROM member WHERE id = ?",
-                Long.class,
-                Id);
     }
 
 }
