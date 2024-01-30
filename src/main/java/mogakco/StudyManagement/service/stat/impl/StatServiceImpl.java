@@ -16,21 +16,25 @@ import mogakco.StudyManagement.dto.SimplePageable;
 import mogakco.StudyManagement.dto.StatGetRes;
 import mogakco.StudyManagement.dto.StatList;
 import mogakco.StudyManagement.enums.ErrorCode;
+import mogakco.StudyManagement.exception.NotFoundException;
 import mogakco.StudyManagement.enums.LogType;
 import mogakco.StudyManagement.repository.StatRepository;
 import mogakco.StudyManagement.service.common.LoggingService;
 import mogakco.StudyManagement.service.stat.StatService;
 import mogakco.StudyManagement.util.DateUtil;
+import mogakco.StudyManagement.util.ExceptionUtil;
 import mogakco.StudyManagement.util.PageUtil;
 
 import mogakco.StudyManagement.domain.AbsentSchedule;
 
 import mogakco.StudyManagement.domain.Member;
+import mogakco.StudyManagement.domain.WakeUp;
 import mogakco.StudyManagement.dto.DTOResCommon;
 import mogakco.StudyManagement.repository.AbsentScheduleRepository;
 import mogakco.StudyManagement.repository.spec.AbsentScheduleSpecification;
 import mogakco.StudyManagement.repository.DailyLogRepository;
 import mogakco.StudyManagement.repository.MemberRepository;
+import mogakco.StudyManagement.repository.WakeUpRepository;
 import mogakco.StudyManagement.repository.MemberScheduleRepository;
 
 @Service
@@ -41,15 +45,18 @@ public class StatServiceImpl implements StatService {
     private final DailyLogRepository dailyLogRepository;
     private final MemberScheduleRepository memberScheduleRepository;
     private final MemberRepository memberRepository;
+    private final WakeUpRepository wakeUpRepository;
 
     public StatServiceImpl(StatRepository statRepository, AbsentScheduleRepository absentScheduleRepository,
             DailyLogRepository dailyLogRepository,
-            MemberScheduleRepository memberScheduleRepository, MemberRepository memberRepository) {
+            MemberScheduleRepository memberScheduleRepository, MemberRepository memberRepository,
+            WakeUpRepository wakeUpRepository) {
         this.statRepository = statRepository;
         this.absentScheduleRepository = absentScheduleRepository;
         this.dailyLogRepository = dailyLogRepository;
         this.memberScheduleRepository = memberScheduleRepository;
         this.memberRepository = memberRepository;
+        this.wakeUpRepository = wakeUpRepository;
     }
 
     @Value("${study.systemId}")
@@ -128,4 +135,44 @@ public class StatServiceImpl implements StatService {
         }
     }
 
+    @Override
+    @Transactional
+    public DTOResCommon createWakeUpLog(Long memberId, String success, LoggingService lo) {
+        try {
+            lo.setDBStart();
+            Member member = memberRepository.findById(memberId)
+                    .orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND.getMessage("memberId")));
+            lo.setDBEnd();
+
+            lo.setDBStart();
+            WakeUp wakeUpMember = wakeUpRepository.findByMember(member);
+            lo.setDBEnd();
+
+            if (wakeUpMember == null) {
+                return new DTOResCommon(systemId, ErrorCode.NOT_FOUND.getCode(),
+                        ErrorCode.NOT_FOUND.getMessage("member의 목표 기상 시간"));
+
+            }
+
+            DailyLog newLog;
+            if ("success".equals(success)) {
+                newLog = new DailyLog(wakeUpMember.getMember(), DateUtil.getCurrentDate(), LogType.WAKEUP, 1,
+                        DateUtil.getCurrentDateTime());
+            } else if ("fail".equals(success)) {
+                newLog = new DailyLog(wakeUpMember.getMember(), DateUtil.getCurrentDate(), LogType.WAKEUP, 0,
+                        DateUtil.getCurrentDateTime());
+            } else {
+                return new DTOResCommon(systemId, ErrorCode.BAD_REQUEST.getCode(),
+                        ErrorCode.BAD_REQUEST.getMessage("success의 값은 'success'또는 'fail'만 허용됩니다."));
+            }
+
+            lo.setDBStart();
+            dailyLogRepository.save(newLog);
+            lo.setDBEnd();
+
+            return new DTOResCommon(systemId, ErrorCode.OK.getCode(), "기상 로그 업데이트가 성공적으로 완료되었습니다.");
+        } catch (NotFoundException e) {
+            return ExceptionUtil.handleException(e);
+        }
+    }
 }

@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -60,14 +61,33 @@ public class StatController extends CommonController {
         return result;
     }
 
-    @Operation(summary = "부재 일정 저장", description = "통계 생성을 위한 부재 일정 일일 업데이트")
+    @Operation(summary = "부재 로그 저장", description = "통계 생성을 위한 부재 로그 일일 업데이트")
     @PostMapping("/stat/absent")
+    @Hidden
+    // AbsentScheduleBatch.java 내 스케줄링의 기능 확인용 이므로 Hidden처리함.
     public DTOResCommon createAbsentLog(HttpServletRequest request) {
 
         DTOResCommon result = new DTOResCommon();
         try {
             startAPI(lo, null);
             result = statService.createAbsentLog(lo);
+        } catch (Exception e) {
+            result = new DTOResCommon(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
+                    ErrorCode.INTERNAL_ERROR.getMessage());
+        }
+        return result;
+    }
+
+    @Operation(summary = "기상 로그 저장", description = "통계 생성을 위한 기상 로그 업데이트")
+    @PostMapping("/stat/wakeup")
+    public DTOResCommon createWakeUpLog(HttpServletRequest request,
+            @RequestParam("memberId") Long memberId,
+            @RequestParam("success") String success) {
+
+        DTOResCommon result = new DTOResCommon();
+        try {
+            startAPI(lo, null);
+            result = statService.createWakeUpLog(memberId, success, lo);
         } catch (Exception e) {
             result = new DTOResCommon(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
                     ErrorCode.INTERNAL_ERROR.getMessage());
