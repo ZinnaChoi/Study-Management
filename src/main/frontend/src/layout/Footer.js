@@ -1,32 +1,24 @@
 import React from "react";
-import Typography from "@mui/material/Typography";
-
-const classes = (theme) => ({
-  footer: {
-    backgroundColor: theme.palette.background.paper,
-    marginTop: theme.spacing.unit * 8,
-    padding: `${theme.spacing.unit * 6}px 0`,
-  },
-});
+import { Typography, Container } from "@mui/material";
+import { copyRights } from "../constants/constants";
 
 // Footer에 해당
 const Footer = () => {
   return (
     <React.Fragment>
-      <hr />
-      <footer className={classes.footer}>
-        <Typography variant="h6" align="center" gutterBottom>
-          Footer
-        </Typography>
-        <Typography
-          variant="subtitle1"
-          align="center"
-          color="textSecondary"
-          component="p"
-        >
-          This is footer
-        </Typography>
-      </footer>
+      <Container maxWidth="lg">
+        <hr />
+        <footer>
+          <Typography
+            variant="subtitle2"
+            align="right"
+            color="textSecondary"
+            component="p"
+          >
+            {copyRights}
+          </Typography>
+        </footer>
+      </Container>
     </React.Fragment>
   );
 };
