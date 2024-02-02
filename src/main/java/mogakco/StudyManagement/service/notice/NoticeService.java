@@ -10,4 +10,7 @@ public interface NoticeService {
     NoticeGetRes getNotice(Long memberId, LoggingService lo);
 
     DTOResCommon updateNotice(Long memberId, NoticeReq noticeReq, LoggingService lo);
+
+    DTOResCommon createGeneralNotice(LoggingService lo);
+
 }
