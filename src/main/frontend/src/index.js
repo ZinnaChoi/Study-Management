@@ -3,7 +3,6 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import ReactDOM from "react-dom/client";
 import Header from "./layout/Header";
 import Footer from "./layout/Footer";
-import Main from "./Main";
 import NotFound from "./NotFound";
 import AbsentSchedule from "./pages/absent-schedule/AbsentSchedule";
 import MyPage from "./pages/my-page/MyPage";
@@ -32,7 +31,10 @@ root.render(
             }}
           >
             <Routes>
-              <Route path={menuTree.main.path} element={<Main />}></Route>
+              <Route
+                path={menuTree.main.path}
+                element={<MembersInfo />}
+              ></Route>
               <Route
                 path={menuTree.absentSchedule.path}
                 element={<AbsentSchedule />}
@@ -49,10 +51,6 @@ root.render(
               <Route
                 path={menuTree.study.management.path}
                 element={<Management />}
-              ></Route>
-              <Route
-                path={menuTree.study.membersInfo.path}
-                element={<MembersInfo />}
               ></Route>
               <Route
                 path={menuTree.study.wakeupSuccessRate.path}

@@ -38,6 +38,26 @@ function Header() {
     setAnchorElUser(null);
   };
 
+  // 스터디 내 서브메뉴
+  const SubMenuItem = ({ menuItem, onCloseSubMenu }) => {
+    return (
+      <MenuItem
+        key={menuItem.path}
+        onClick={onCloseSubMenu}
+        disabled={menuItem.disabled}
+      >
+        <Typography textAlign="center">
+          <Link
+            to={menuItem.path}
+            style={{ textDecoration: "none", color: "inherit" }}
+          >
+            {menuItem.name}
+          </Link>
+        </Typography>
+      </MenuItem>
+    );
+  };
+
   useEffect(() => {
     // JWT 세션 스토리지에 초기 세팅(로그인 화면 구현 후 변경 예정)
     axios
@@ -89,10 +109,7 @@ function Header() {
             to={menuTree.main.path}
             style={{ textDecoration: "none", color: "inherit" }}
           >
-            <img
-              alt="Logo"
-              sx={{ display: "flex", mr: 1, width: 32, height: 32 }}
-            />
+            <img alt="Logo" width="32" height="32" />
           </Link>
           <Box
             sx={{
@@ -159,63 +176,15 @@ function Header() {
               open={Boolean(anchorElStudy)}
               onClose={handleCloseStudySubMenu}
             >
-              {/* 스터디원 정보 메뉴 */}
-              <MenuItem
-                key={menuTree.study.membersInfo.path}
-                onClick={handleCloseStudySubMenu}
-              >
-                <Typography textAlign="center">
-                  <Link
-                    to={menuTree.study.membersInfo.path}
-                    style={{ textDecoration: "none", color: "inherit" }}
-                  >
-                    {menuTree.study.membersInfo.name}
-                  </Link>
-                </Typography>
-              </MenuItem>
-              {/* 출석 통계 메뉴 */}
-              <MenuItem
-                key={menuTree.study.attendanceStatistics.path}
-                onClick={handleCloseStudySubMenu}
-              >
-                <Typography textAlign="center">
-                  <Link
-                    to={menuTree.study.attendanceStatistics.path}
-                    style={{ textDecoration: "none", color: "inherit" }}
-                  >
-                    {menuTree.study.attendanceStatistics.name}
-                  </Link>
-                </Typography>
-              </MenuItem>
-              {/* 기상시간 성공률 메뉴 */}
-              <MenuItem
-                key={menuTree.study.wakeupSuccessRate.path}
-                onClick={handleCloseStudySubMenu}
-              >
-                <Typography textAlign="center">
-                  <Link
-                    to={menuTree.study.wakeupSuccessRate.path}
-                    style={{ textDecoration: "none", color: "inherit" }}
-                  >
-                    {menuTree.study.wakeupSuccessRate.name}
-                  </Link>
-                </Typography>
-              </MenuItem>
-              {/* 스터디 관리(관리자 계정만 접근 가능) 메뉴 */}
-              <MenuItem
-                key={menuTree.study.management.path}
-                onClick={handleCloseStudySubMenu}
-                disabled={true}
-              >
-                <Typography textAlign="center">
-                  <Link
-                    to={menuTree.study.management.name}
-                    style={{ textDecoration: "none", color: "inherit" }}
-                  >
-                    {menuTree.study.management.name}
-                  </Link>
-                </Typography>
-              </MenuItem>
+              {Object.values(menuTree.study).map((menuItem) =>
+                menuItem !== "스터디" ? (
+                  <SubMenuItem
+                    key={menuItem.path}
+                    menuItem={menuItem}
+                    onCloseSubMenu={handleCloseStudySubMenu}
+                  />
+                ) : null
+              )}
             </Menu>
           </Box>
 

@@ -4,7 +4,7 @@ import React from "react";
 const MyPage = () => {
   return (
     <React.Fragment>
-      <h1>My Page 화면</h1>
+      <h1>My Page 화면(개인 정보 및 알람 설정)</h1>
     </React.Fragment>
   );
 };

@@ -7,7 +7,6 @@ export const authClient = axios.create({
   headers: {
     "Cache-Control": "no-cache",
     "Content-Type": "application/json",
-    "Access-Control-Allow-Origin": "*",
     Authorization: localStorage.getItem("token"),
   },
   responseType: "json",
@@ -20,7 +19,6 @@ export const client = axios.create({
   headers: {
     "Cache-Control": "no-cache",
     "Content-Type": "application/json",
-    "Access-Control-Allow-Origin": "*",
   },
   responseType: "json",
 });
