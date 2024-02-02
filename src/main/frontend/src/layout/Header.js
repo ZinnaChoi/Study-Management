@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 
 import {
   AppBar,
@@ -15,8 +15,10 @@ import {
 } from "@mui/material";
 import { Link } from "react-router-dom";
 import { menuTree } from "../constants/constants";
+import axios from "axios";
+import { authClient } from "../services/APIService";
 
-function ResponsiveAppBar() {
+function Header() {
   const [anchorElStudy, setAnchorElStudy] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
 
@@ -35,6 +37,48 @@ function ResponsiveAppBar() {
   const handleCloseUserMenu = () => {
     setAnchorElUser(null);
   };
+
+  useEffect(() => {
+    // JWT 세션 스토리지에 초기 세팅(로그인 화면 구현 후 변경 예정)
+    axios
+      .post("api/v1/login", {
+        sendDate: "20240112113804899",
+        systemId: "STUDY_0001",
+        id: "admin",
+        password: "password",
+      })
+      .then(function (response) {
+        localStorage.setItem("token", "Bearer " + response?.data?.token);
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+
+    // api 요청 예제 post
+    let reqBody = {
+      sendDate: "20240112113804899",
+      systemId: "STUDY_0001",
+      id: "admin",
+    };
+    authClient
+      .post("/join/check-id", reqBody)
+      .then(function (response) {
+        console.log(response);
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+
+    // api 요청 예제 get
+    authClient
+      .get("/notice/1")
+      .then(function (response) {
+        console.log(response);
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+  });
 
   return (
     <AppBar position="static" color="inherit" sx={{ boxShadow: "none", mb: 2 }}>
@@ -230,4 +274,4 @@ function ResponsiveAppBar() {
     </AppBar>
   );
 }
-export default ResponsiveAppBar;
+export default Header;
