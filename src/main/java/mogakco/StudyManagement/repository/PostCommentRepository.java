@@ -13,6 +13,10 @@ import mogakco.StudyManagement.domain.PostComment;
 @Repository
 public interface PostCommentRepository extends JpaRepository<PostComment, Long>, JpaSpecificationExecutor<PostComment> {
 
+    PostComment findByPostPostIdAndCommentId(Long postId, Long commentId);
+
+    List<PostComment> findByParentCommentCommentId(Long parentCommentId);
+
     List<PostComment> findByPostPostIdAndParentCommentIsNull(Long postId);
 
     Integer countByPostPostId(Long postId);
