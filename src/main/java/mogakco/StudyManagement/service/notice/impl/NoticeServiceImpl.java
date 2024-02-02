@@ -151,7 +151,7 @@ public class NoticeServiceImpl implements NoticeService {
 
                     Boolean linkShareValue = noticeRepository.findByMember_MemberId(notifier).get().getLinkShare();
                     if (linkShareValue != null && linkShareValue) {
-                        emailService.sendEamil(notifierMember.get().getName(), "general",
+                        emailService.sendEmail(notifierMember.get().getName(), "general",
                                 notifierMember.get().getContact());
                         lo.setDBStart();
                     }

@@ -13,7 +13,7 @@ import java.util.Properties;
 @Component
 public class EmailService {
 
-    public void sendEamil(String memberName, String type, String toAddress) {
+    public void sendEmail(String memberName, String type, String toAddress) {
 
         try {
 
