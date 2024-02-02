@@ -1,6 +1,5 @@
 package mogakco.StudyManagement.service.post.impl;
 
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,7 +19,6 @@ import mogakco.StudyManagement.exception.UnauthorizedAccessException;
 import mogakco.StudyManagement.repository.MemberRepository;
 import mogakco.StudyManagement.repository.PostCommentRepository;
 import mogakco.StudyManagement.repository.PostRepository;
-import mogakco.StudyManagement.repository.spec.PostCommentSpecification;
 import mogakco.StudyManagement.service.common.LoggingService;
 import mogakco.StudyManagement.service.post.PostCommentService;
 import mogakco.StudyManagement.service.post.PostCommonService;
@@ -95,7 +93,6 @@ public class PostCommentServiceImpl extends PostCommonService implements PostCom
     @Override
     public PostCommentReplyRes getCommentReply(Long postId, Long commentId, LoggingService lo) {
         try {
-            Specification<PostComment> replySpec = PostCommentSpecification.withParentCommentId(commentId);
             lo.setDBStart();
             isPostExistById(postId);
             PostComment postComment = getCommentByPostIdAndCommentId(postId, commentId);
@@ -105,7 +102,7 @@ public class PostCommentServiceImpl extends PostCommonService implements PostCom
                 throw new InvalidRequestException(ErrorCode.BAD_REQUEST.getMessage("답글에 대한 답글 조회는 지원하지 않습니다."));
 
             lo.setDBStart();
-            List<PostComment> replies = postCommentRepository.findAll(replySpec);
+            List<PostComment> replies = postCommentRepository.findByParentCommentCommentId(commentId);
             lo.setDBEnd();
 
             List<PostCommentReply> postCommentReplies = replies.stream()
@@ -184,9 +181,11 @@ public class PostCommentServiceImpl extends PostCommonService implements PostCom
     }
 
     private PostComment getCommentByPostIdAndCommentId(Long postId, Long commentId) {
-        Specification<PostComment> spec = PostCommentSpecification.withPostIdAndCommentId(postId, commentId);
-        return postCommentRepository.findOne(spec)
-                .orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND.getMessage("게시판 댓글")));
-    }
+        PostComment postComments = postCommentRepository.findByPostPostIdAndCommentId(postId, commentId);
 
+        if (postComments == null) {
+            throw new NotFoundException(ErrorCode.NOT_FOUND.getMessage("게시판 댓글"));
+        }
+        return postComments;
+    }
 }
