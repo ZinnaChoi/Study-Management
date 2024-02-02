@@ -8,7 +8,7 @@ export const menuTree = {
     attendanceStatistics: { path: "/attendance-statistics", name: "출석 통계" },
     wakeupSuccessRate: {
       path: "/wakeup-success-rate",
-      name: "기상시간 성공률",
+      name: "기상 통계",
     },
     management: { path: "/management", name: "스터디 관리", disabled: true },
   },
