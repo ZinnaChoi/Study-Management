@@ -17,6 +17,7 @@ services:
 
   redis:
     image: redis:latest
+    restart: always
     command: redis-server --port 6379
     container_name: study_redis
     # hostname: redis
@@ -25,6 +26,8 @@ services:
       - "mode=standalone"
     ports:
       - 6379:6379
+    volumes:
+      - REDISDATA:/data
   #     extra_hosts:
   #       - host.docker.internal:host-gateway
   #     networks:
@@ -40,3 +43,4 @@ services:
 
 volumes:
   MYDATA:
+  REDISDATA:
