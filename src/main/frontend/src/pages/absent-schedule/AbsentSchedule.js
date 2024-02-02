@@ -3,6 +3,7 @@ import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import { authClient } from "../../services/APIService";
+import { getCurrentDateTime } from "../../util/DateUtil";
 
 // 부재 일정 화면
 const AbsentSchedule = () => {
@@ -11,7 +12,7 @@ const AbsentSchedule = () => {
 
   useEffect(() => {
     const requestBody = {
-      sendDate: "20240112113804899",
+      sendDate: getCurrentDateTime(),
       systemId: "STUDY_0001",
     };
 
