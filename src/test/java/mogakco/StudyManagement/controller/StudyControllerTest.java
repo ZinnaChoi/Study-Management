@@ -187,7 +187,7 @@ public class StudyControllerTest {
                 List<ScheduleReq> schedules = Collections.singletonList(scheduleUpdateReq);
 
                 StudyReq studyReq = new StudyReq(
-                                "NotExistStudyName", "10.10.10.110", "admin", "password", schedules);
+                                getStudyName(), "10.10.10.110", "admin", "password", schedules);
                 studyReq.setSendDate(DateUtil.getCurrentDateTime());
                 studyReq.setSystemId("SYS_01");
                 String requestBodyJson = objectMapper.writeValueAsString(studyReq);
@@ -264,6 +264,12 @@ public class StudyControllerTest {
                 return jdbcTemplate.queryForObject(
                                 "SELECT study_id FROM study_info",
                                 Long.class);
+        }
+
+        private String getStudyName() {
+                return jdbcTemplate.queryForObject(
+                                "SELECT study_name FROM study_info",
+                                String.class);
         }
 
         /////////////////////////////////////////////////////////////////

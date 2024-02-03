@@ -7,7 +7,6 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-
 import mogakco.StudyManagement.domain.AbsentSchedule;
 import mogakco.StudyManagement.domain.Member;
 import mogakco.StudyManagement.domain.Schedule;
@@ -16,7 +15,14 @@ import mogakco.StudyManagement.domain.Schedule;
 public interface AbsentScheduleRepository
         extends JpaRepository<AbsentSchedule, Long>, JpaSpecificationExecutor<AbsentSchedule> {
 
+    List<AbsentSchedule> findByAbsentDate(String absentDate);
+
+    List<AbsentSchedule> findByAbsentDateAndMember(String absentDate, Member member);
+
+    Integer countByAbsentDateAndScheduleAndMember(String absentDate, Schedule schedule, Member member);
+
     @Query("SELECT as.member FROM AbsentSchedule as WHERE as.member = :member AND as.absentDate = :currentDate AND as.schedule = :schedule")
     List<Member> findAbsentParticipants(@Param("member") Member member, @Param("currentDate") String currentDate,
             @Param("schedule") Schedule schedule);
+
 }

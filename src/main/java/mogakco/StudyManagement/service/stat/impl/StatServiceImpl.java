@@ -110,11 +110,9 @@ public class StatServiceImpl implements StatService {
 
                 if (totalScoreForMember != 0) {
 
-                    Specification<AbsentSchedule> spec = AbsentScheduleSpecification
-                            .withAbsentDateAndMember(DateUtil.getCurrentDate(), member);
-
                     lo.setDBStart();
-                    List<AbsentSchedule> todayAbsentSchedules = absentScheduleRepository.findAll(spec);
+                    List<AbsentSchedule> todayAbsentSchedules = absentScheduleRepository
+                            .findByAbsentDateAndMember(DateUtil.getCurrentDate(), member);
                     lo.setDBEnd();
 
                     if (todayAbsentSchedules.size() == 0) {
