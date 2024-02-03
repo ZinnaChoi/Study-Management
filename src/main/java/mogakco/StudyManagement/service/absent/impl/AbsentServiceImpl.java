@@ -88,11 +88,9 @@ public class AbsentServiceImpl implements AbsentService {
 
             // Check if the absent schedule already exists
             for (Schedule schedule : scheduleList) {
-                Specification<AbsentSchedule> spec = AbsentScheduleSpecification.withAbsentDateAndScheduleAndMember(
-                        absentReq.getAbsentDate(), schedule, member);
-
                 lo.setDBStart();
-                long absentScheduleCnt = absentScheduleRepository.count(spec);
+                long absentScheduleCnt = absentScheduleRepository
+                        .countByAbsentDateAndScheduleAndMember(absentReq.getAbsentDate(), schedule, member);
                 lo.setDBEnd();
                 if (absentScheduleCnt > 0) {
                     throw new ConflictException(ErrorCode.CONFLICT.getMessage("부재 일정: " +
@@ -179,12 +177,9 @@ public class AbsentServiceImpl implements AbsentService {
     @Override
     public AbsentDetailRes getAbsentScheduleDetail(AbsentDetailReq absentDetailReq, LoggingService lo) {
 
-        List<AbsentSchedule> absentSchedules = new ArrayList<>();
-        Specification<AbsentSchedule> spec = AbsentScheduleSpecification
-                .withAbsentDate(absentDetailReq.getAbsentDate());
-
         lo.setDBStart();
-        absentSchedules = absentScheduleRepository.findAll(spec);
+        List<AbsentSchedule> absentSchedules = absentScheduleRepository
+                .findByAbsentDate(absentDetailReq.getAbsentDate());
         lo.setDBEnd();
 
         Map<String, AbsentDetail> groupedSchedules = new HashMap<>();
@@ -214,14 +209,9 @@ public class AbsentServiceImpl implements AbsentService {
 
             lo.setDBStart();
             Member loginMember = memberRepository.findById(SecurityUtil.getLoginUserId());
-            lo.setDBEnd();
-
-            Specification<AbsentSchedule> spec = AbsentScheduleSpecification
-                    .withAbsentDateAndMember(absentReq.getAbsentDate(), loginMember);
-
-            lo.setDBStart();
             List<Schedule> scheduleList = scheduleRepository.findAllByScheduleNameIn(absentReq.getScheduleNameList());
-            List<AbsentSchedule> absentScheduleList = absentScheduleRepository.findAll(spec);
+            List<AbsentSchedule> absentScheduleList = absentScheduleRepository
+                    .findByAbsentDateAndMember(absentReq.getAbsentDate(), loginMember);
             lo.setDBEnd();
 
             validateScheduleNames(scheduleList, absentReq.getScheduleNameList());
@@ -293,13 +283,8 @@ public class AbsentServiceImpl implements AbsentService {
         try {
             lo.setDBStart();
             Member loginMember = memberRepository.findById(SecurityUtil.getLoginUserId());
-            lo.setDBEnd();
-
-            Specification<AbsentSchedule> spec = AbsentScheduleSpecification
-                    .withAbsentDateAndMember(absentDate, loginMember);
-
-            lo.setDBStart();
-            List<AbsentSchedule> absentScheduleList = absentScheduleRepository.findAll(spec);
+            List<AbsentSchedule> absentScheduleList = absentScheduleRepository.findByAbsentDateAndMember(absentDate,
+                    loginMember);
             lo.setDBEnd();
 
             if (absentScheduleList.isEmpty()) {

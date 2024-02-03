@@ -1,6 +1,5 @@
 package mogakco.StudyManagement.service.post.impl;
 
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,7 +13,6 @@ import mogakco.StudyManagement.exception.NotFoundException;
 import mogakco.StudyManagement.repository.MemberRepository;
 import mogakco.StudyManagement.repository.PostLikeRepository;
 import mogakco.StudyManagement.repository.PostRepository;
-import mogakco.StudyManagement.repository.spec.PostLikeSpecification;
 import mogakco.StudyManagement.service.common.LoggingService;
 import mogakco.StudyManagement.service.post.PostCommonService;
 import mogakco.StudyManagement.service.post.PostLikeService;
@@ -39,11 +37,7 @@ public class PostLikeServiceImpl extends PostCommonService implements PostLikeSe
             lo.setDBStart();
             Member member = getLoginMember();
             Post post = getPostById(postId);
-            lo.setDBEnd();
-
-            Specification<PostLike> postLikeSpec = PostLikeSpecification.withMemberId(member);
-            lo.setDBStart();
-            long count = postLikeRepository.count(postLikeSpec);
+            long count = postLikeRepository.countByMember(member);
             lo.setDBEnd();
 
             if (count > 0) {
@@ -71,12 +65,14 @@ public class PostLikeServiceImpl extends PostCommonService implements PostLikeSe
             lo.setDBStart();
             Member member = getLoginMember();
             Post post = getPostById(postId);
+            PostLike postLike = postLikeRepository.findByPostAndMember(post, member);
             lo.setDBEnd();
 
-            Specification<PostLike> postLikeSpec = PostLikeSpecification.withPostAndMember(post, member);
+            if (postLike == null) {
+                throw new NotFoundException(ErrorCode.NOT_FOUND.getMessage("게시글 좋아요"));
+            }
+
             lo.setDBStart();
-            PostLike postLike = postLikeRepository.findOne(postLikeSpec)
-                    .orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND.getMessage("게시글 좋아요")));
             postLikeRepository.delete(postLike);
             lo.setDBEnd();
 
