@@ -1,12 +1,14 @@
 export const getCurrentDateTime = () => {
   const now = new Date();
+  const format = (num, length = 2) => String(num).padStart(length, "0");
+
   const year = now.getFullYear();
-  const month = String(now.getMonth() + 1).padStart(2, "0");
-  const day = String(now.getDate()).padStart(2, "0");
-  const hours = String(now.getHours()).padStart(2, "0");
-  const minutes = String(now.getMinutes()).padStart(2, "0");
-  const seconds = String(now.getSeconds()).padStart(2, "0");
-  const milliseconds = String(now.getMilliseconds()).padStart(3, "0");
+  const month = format(now.getMonth() + 1);
+  const day = format(now.getDate());
+  const hours = format(now.getHours());
+  const minutes = format(now.getMinutes());
+  const seconds = format(now.getSeconds());
+  const milliseconds = format(now.getMilliseconds(), 3);
 
   return `${year}${month}${day}${hours}${minutes}${seconds}${milliseconds}`;
 };

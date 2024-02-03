@@ -13,9 +13,7 @@ const AbsentSchedule = () => {
   const [currentYearMonth, setCurrentYearMonth] = useState("");
   const [prevYearMonth, setPrevYearMonth] = useState("");
 
-  const getRandomPastelColor = () => {
-    return `hsl(${360 * Math.random()}, 70%, 80%)`;
-  };
+  const getRandomPastelColor = () => `hsl(${360 * Math.random()}, 70%, 80%)`;
 
   const getCurrentYearMonth = (dateInfo) => {
     const start = new Date(dateInfo.start);
