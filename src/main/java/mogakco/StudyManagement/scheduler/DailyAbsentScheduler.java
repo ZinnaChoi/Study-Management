@@ -12,17 +12,17 @@ import mogakco.StudyManagement.service.stat.StatService;
 @Configuration
 @EnableBatchProcessing
 @Service
-public class AbsentScheduleBatch {
+public class DailyAbsentScheduler {
     private final StatService statService;
     private final LoggingService lo;
 
-    public AbsentScheduleBatch(StatService statService, LoggingService lo) {
+    public DailyAbsentScheduler(StatService statService, LoggingService lo) {
         this.statService = statService;
         this.lo = lo;
     }
 
     @Scheduled(cron = "0 59 23 * * ?")
-    public void executeDailyBatch() {
+    public void executeDailyLog() {
         try {
             statService.createAbsentLog(lo);
             System.out.println("일일 출석 로그가 저장되었습니다.");

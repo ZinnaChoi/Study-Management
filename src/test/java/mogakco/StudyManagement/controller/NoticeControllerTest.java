@@ -24,7 +24,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import mogakco.StudyManagement.dto.NoticeReq;
-import mogakco.StudyManagement.scheduler.ScheduleStartTimeMonitoring;
+import mogakco.StudyManagement.scheduler.StartTimeMonitoringScheduler;
 import mogakco.StudyManagement.service.common.LoggingService;
 import mogakco.StudyManagement.service.notice.NoticeService;
 import mogakco.StudyManagement.util.DateUtil;
@@ -143,10 +143,10 @@ public class NoticeControllerTest {
                 NoticeService noticeServiceMock = Mockito.mock(NoticeService.class);
                 LoggingService loggingServiceMock = Mockito.mock(LoggingService.class);
 
-                ScheduleStartTimeMonitoring scheduleStartTimeMonitoring = new ScheduleStartTimeMonitoring(
+                StartTimeMonitoringScheduler startTimeMonitoringScheduler = new StartTimeMonitoringScheduler(
                                 noticeServiceMock, loggingServiceMock);
 
-                scheduleStartTimeMonitoring.excuteGeneralNotice();
+                startTimeMonitoringScheduler.executeGeneralNotice();
 
                 verify(noticeServiceMock, times(1)).createGeneralNotice(loggingServiceMock);
         }
