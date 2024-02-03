@@ -10,11 +10,21 @@ const AbsentSchedule = () => {
   const [events, setEvents] = useState([]);
   const [currentYearMonth, setCurrentYearMonth] = useState("");
   const [prevYearMonth, setPrevYearMonth] = useState("");
+  const [colorMap, setColorMap] = useState({});
 
   const getRandomPastelColor = () =>
     `hsl(${360 * Math.random()}, ${60 + 40 * Math.random()}%, ${
       70 + 30 * Math.random()
     }%)`;
+
+  const assignColorToScheduleName = (scheduleName) => {
+    if (!colorMap[scheduleName]) {
+      setColorMap((prevColorMap) => ({
+        ...prevColorMap,
+        [scheduleName]: getRandomPastelColor(),
+      }));
+    }
+  };
 
   const getCurrentYearMonth = (dateInfo) => {
     const start = new Date(dateInfo.start);
@@ -40,15 +50,24 @@ const AbsentSchedule = () => {
       authClient
         .get("/absent/calendar", { params: requestBody })
         .then((absentResponse) => {
+          const newColorMap = { ...colorMap };
+          absentResponse.data.content.forEach((absentInfo) => {
+            const { scheduleName } = absentInfo;
+            if (!newColorMap[scheduleName]) {
+              newColorMap[scheduleName] = getRandomPastelColor();
+            }
+          });
+
+          setColorMap(newColorMap);
+
           const newEvents = absentResponse.data.content.map((absentInfo) => {
-            const color = getRandomPastelColor();
             return {
               title: `${
                 absentInfo.scheduleName
               }: ${absentInfo.memberNameList.join(", ")}`,
               start: absentInfo.absentDate,
-              backgroundColor: color,
-              borderColor: color,
+              backgroundColor: newColorMap[absentInfo.scheduleName],
+              borderColor: newColorMap[absentInfo.scheduleName],
               display: "block",
             };
           });
@@ -59,7 +78,7 @@ const AbsentSchedule = () => {
           console.error("데이터 조회 실패:", error);
         });
     }
-  }, [currentYearMonth, prevYearMonth]);
+  }, [currentYearMonth, prevYearMonth, colorMap]);
 
   const calendarStyle = {
     height: "100vh",
