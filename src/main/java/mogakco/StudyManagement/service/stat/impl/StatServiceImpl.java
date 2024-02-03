@@ -6,7 +6,6 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import org.springframework.transaction.annotation.Transactional;
@@ -32,7 +31,6 @@ import mogakco.StudyManagement.domain.Member;
 import mogakco.StudyManagement.domain.WakeUp;
 import mogakco.StudyManagement.dto.DTOResCommon;
 import mogakco.StudyManagement.repository.AbsentScheduleRepository;
-import mogakco.StudyManagement.repository.spec.AbsentScheduleSpecification;
 import mogakco.StudyManagement.repository.DailyLogRepository;
 import mogakco.StudyManagement.repository.MemberRepository;
 import mogakco.StudyManagement.repository.WakeUpRepository;

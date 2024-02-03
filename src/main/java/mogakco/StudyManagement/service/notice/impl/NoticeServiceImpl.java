@@ -18,6 +18,8 @@ import mogakco.StudyManagement.dto.NoticeGetRes;
 import mogakco.StudyManagement.dto.NoticeList;
 import mogakco.StudyManagement.dto.NoticeReq;
 import mogakco.StudyManagement.enums.ErrorCode;
+
+import mogakco.StudyManagement.enums.MessageType;
 import mogakco.StudyManagement.exception.NotFoundException;
 import mogakco.StudyManagement.exception.UnauthorizedAccessException;
 import mogakco.StudyManagement.repository.AbsentScheduleRepository;
@@ -151,7 +153,7 @@ public class NoticeServiceImpl implements NoticeService {
 
                     Boolean linkShareValue = noticeRepository.findByMember_MemberId(notifier).get().getLinkShare();
                     if (linkShareValue != null && linkShareValue) {
-                        emailService.sendEmail(notifierMember.get().getName(), "general",
+                        emailService.sendEmail(notifierMember.get().getName(), MessageType.GENERAL,
                                 notifierMember.get().getContact());
                         lo.setDBStart();
                     }

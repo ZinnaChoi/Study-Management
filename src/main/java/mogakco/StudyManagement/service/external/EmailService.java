@@ -3,6 +3,9 @@ package mogakco.StudyManagement.service.external;
 import org.springframework.stereotype.Component;
 
 import lombok.RequiredArgsConstructor;
+import mogakco.StudyManagement.enums.MessageType;
+
+import org.springframework.beans.factory.annotation.Value;
 
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
@@ -13,12 +16,15 @@ import java.util.Properties;
 @Component
 public class EmailService {
 
-    public void sendEmail(String memberName, String type, String toAddress) {
+    @Value("${email.username}")
+    private String username;
+
+    @Value("${email.password}")
+    private String password;
+
+    public void sendEmail(String memberName, MessageType type, String toAddress) {
 
         try {
-
-            final String username = "wowdayeon@gmail.com";
-            final String password = "itmytkxjlgxfltgu";
 
             Properties props = new Properties();
             props.put("mail.smtp.auth", "true");
@@ -46,17 +52,17 @@ public class EmailService {
         }
     }
 
-    public String createContent(String memberName, String messageType) {
+    public String createContent(String memberName, MessageType messageType) {
         switch (messageType) {
-            case "general":
+            case GENERAL:
                 return String.format(
                         "안녕하세요 %s님! \n10분 뒤 시작할 스터디를 위해 구글 미트를 생성해주세요. \n https://meet.google.com/iai-womn-bcb?ec=asw-meet-hero-startmeeting",
                         memberName);
-            case "newpost":
+            case NEW_POST:
                 return String.format("%s님의 새 글이 등록되었습니다.", memberName);
-            case "absent":
+            case ABSENT:
                 return String.format("%s님의 부재 일정이 등록되었습니다.", memberName);
-            case "wakeup":
+            case WAKE_UP:
                 return String.format("%s님의 기상 성공 여부가 등록되었습니다.", memberName);
             default:
                 return "";
