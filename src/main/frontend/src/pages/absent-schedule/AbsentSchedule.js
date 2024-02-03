@@ -17,15 +17,6 @@ const AbsentSchedule = () => {
       70 + 30 * Math.random()
     }%)`;
 
-  const assignColorToScheduleName = (scheduleName) => {
-    if (!colorMap[scheduleName]) {
-      setColorMap((prevColorMap) => ({
-        ...prevColorMap,
-        [scheduleName]: getRandomPastelColor(),
-      }));
-    }
-  };
-
   const getCurrentYearMonth = (dateInfo) => {
     const start = new Date(dateInfo.start);
     let year = start.getFullYear();
