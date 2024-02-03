@@ -139,7 +139,7 @@ const AbsentSchedule = () => {
 function renderEventContent(eventInfo) {
   return (
     <>
-      <div>{eventInfo.event.title}</div>
+      <div style={{ color: "black" }}>{eventInfo.event.title}</div>
     </>
   );
 }
