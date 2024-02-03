@@ -8,28 +8,24 @@ import { getCurrentDateTime } from "../../util/DateUtil";
 // 부재 일정 화면
 const AbsentSchedule = () => {
   const [events, setEvents] = useState([]);
-  const [schedules, setSchedules] = useState([]);
-  const [scheduleColors, setScheduleColors] = useState({});
   const [currentYearMonth, setCurrentYearMonth] = useState("");
   const [prevYearMonth, setPrevYearMonth] = useState("");
 
-  const getRandomPastelColor = () => `hsl(${360 * Math.random()}, 70%, 80%)`;
+  const getRandomPastelColor = () =>
+    `hsl(${360 * Math.random()}, ${60 + 40 * Math.random()}%, ${
+      70 + 30 * Math.random()
+    }%)`;
 
   const getCurrentYearMonth = (dateInfo) => {
     const start = new Date(dateInfo.start);
     let year = start.getFullYear();
-    let month;
-
-    if (start.getDate() > 20) {
-      month = start.getMonth() + 2;
-      if (month === 13) {
-        month = 1;
-        year++;
-      }
-    } else {
-      month = start.getMonth() + 1;
+    let month =
+      start.getDate() > 20 ? start.getMonth() + 2 : start.getMonth() + 1;
+    if (month === 13) {
+      month = 1;
+      year++;
     }
-    const formattedMonth = month < 10 ? `0${month}` : month;
+    const formattedMonth = month < 10 ? `0${month}` : `${month}`;
     setCurrentYearMonth(`${year}${formattedMonth}`);
   };
 
@@ -38,59 +34,34 @@ const AbsentSchedule = () => {
       const requestBody = {
         sendDate: getCurrentDateTime(),
         systemId: "STUDY_0001",
-      };
-
-      const absentRequestBody = {
-        ...requestBody,
         yearMonth: currentYearMonth,
       };
 
-      Promise.all([
-        authClient.get("/schedules", { params: requestBody }),
-        authClient.get("/absent/calendar", { params: absentRequestBody }),
-      ])
-        .then(([schedulesResponse, absentResponse]) => {
-          const sortedSchedules = schedulesResponse.data.registedSchedules.sort(
-            (a, b) => a.startTime.localeCompare(b.startTime)
-          );
-          setSchedules(sortedSchedules);
-
-          const newScheduleColors = { ...scheduleColors };
-          sortedSchedules.forEach((schedule) => {
-            if (!newScheduleColors[schedule.scheduleName]) {
-              newScheduleColors[schedule.scheduleName] = getRandomPastelColor();
-            }
+      authClient
+        .get("/absent/calendar", { params: requestBody })
+        .then((absentResponse) => {
+          const newEvents = absentResponse.data.content.map((absentInfo) => {
+            const color = getRandomPastelColor();
+            return {
+              title: `${
+                absentInfo.scheduleName
+              }: ${absentInfo.memberNameList.join(", ")}`,
+              start: absentInfo.absentDate,
+              backgroundColor: color,
+              borderColor: color,
+              display: "block",
+            };
           });
-          setScheduleColors(newScheduleColors);
-
-          const newEvents = absentResponse.data.content.map((absentInfo) => ({
-            title: absentInfo.memberNameList.join(", "),
-            start: absentInfo.absentDate,
-            backgroundColor: newScheduleColors[absentInfo.scheduleName],
-            borderColor: newScheduleColors[absentInfo.scheduleName],
-            display: "block",
-          }));
           setEvents(newEvents);
-
           setPrevYearMonth(currentYearMonth);
         })
         .catch((error) => {
           console.error("데이터 조회 실패:", error);
         });
     }
-  }, [currentYearMonth, scheduleColors, prevYearMonth]);
-
-  const containerStyle = {
-    display: "flex",
-  };
-
-  const scheduleStyle = {
-    flex: 1,
-    marginRight: "10px",
-  };
+  }, [currentYearMonth, prevYearMonth]);
 
   const calendarStyle = {
-    flex: 4,
     height: "100vh",
     maxWidth: "100%",
     padding: 0,
@@ -98,40 +69,15 @@ const AbsentSchedule = () => {
     fontSize: "1.2em",
   };
 
-  const getScheduleListItemStyle = (scheduleName) => ({
-    backgroundColor: scheduleColors[scheduleName],
-    padding: "3px",
-    borderRadius: "3px",
-    height: "25px",
-    marginBottom: "3px",
-  });
-
   return (
-    <div>
-      <div style={containerStyle}>
-        <div style={scheduleStyle}>
-          <h3>스터디 시간</h3>
-          <ul>
-            {schedules.map((schedule) => (
-              <li
-                key={schedule.scheduleId}
-                style={getScheduleListItemStyle(schedule.scheduleName)}
-              >
-                {schedule.scheduleName}
-              </li>
-            ))}
-          </ul>
-        </div>
-        <div style={calendarStyle}>
-          <FullCalendar
-            plugins={[dayGridPlugin, interactionPlugin]}
-            initialView="dayGridMonth"
-            events={events}
-            datesSet={getCurrentYearMonth}
-            eventContent={renderEventContent}
-          />
-        </div>
-      </div>
+    <div style={calendarStyle}>
+      <FullCalendar
+        plugins={[dayGridPlugin, interactionPlugin]}
+        initialView="dayGridMonth"
+        events={events}
+        datesSet={getCurrentYearMonth}
+        eventContent={renderEventContent}
+      />
     </div>
   );
 };
