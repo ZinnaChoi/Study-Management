@@ -11,6 +11,7 @@ const AbsentSchedule = () => {
   const [schedules, setSchedules] = useState([]);
   const [scheduleColors, setScheduleColors] = useState({});
   const [currentYearMonth, setCurrentYearMonth] = useState("");
+  const [prevYearMonth, setPrevYearMonth] = useState("");
 
   const getRandomPastelColor = () => {
     return `hsl(${360 * Math.random()}, 70%, 80%)`;
@@ -31,54 +32,55 @@ const AbsentSchedule = () => {
       month = start.getMonth() + 1;
     }
     const formattedMonth = month < 10 ? `0${month}` : month;
-    console.log(year);
-    console.log(formattedMonth);
     setCurrentYearMonth(`${year}${formattedMonth}`);
   };
 
   useEffect(() => {
-    const requestBody = {
-      sendDate: getCurrentDateTime(),
-      systemId: "STUDY_0001",
-    };
+    if (currentYearMonth !== prevYearMonth) {
+      const requestBody = {
+        sendDate: getCurrentDateTime(),
+        systemId: "STUDY_0001",
+      };
 
-    const absentRequestBody = {
-      sendDate: getCurrentDateTime(),
-      systemId: "STUDY_0001",
-      yearMonth: currentYearMonth,
-    };
+      const absentRequestBody = {
+        ...requestBody,
+        yearMonth: currentYearMonth,
+      };
 
-    Promise.all([
-      authClient.get("/schedules", { params: requestBody }),
-      authClient.get("/absent/calendar", { params: absentRequestBody }),
-    ])
-      .then(([schedulesResponse, absentResponse]) => {
-        const sortedSchedules = schedulesResponse.data.registedSchedules.sort(
-          (a, b) => a.startTime.localeCompare(b.startTime)
-        );
-        setSchedules(sortedSchedules);
+      Promise.all([
+        authClient.get("/schedules", { params: requestBody }),
+        authClient.get("/absent/calendar", { params: absentRequestBody }),
+      ])
+        .then(([schedulesResponse, absentResponse]) => {
+          const sortedSchedules = schedulesResponse.data.registedSchedules.sort(
+            (a, b) => a.startTime.localeCompare(b.startTime)
+          );
+          setSchedules(sortedSchedules);
 
-        const newScheduleColors = { ...scheduleColors };
-        sortedSchedules.forEach((schedule) => {
-          if (!newScheduleColors[schedule.scheduleName]) {
-            newScheduleColors[schedule.scheduleName] = getRandomPastelColor();
-          }
+          const newScheduleColors = { ...scheduleColors };
+          sortedSchedules.forEach((schedule) => {
+            if (!newScheduleColors[schedule.scheduleName]) {
+              newScheduleColors[schedule.scheduleName] = getRandomPastelColor();
+            }
+          });
+          setScheduleColors(newScheduleColors);
+
+          const newEvents = absentResponse.data.content.map((absentInfo) => ({
+            title: absentInfo.memberNameList.join(", "),
+            start: absentInfo.absentDate,
+            backgroundColor: newScheduleColors[absentInfo.scheduleName],
+            borderColor: newScheduleColors[absentInfo.scheduleName],
+            display: "block",
+          }));
+          setEvents(newEvents);
+
+          setPrevYearMonth(currentYearMonth);
+        })
+        .catch((error) => {
+          console.error("데이터 조회 실패:", error);
         });
-        setScheduleColors(newScheduleColors);
-
-        const newEvents = absentResponse.data.content.map((absentInfo) => ({
-          title: absentInfo.memberNameList.join(", "),
-          start: absentInfo.absentDate,
-          backgroundColor: newScheduleColors[absentInfo.scheduleName],
-          borderColor: newScheduleColors[absentInfo.scheduleName],
-          display: "block",
-        }));
-        setEvents(newEvents);
-      })
-      .catch((error) => {
-        console.error("데이터 조회 실패:", error);
-      });
-  }, [currentYearMonth, scheduleColors]);
+    }
+  }, [currentYearMonth, scheduleColors, prevYearMonth]);
 
   const containerStyle = {
     display: "flex",
