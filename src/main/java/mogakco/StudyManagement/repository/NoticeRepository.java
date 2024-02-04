@@ -25,4 +25,13 @@ public interface NoticeRepository extends JpaRepository<Notice, Long> {
     @Query("SELECT n.member.memberId FROM Notice n ORDER BY n.lastShareDate ASC, n.member.memberId DESC")
     List<Long> findLastShareDateByMemberId();
 
+    @Query("SELECT n.member.memberId FROM Notice n WHERE n.absent = true")
+    List<Long> findMemberIdByAbsentIsTrue();
+
+    @Query("SELECT n.member.memberId FROM Notice n WHERE n.newPost = true")
+    List<Long> findByNewPostTrue();
+
+    @Query("SELECT n.member.memberId FROM Notice n WHERE n.wakeup = true")
+    List<Long> findByWakeupTrue();
+
 }

@@ -1,20 +1,20 @@
 package mogakco.StudyManagement.service.external;
 
-import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
-import mogakco.StudyManagement.enums.MessageType;
-
-import org.springframework.beans.factory.annotation.Value;
-
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import java.util.Properties;
 
+import mogakco.StudyManagement.enums.MessageType;
+
 @RequiredArgsConstructor
-@Component
-public class EmailService {
+@Service
+
+public class SendEmailService {
 
     @Value("${email.username}")
     private String username;
@@ -47,8 +47,10 @@ public class EmailService {
 
             Transport.send(message);
 
+            System.out.println("알림 이메일이 전송되었습니다.");
+
         } catch (MessagingException e) {
-            e.printStackTrace();
+            System.out.println("알림 이메일 전송에 실패하였습니다." + e.getMessage());
         }
     }
 
@@ -56,7 +58,7 @@ public class EmailService {
         switch (messageType) {
             case GENERAL:
                 return String.format(
-                        "안녕하세요 %s님! \n10분 뒤 시작할 스터디를 위해 구글 미트를 생성해주세요. \n https://meet.google.com/iai-womn-bcb?ec=asw-meet-hero-startmeeting",
+                        "안녕하세요 %s님! \n \n 10분 뒤 시작할 스터디를 위해 구글 미트 화상 회의를 생성해 멤버들에게 공유해주세요. \n https://meet.google.com/iai-womn-bcb?ec=asw-meet-hero-startmeeting \n \n 참가자가 2인 이상인 경우, 한 시간 뒤 회의가 종료되오니 새 회의를 만들어주세요.",
                         memberName);
             case NEW_POST:
                 return String.format("%s님의 새 글이 등록되었습니다.", memberName);
@@ -68,5 +70,4 @@ public class EmailService {
                 return "";
         }
     }
-
 }

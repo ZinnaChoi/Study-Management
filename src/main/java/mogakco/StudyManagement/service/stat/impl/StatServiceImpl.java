@@ -3,6 +3,7 @@ package mogakco.StudyManagement.service.stat.impl;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,8 +19,10 @@ import mogakco.StudyManagement.enums.ErrorCode;
 import mogakco.StudyManagement.exception.InvalidRequestException;
 import mogakco.StudyManagement.exception.NotFoundException;
 import mogakco.StudyManagement.enums.LogType;
+import mogakco.StudyManagement.enums.MessageType;
 import mogakco.StudyManagement.repository.StatRepository;
 import mogakco.StudyManagement.service.common.LoggingService;
+import mogakco.StudyManagement.service.notice.NoticeService;
 import mogakco.StudyManagement.service.stat.StatService;
 import mogakco.StudyManagement.util.DateUtil;
 import mogakco.StudyManagement.util.ExceptionUtil;
@@ -65,6 +68,9 @@ public class StatServiceImpl implements StatService {
 
     @Value("${study.systemId}")
     protected String systemId;
+
+    @Autowired
+    NoticeService noticeService;
 
     @Override
     public StatGetRes getStat(LogType type, LoggingService lo, Pageable pageable) {
@@ -165,6 +171,8 @@ public class StatServiceImpl implements StatService {
             lo.setDBStart();
             dailyLogRepository.save(newLog);
             lo.setDBEnd();
+
+            noticeService.createSpecificNotice(member, MessageType.WAKE_UP, lo);
 
             return new DTOResCommon(systemId, ErrorCode.OK.getCode(), "기상 로그 업데이트가 성공적으로 완료되었습니다.");
         } catch (NotFoundException | InvalidRequestException e) {

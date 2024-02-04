@@ -28,7 +28,7 @@ import mogakco.StudyManagement.repository.MemberScheduleRepository;
 import mogakco.StudyManagement.repository.NoticeRepository;
 import mogakco.StudyManagement.repository.ScheduleRepository;
 import mogakco.StudyManagement.service.common.LoggingService;
-import mogakco.StudyManagement.service.external.EmailService;
+import mogakco.StudyManagement.service.external.SendEmailService;
 import mogakco.StudyManagement.service.notice.NoticeService;
 import mogakco.StudyManagement.util.DateUtil;
 import mogakco.StudyManagement.util.ExceptionUtil;
@@ -60,7 +60,7 @@ public class NoticeServiceImpl implements NoticeService {
     protected String systemId;
 
     @Autowired
-    EmailService emailService;
+    SendEmailService sendEmailService;
 
     @Override
     public NoticeGetRes getNotice(Long memberId, LoggingService lo) {
@@ -153,7 +153,7 @@ public class NoticeServiceImpl implements NoticeService {
 
                     Boolean linkShareValue = noticeRepository.findByMember_MemberId(notifier).get().getLinkShare();
                     if (linkShareValue != null && linkShareValue) {
-                        emailService.sendEmail(notifierMember.get().getName(), MessageType.GENERAL,
+                        sendEmailService.sendEmail(notifierMember.get().getName(), MessageType.GENERAL,
                                 notifierMember.get().getContact());
                         lo.setDBStart();
                     }
@@ -187,6 +187,36 @@ public class NoticeServiceImpl implements NoticeService {
         }
 
         return null;
+    }
+
+    public void createSpecificNotice(Member member, MessageType type, LoggingService lo) {
+
+        List<Long> targetedMembers = new ArrayList<>();
+        try {
+
+            switch (type) {
+                case ABSENT:
+                    targetedMembers = noticeRepository.findMemberIdByAbsentIsTrue();
+                    break;
+                case NEW_POST:
+                    targetedMembers = noticeRepository.findByNewPostTrue();
+                    break;
+                case WAKE_UP:
+                    targetedMembers = noticeRepository.findByWakeupTrue();
+                    break;
+                default:
+                    break;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        for (Long targetedMemberId : targetedMembers) {
+
+            Optional<Member> mmember = memberRepository.findById(targetedMemberId);
+            sendEmailService.sendEmail(member.getName(), type, mmember.get().getContact());
+        }
+
     }
 
 }
