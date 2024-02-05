@@ -33,6 +33,7 @@ import mogakco.StudyManagement.dto.MemberInfo;
 import mogakco.StudyManagement.dto.MemberInfoRes;
 import mogakco.StudyManagement.dto.MemberInfoUpdateReq;
 import mogakco.StudyManagement.dto.MemberJoinReq;
+import mogakco.StudyManagement.dto.MemberListRes;
 import mogakco.StudyManagement.dto.MemberLoginReq;
 import mogakco.StudyManagement.dto.MemberLoginRes;
 import mogakco.StudyManagement.dto.RegistedSchedule;
@@ -207,7 +208,7 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
     }
 
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public MemberInfoRes getMemberInfo(LoggingService lo) {
         MemberInfoRes result = new MemberInfoRes();
 
@@ -238,6 +239,17 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
 
         return result;
 
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public MemberListRes getMemberList(LoggingService lo) {
+
+        lo.setDBStart();
+        List<Member> content = memberRepository.findAll();
+        lo.setDBEnd();
+
+        return new MemberListRes(systemId, ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), content);
     }
 
     @Override
