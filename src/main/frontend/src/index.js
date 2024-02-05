@@ -4,7 +4,7 @@ import ReactDOM from "react-dom/client";
 import Header from "./layout/Header";
 import Footer from "./layout/Footer";
 import NotFound from "./NotFound";
-import AbsentSchedule from "./pages/absent-schedule/AbsentSchedule";
+import AbsentSchedule from "./pages/absent-schedule/AbsentSchedulePage";
 import MyPage from "./pages/my-page/MyPage";
 import NoticeBoard from "./pages/notice-board/NoticeBoard";
 import AttendanceStatistics from "./pages/study/AttendanceStatistics";

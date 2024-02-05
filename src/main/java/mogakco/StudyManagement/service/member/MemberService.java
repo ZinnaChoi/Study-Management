@@ -9,6 +9,7 @@ import mogakco.StudyManagement.dto.MemberIdDuplReq;
 import mogakco.StudyManagement.dto.MemberInfoRes;
 import mogakco.StudyManagement.dto.MemberInfoUpdateReq;
 import mogakco.StudyManagement.dto.MemberJoinReq;
+import mogakco.StudyManagement.dto.MemberListRes;
 import mogakco.StudyManagement.dto.MemberLoginReq;
 import mogakco.StudyManagement.dto.MemberLoginRes;
 import mogakco.StudyManagement.dto.RegistedScheduleRes;
@@ -28,6 +29,8 @@ public interface MemberService {
     boolean isIdDuplicated(MemberIdDuplReq idInfo, LoggingService lo);
 
     MemberInfoRes getMemberInfo(LoggingService lo);
+
+    MemberListRes getMemberList(LoggingService lo);
 
     DTOResCommon setMemberInfo(MemberInfoUpdateReq updateInfo, LoggingService lo);
 

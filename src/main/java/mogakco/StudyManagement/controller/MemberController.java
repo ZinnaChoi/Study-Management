@@ -25,6 +25,7 @@ import mogakco.StudyManagement.dto.MemberIdDuplRes;
 import mogakco.StudyManagement.dto.MemberInfoRes;
 import mogakco.StudyManagement.dto.MemberInfoUpdateReq;
 import mogakco.StudyManagement.dto.MemberJoinReq;
+import mogakco.StudyManagement.dto.MemberListRes;
 import mogakco.StudyManagement.dto.MemberLoginReq;
 import mogakco.StudyManagement.dto.MemberLoginRes;
 import mogakco.StudyManagement.dto.RegistedScheduleRes;
@@ -140,6 +141,24 @@ public class MemberController extends CommonController {
         }
         return result;
 
+    }
+
+    @Operation(summary = "회원 목록 조회", description = "스터디에 가입한 회원 목록 조회")
+    @SecurityRequirement(name = "bearer-key")
+    @GetMapping("/members")
+    public MemberListRes getMemberList(HttpServletRequest request, @Valid @ModelAttribute DTOReqCommon info) {
+        MemberListRes result = new MemberListRes();
+        try {
+            startAPI(lo, info);
+            result = memberService.getMemberList(lo);
+            result.setSendDate(info.getSendDate());
+        } catch (Exception e) {
+            result = new MemberListRes(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
+                    ErrorCode.INTERNAL_ERROR.getMessage(), null);
+        } finally {
+            endAPI(request, findErrorCodeByCode(result.getRetCode()), lo, result);
+        }
+        return result;
     }
 
     @Operation(summary = "MyPage 회원 정보변경", description = "로그인된 회원 정보 변경(이름 or 스터디 시간 or 기상 시간 or 비밀번호)")
