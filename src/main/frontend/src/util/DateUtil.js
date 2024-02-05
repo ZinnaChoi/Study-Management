@@ -1,6 +1,19 @@
+export const format = (num, length = 2) => String(num).padStart(length, "0");
+
+export const getCurrentYearMonth = (dateInfo) => {
+  const start = new Date(dateInfo.start);
+  let year = start.getFullYear();
+  let month =
+    start.getDate() > 20 ? start.getMonth() + 2 : start.getMonth() + 1;
+  if (month === 13) {
+    month = 1;
+    year++;
+  }
+  return `${year}${format(month)}`;
+};
+
 export const getCurrentDateTime = () => {
   const now = new Date();
-  const format = (num, length = 2) => String(num).padStart(length, "0");
 
   const year = now.getFullYear();
   const month = format(now.getMonth() + 1);

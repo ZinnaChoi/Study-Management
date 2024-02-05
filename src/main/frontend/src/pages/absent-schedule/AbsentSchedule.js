@@ -4,7 +4,7 @@ import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import { authClient } from "../../services/APIService";
-import { getCurrentDateTime } from "../../util/DateUtil";
+import { getCurrentDateTime, getCurrentYearMonth } from "../../util/DateUtil";
 
 // 부재 일정 화면
 const AbsentSchedule = () => {
@@ -28,17 +28,9 @@ const AbsentSchedule = () => {
     }%)`;
   };
 
-  const getCurrentYearMonth = (dateInfo) => {
-    const start = new Date(dateInfo.start);
-    let year = start.getFullYear();
-    let month =
-      start.getDate() > 20 ? start.getMonth() + 2 : start.getMonth() + 1;
-    if (month === 13) {
-      month = 1;
-      year++;
-    }
-    const formattedMonth = month < 10 ? `0${month}` : `${month}`;
-    setCurrentYearMonth(`${year}${formattedMonth}`);
+  const getYearMonth = (dateInfo) => {
+    const newYearMonth = getCurrentYearMonth(dateInfo);
+    setCurrentYearMonth(newYearMonth);
   };
 
   function handleCheckboxChange(memberName) {
@@ -154,7 +146,7 @@ const AbsentSchedule = () => {
           plugins={[dayGridPlugin, interactionPlugin]}
           initialView="dayGridMonth"
           events={events}
-          datesSet={getCurrentYearMonth}
+          datesSet={getYearMonth}
           eventContent={renderEventContent}
         />
       </div>
