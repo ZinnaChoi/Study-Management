@@ -2,11 +2,13 @@ package mogakco.StudyManagement.controller;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -57,7 +59,7 @@ public class NoticeController extends CommonController {
     @Operation(summary = "알림 상태 수정", description = "개인별 알림 수신 여부 상태 수정")
     @SecurityRequirement(name = "bearer-key")
     @PatchMapping(value = "/notice/{memberId}")
-    public DTOResCommon updateStudy(HttpServletRequest request,
+    public DTOResCommon updateNotice(HttpServletRequest request,
             @PathVariable(name = "memberId", required = true) Long memberId,
             @RequestBody @Valid NoticeReq noticeReq) {
         DTOResCommon result = new DTOResCommon();
@@ -77,4 +79,24 @@ public class NoticeController extends CommonController {
 
         return result;
     }
+
+    @Operation(summary = "구글 미트 생성 알림", description = "모니터링 작업을 통해 스터디 시작 10분 전 구글 미트 생성 알림 전송")
+    @PostMapping("/notice/general")
+    @Hidden
+    // ScheduleStartTimeMonitoring.java 내 스케줄링의 기능 확인용 이므로 Hidden처리함.
+    public DTOResCommon createGeneralNotice(HttpServletRequest request) {
+
+        DTOResCommon result = new DTOResCommon();
+        try {
+            startAPI(lo, null);
+            result = noticeService.createGeneralNotice(lo);
+        } catch (Exception e) {
+            result = new DTOResCommon(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
+                    ErrorCode.INTERNAL_ERROR.getMessage());
+        } finally {
+            endAPI(request, findErrorCodeByCode(result.getRetCode()), lo, result);
+        }
+        return result;
+    }
+
 }
