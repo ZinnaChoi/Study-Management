@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import qs from "qs";
 import { authClient } from "../../services/APIService";
 import { getCurrentDateTime, getCurrentYearMonth } from "../../util/DateUtil";
-import MemberCheckbox from "./MemberCheckbox";
+import MemberCheckbox from "../../components/MemberCheckbox";
 import AbsentCalendar from "./AbsentCalendar";
 
 const AbsentSchedule = () => {
