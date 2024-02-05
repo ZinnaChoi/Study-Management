@@ -20,9 +20,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import mogakco.StudyManagement.batch.AbsentScheduleBatch;
 import mogakco.StudyManagement.dto.DTOReqCommon;
 import mogakco.StudyManagement.enums.LogType;
+import mogakco.StudyManagement.scheduler.DailyAbsentScheduler;
 import mogakco.StudyManagement.service.common.LoggingService;
 import mogakco.StudyManagement.service.stat.StatService;
 import mogakco.StudyManagement.util.DateUtil;
@@ -153,15 +153,17 @@ public class StatControllerTest {
 
     @Test
     @DisplayName("부재 로그 배치 작업 성공")
-    public void executeDailyBatch() {
+    public void executeDailyLog() {
         StatService statServiceMock = Mockito.mock(StatService.class);
+        LoggingService loggingServiceMock = Mockito.mock(LoggingService.class);
 
-        AbsentScheduleBatch absentScheduleBatch = new AbsentScheduleBatch(statServiceMock);
+        DailyAbsentScheduler dailyAbsentScheduler = new DailyAbsentScheduler(statServiceMock, loggingServiceMock);
 
-        absentScheduleBatch.executeDailyBatch();
+        dailyAbsentScheduler.executeDailyLog();
 
-        verify(statServiceMock, times(1)).createAbsentLog(null);
+        verify(statServiceMock, times(1)).createAbsentLog(loggingServiceMock);
     }
+
     ////////////////////////////////////////////////////////
 
     @Test

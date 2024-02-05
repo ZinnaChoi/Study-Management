@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 import java.util.Map;
 import java.util.HashMap;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,6 +27,7 @@ import mogakco.StudyManagement.dto.AbsentDetailRes;
 import mogakco.StudyManagement.dto.AbsentReq;
 import mogakco.StudyManagement.dto.DTOResCommon;
 import mogakco.StudyManagement.enums.ErrorCode;
+import mogakco.StudyManagement.enums.MessageType;
 import mogakco.StudyManagement.repository.AbsentScheduleRepository;
 import mogakco.StudyManagement.repository.MemberRepository;
 import mogakco.StudyManagement.repository.MemberScheduleRepository;
@@ -36,6 +38,7 @@ import mogakco.StudyManagement.exception.InvalidRequestException;
 import mogakco.StudyManagement.exception.NotFoundException;
 import mogakco.StudyManagement.service.absent.AbsentService;
 import mogakco.StudyManagement.service.common.LoggingService;
+import mogakco.StudyManagement.service.notice.NoticeService;
 import mogakco.StudyManagement.util.DateUtil;
 
 import mogakco.StudyManagement.util.ExceptionUtil;
@@ -57,6 +60,9 @@ public class AbsentServiceImpl implements AbsentService {
         this.memberScheduleRepository = memberScheduleRepository;
         this.absentScheduleRepository = absentScheduleRepository;
     }
+
+    @Autowired
+    NoticeService noticeService;
 
     @Override
     @Transactional
@@ -108,6 +114,8 @@ public class AbsentServiceImpl implements AbsentService {
                 absentScheduleRepository.save(absentSchedule);
                 lo.setDBEnd();
             }
+            noticeService.createSpecificNotice(member, MessageType.ABSENT, lo);
+
             return new DTOResCommon(null, ErrorCode.CREATED.getCode(), ErrorCode.CREATED.getMessage("부재 일정"));
         } catch (NotFoundException | InvalidRequestException | ConflictException e) {
             return ExceptionUtil.handleException(e);

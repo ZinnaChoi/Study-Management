@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -22,6 +23,8 @@ import mogakco.StudyManagement.dto.PostList;
 import mogakco.StudyManagement.dto.PostListReq;
 import mogakco.StudyManagement.dto.PostListRes;
 import mogakco.StudyManagement.enums.ErrorCode;
+
+import mogakco.StudyManagement.enums.MessageType;
 import mogakco.StudyManagement.enums.PostSearchType;
 import mogakco.StudyManagement.exception.NotFoundException;
 import mogakco.StudyManagement.exception.UnauthorizedAccessException;
@@ -31,6 +34,8 @@ import mogakco.StudyManagement.repository.PostLikeRepository;
 import mogakco.StudyManagement.repository.PostRepository;
 import mogakco.StudyManagement.repository.spec.PostSpecification;
 import mogakco.StudyManagement.service.common.LoggingService;
+
+import mogakco.StudyManagement.service.notice.NoticeService;
 import mogakco.StudyManagement.service.post.PostCommonService;
 import mogakco.StudyManagement.service.post.PostService;
 import mogakco.StudyManagement.util.DateUtil;
@@ -50,6 +55,9 @@ public class PostServiceImpl extends PostCommonService implements PostService {
         this.postLikeRepository = postLikeRepository;
     }
 
+    @Autowired
+    NoticeService noticeService;
+
     @Override
     @Transactional
     public void createPost(PostReq postCreateReq, LoggingService lo) {
@@ -64,6 +72,8 @@ public class PostServiceImpl extends PostCommonService implements PostService {
         lo.setDBStart();
         postRepository.save(post);
         lo.setDBEnd();
+
+        noticeService.createSpecificNotice(member, MessageType.NEW_POST, lo);
     }
 
     @Override
