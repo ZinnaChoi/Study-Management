@@ -16,10 +16,23 @@ const AbsentSchedule = () => {
   const [colorMap, setColorMap] = useState({});
 
   useEffect(() => {
-    // TODO: Call MemberList
-    const memberNames = ["지나", "엠마"];
-    setMembersList(memberNames);
-    setSelectedMembers(memberNames);
+    const params = {
+      sendDate: getCurrentDateTime(),
+      systemId: "STUDY_0001",
+    };
+    authClient
+      .get("/members", { params: params })
+      .then((response) => {
+        const memberNames = response.data.content
+          .filter((member) => member.id !== "admin")
+          .map((member) => member.name);
+
+        setMembersList(memberNames);
+        setSelectedMembers(memberNames);
+      })
+      .catch((error) => {
+        console.error("스터디원 목록 조회 실패:", error);
+      });
   }, []);
 
   const getRandomPastelColor = () => {
