@@ -61,6 +61,7 @@ public class MemberControllerTest {
     private static final String JOIN_URL = "/api/v1/join";
     private static final String ID_DUPLICATED_CHECK_URL = "/api/v1/join/check-id";
     private static final String MEMBER_INFO_URL = "/api/v1/member";
+    private static final String MEMEBER_LIST_URL = "/api/v1/members";
     private static final String MEMBERS_INFO_BY_SCHEDULE_URL = "/api/v1/members/schedule-name";
     private static final String MEMBERS_INFO_BY_WAKEUP_URL = "/api/v1/members/wakeup-time";
     private static final String GET_SCHEDULES_URL = "/api/v1/schedules";
@@ -259,7 +260,19 @@ public class MemberControllerTest {
         MvcResult result = TestUtil.performRequest(mockMvc, uriBuilder.toUriString(), null, "GET", 400, 400);
         assertEquals(400, result.getResponse().getStatus());
     }
+    /////////////////////////////////////////////////////////////////
 
+    @Test
+    @WithMockUser(username = "admin", authorities = { "ADMIN" })
+    @DisplayName("회원 목록 조회 성공")
+    public void getMemberList_Success() throws Exception {
+        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(MEMEBER_LIST_URL);
+
+        uriBuilder.queryParam("sendDate", DateUtil.getCurrentDateTime())
+                .queryParam("systemId", "SYS_01");
+
+        TestUtil.performRequest(mockMvc, uriBuilder.toUriString(), null, "GET", 200, 200);
+    }
     /////////////////////////////////////////////////////////////////
 
     @Test
