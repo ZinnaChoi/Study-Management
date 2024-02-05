@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from "react";
 import qs from "qs";
-import FullCalendar from "@fullcalendar/react";
-import dayGridPlugin from "@fullcalendar/daygrid";
-import interactionPlugin from "@fullcalendar/interaction";
 import { authClient } from "../../services/APIService";
 import { getCurrentDateTime, getCurrentYearMonth } from "../../util/DateUtil";
+import MemberCheckbox from "./MemberCheckbox";
+import AbsentCalendar from "./AbsentCalendar";
 
-// 부재 일정 화면
 const AbsentSchedule = () => {
   const [events, setEvents] = useState([]);
   const [membersList, setMembersList] = useState([]);
@@ -58,37 +56,30 @@ const AbsentSchedule = () => {
     });
   }
 
-  const renderCheckboxes = () => {
-    return membersList.map((memberName) => (
-      <div key={memberName}>
-        <label>
-          <input
-            type="checkbox"
-            checked={selectedMembers.includes(memberName)}
-            onChange={() => handleCheckboxChange(memberName)}
-          />
-          {memberName}
-        </label>
-      </div>
-    ));
-  };
+  function renderEventContent(eventInfo) {
+    return (
+      <>
+        <div style={{ color: "black" }}>{eventInfo.event.title}</div>
+      </>
+    );
+  }
 
   useEffect(() => {
     if (
       currentYearMonth &&
       (currentYearMonth !== prevYearMonth || selectedMembers.length > 0)
     ) {
-      const requestBody = {
+      const params = {
         sendDate: getCurrentDateTime(),
         systemId: "STUDY_0001",
         yearMonth: currentYearMonth,
         memberNameList: selectedMembers,
       };
 
-      const queryString = qs.stringify(requestBody, { arrayFormat: "repeat" });
-
       authClient
-        .get("/absent/calendar?" + queryString)
+        .get(
+          "/absent/calendar?" + qs.stringify(params, { arrayFormat: "repeat" })
+        )
         .then((absentResponse) => {
           const newColorMap = absentResponse.data.content.reduce(
             (map, absentInfo) => {
@@ -152,27 +143,21 @@ const AbsentSchedule = () => {
     <div style={containerStyle}>
       <div style={checkboxContainerStyle}>
         <h3>스터디원 선택</h3>
-        {renderCheckboxes()}
+        <MemberCheckbox
+          membersList={membersList}
+          selectedMembers={selectedMembers}
+          onCheckboxChange={handleCheckboxChange}
+        />
       </div>
       <div style={calendarContainerStyle}>
-        <FullCalendar
-          plugins={[dayGridPlugin, interactionPlugin]}
-          initialView="dayGridMonth"
+        <AbsentCalendar
           events={events}
-          datesSet={getYearMonth}
-          eventContent={renderEventContent}
+          getYearMonth={getYearMonth}
+          renderEventContent={renderEventContent}
         />
       </div>
     </div>
   );
 };
-
-function renderEventContent(eventInfo) {
-  return (
-    <>
-      <div style={{ color: "black" }}>{eventInfo.event.title}</div>
-    </>
-  );
-}
 
 export default AbsentSchedule;
