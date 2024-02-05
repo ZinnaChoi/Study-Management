@@ -3,6 +3,14 @@ import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
 
 const AbsentCalendar = ({ events, getYearMonth, renderEventContent }) => {
+  function renderEventContent(eventInfo) {
+    return (
+      <>
+        <div style={{ color: "black" }}>{eventInfo.event.title}</div>
+      </>
+    );
+  }
+
   return (
     <FullCalendar
       plugins={[dayGridPlugin, interactionPlugin]}

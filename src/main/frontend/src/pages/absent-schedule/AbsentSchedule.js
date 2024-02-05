@@ -13,6 +13,17 @@ const AbsentSchedule = () => {
   const [prevYearMonth, setPrevYearMonth] = useState("");
   const [colorMap, setColorMap] = useState({});
 
+  const getRandomPastelColor = () => {
+    return `hsl(${360 * Math.random()}, ${25 + 70 * Math.random()}%, ${
+      85 + 10 * Math.random()
+    }%)`;
+  };
+
+  const getYearMonth = (dateInfo) => {
+    const newYearMonth = getCurrentYearMonth(dateInfo);
+    setCurrentYearMonth(newYearMonth);
+  };
+
   useEffect(() => {
     const params = {
       sendDate: getCurrentDateTime(),
@@ -32,37 +43,6 @@ const AbsentSchedule = () => {
         console.error("스터디원 목록 조회 실패:", error);
       });
   }, []);
-
-  const getRandomPastelColor = () => {
-    return `hsl(${360 * Math.random()}, ${25 + 70 * Math.random()}%, ${
-      85 + 10 * Math.random()
-    }%)`;
-  };
-
-  const getYearMonth = (dateInfo) => {
-    const newYearMonth = getCurrentYearMonth(dateInfo);
-    setCurrentYearMonth(newYearMonth);
-  };
-
-  function handleCheckboxChange(memberName) {
-    setSelectedMembers((prev) => {
-      const newSelectedMembers = prev.includes(memberName)
-        ? prev.filter((name) => name !== memberName)
-        : [...prev, memberName];
-      if (newSelectedMembers.length === 0) {
-        setEvents([]);
-      }
-      return newSelectedMembers;
-    });
-  }
-
-  function renderEventContent(eventInfo) {
-    return (
-      <>
-        <div style={{ color: "black" }}>{eventInfo.event.title}</div>
-      </>
-    );
-  }
 
   useEffect(() => {
     if (
@@ -146,15 +126,11 @@ const AbsentSchedule = () => {
         <MemberCheckbox
           membersList={membersList}
           selectedMembers={selectedMembers}
-          onCheckboxChange={handleCheckboxChange}
+          setSelectedMembers={setSelectedMembers}
         />
       </div>
       <div style={calendarContainerStyle}>
-        <AbsentCalendar
-          events={events}
-          getYearMonth={getYearMonth}
-          renderEventContent={renderEventContent}
-        />
+        <AbsentCalendar events={events} getYearMonth={getYearMonth} />
       </div>
     </div>
   );
