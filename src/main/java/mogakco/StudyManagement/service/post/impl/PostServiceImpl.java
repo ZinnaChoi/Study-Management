@@ -81,18 +81,25 @@ public class PostServiceImpl extends PostCommonService implements PostService {
 
         String searchKeyWord = postListReq.getSearchKeyWord().trim();
         Specification<Post> spec;
+        Page<Post> posts;
 
-        if (postListReq.getSearchType() == PostSearchType.TITLE) {
-            spec = PostSpecification.withTitleContaining(searchKeyWord);
-        } else {
+        if (searchKeyWord.length() == 0) {
             lo.setDBStart();
-            List<Member> members = memberRepository.findByNameContaining(searchKeyWord);
+            posts = postRepository.findAll(pageable);
             lo.setDBEnd();
-            spec = PostSpecification.withMemberIn(members);
+        } else {
+            if (postListReq.getSearchType() == PostSearchType.TITLE) {
+                spec = PostSpecification.withTitleContaining(searchKeyWord);
+            } else {
+                lo.setDBStart();
+                List<Member> members = memberRepository.findByNameContaining(searchKeyWord);
+                lo.setDBEnd();
+                spec = PostSpecification.withMemberIn(members);
+            }
+            lo.setDBStart();
+            posts = postRepository.findAll(spec, pageable);
+            lo.setDBEnd();
         }
-        lo.setDBStart();
-        Page<Post> posts = postRepository.findAll(spec, pageable);
-        lo.setDBEnd();
 
         List<PostList> postLists = posts.getContent().stream()
                 .map(post -> {
