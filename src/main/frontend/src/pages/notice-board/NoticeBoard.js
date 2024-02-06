@@ -12,38 +12,57 @@ const NoticeBoard = () => {
   const [searchType, setSearchType] = useState("MEMBER");
   const [searchKeyword, setSearchKeyword] = useState("");
 
-  const fetchPosts = async (page, size, searchType, searchKeyWord) => {
+  const fetchPosts = (
+    currentPage = page,
+    currentSize = size,
+    currentSearchType = searchType,
+    currentSearchKeyword = searchKeyword
+  ) => {
     const params = {
       sendDate: getCurrentDateTime(),
       systemId: "STUDY_0001",
-      page,
-      size,
+      page: currentPage,
+      size: currentSize,
       sort: "postId,desc",
-      searchType,
-      searchKeyWord,
+      searchType: currentSearchType,
+      searchKeyWord: currentSearchKeyword,
     };
 
-    try {
-      const response = await authClient.get("/posts", { params });
-      setPosts(response.data.content);
-      setPage(response.data.pageable.page);
-      setSize(response.data.pageable.size);
-      setTotalPages(response.data.pageable.totalPages);
-    } catch (error) {
-      console.error("게시판 목록 조회 실패:", error);
-    }
+    authClient
+      .get("/posts", { params })
+      .then((response) => {
+        if (response && response.data) {
+          setPosts(response.data.content);
+          setPage(response.data.pageable.page);
+          setSize(response.data.pageable.size);
+          setTotalPages(response.data.pageable.totalPages);
+        }
+      })
+      .catch((error) => {
+        alert(
+          "게시판 목록 조회 실패: " +
+            (error.response?.data.retMsg || "Unknown error")
+        );
+      });
   };
 
   useEffect(() => {
-    fetchPosts(page, size, searchType, searchKeyword);
-  }, [page, size, searchType, searchKeyword]);
+    fetchPosts();
+  }, []);
 
   const handleSearch = () => {
     fetchPosts(page, size, searchType, searchKeyword);
   };
 
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      fetchPosts(page, size, searchType, searchKeyword);
+    }
+  };
+
   const handlePageChange = (newPage) => {
     setPage(newPage);
+    fetchPosts(newPage, size, searchType, searchKeyword);
   };
 
   const containerStyle = {
@@ -140,6 +159,7 @@ const NoticeBoard = () => {
           type="text"
           value={searchKeyword}
           onChange={(e) => setSearchKeyword(e.target.value)}
+          onKeyDown={handleKeyDown}
           style={inputStyle}
         />
         <button onClick={handleSearch} style={searchButtonStyle}>
