@@ -32,9 +32,21 @@ const NoticeBoard = () => {
     }
   };
 
+  const parseDate = (dateString) => {
+    const year = parseInt(dateString.substring(0, 4), 10);
+    const month = parseInt(dateString.substring(4, 6), 10) - 1;
+    const day = parseInt(dateString.substring(6, 8), 10);
+    const hour = parseInt(dateString.substring(8, 10), 10);
+    const minute = parseInt(dateString.substring(10, 12), 10);
+    const second = parseInt(dateString.substring(12, 14), 10);
+    const millisecond = parseInt(dateString.substring(14, 17), 10);
+
+    return new Date(year, month, day, hour, minute, second, millisecond);
+  };
+
   useEffect(() => {
-    fetchPosts(page, size, "", "");
-  }, []);
+    fetchPosts(page, size, searchType, searchKeyword);
+  }, [page, size, searchType, searchKeyword]);
 
   const handleSearch = () => {
     fetchPosts(page, size, searchType, searchKeyword);
@@ -44,17 +56,34 @@ const NoticeBoard = () => {
     setPage(newPage);
   };
 
-  // 인라인 스타일 선언
   const containerStyle = {
     padding: "30px",
     minHeight: "100vh",
     justifyContent: "center",
   };
 
+  const selectAndInputBaseStyle = {
+    marginRight: "5px",
+    padding: "5px 10px",
+    borderRadius: "5px",
+  };
+
   const searchAndTableContainerStyle = {
+    display: "flex",
+    justifyContent: "space-between",
     width: "100%",
-    maxWidth: "1200px",
-    marginBottom: "20px",
+    minHeight: "50px",
+    marginBottom: "10px",
+  };
+
+  const selectStyle = {
+    flex: "1",
+    ...selectAndInputBaseStyle,
+  };
+
+  const inputStyle = {
+    flex: "8",
+    ...selectAndInputBaseStyle,
   };
 
   const tableStyle = {
@@ -64,7 +93,7 @@ const NoticeBoard = () => {
   };
 
   const thStyle = {
-    backgroundColor: "#004085",
+    backgroundColor: "#375582",
     color: "white",
     padding: "10px",
     border: "1px solid #dee2e6",
@@ -81,9 +110,19 @@ const NoticeBoard = () => {
     padding: "5px 10px",
     border: "none",
     borderRadius: "5px",
-    backgroundColor: "#004085",
+    backgroundColor: "#375582",
     color: "white",
     cursor: "pointer",
+  };
+
+  const searchButtonStyle = {
+    flex: "0.5",
+    ...buttonStyle,
+  };
+
+  const addButtonStyle = {
+    flex: "0.5",
+    ...buttonStyle,
   };
 
   const paginationContainerStyle = {
@@ -98,6 +137,7 @@ const NoticeBoard = () => {
         <select
           value={searchType}
           onChange={(e) => setSearchType(e.target.value)}
+          style={selectStyle}
         >
           <option value="MEMBER">작성자</option>
           <option value="TITLE">제목</option>
@@ -106,16 +146,17 @@ const NoticeBoard = () => {
           type="text"
           value={searchKeyword}
           onChange={(e) => setSearchKeyword(e.target.value)}
+          style={inputStyle}
         />
-        <button onClick={handleSearch} style={buttonStyle}>
+        <button onClick={handleSearch} style={searchButtonStyle}>
           검색
         </button>
-        <button style={buttonStyle}>추가</button>
+        <button style={addButtonStyle}>추가</button>
       </div>
       <table style={tableStyle}>
         <thead>
           <tr>
-            <th style={thStyle}>좋아요수</th>
+            <th style={thStyle}>좋아요 수</th>
             <th style={thStyle}>제목</th>
             <th style={thStyle}>작성자</th>
             <th style={thStyle}>댓글 수</th>
@@ -131,10 +172,10 @@ const NoticeBoard = () => {
               <td style={tdStyle}>{post.memberName}</td>
               <td style={tdStyle}>{post.commentCnt}</td>
               <td style={tdStyle}>
-                {new Date(post.createdAt).toLocaleString()}
+                {parseDate(post.createdAt).toLocaleString()}
               </td>
               <td style={tdStyle}>
-                {new Date(post.updatedAt).toLocaleString()}
+                {parseDate(post.updatedAt).toLocaleString()}
               </td>
             </tr>
           ))}
