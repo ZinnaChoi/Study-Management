@@ -18,10 +18,12 @@ import { menuTree } from "../constants/constants";
 import axios from "axios";
 import { authClient } from "../services/APIService";
 import HomeIcon from "@mui/icons-material/Home";
+import { getCurrentDateTime } from "../util/DateUtil";
 
 function Header() {
   const [anchorElStudy, setAnchorElStudy] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
+  const [logo, setLogo] = React.useState(null);
 
   const handleOpenStatisticsSubMenu = (event) => {
     setAnchorElStudy(event.currentTarget);
@@ -55,8 +57,20 @@ function Header() {
     );
   };
 
-  useEffect(() => {
-    // JWT 세션 스토리지에 초기 세팅(로그인 화면 구현 후 변경 예정)
+  function setLogoImg() {
+    const curDateParam = "sendDate=" + getCurrentDateTime();
+    authClient
+      .get("/study?" + curDateParam)
+      .then(function (response) {
+        setLogo(response.data?.logo);
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+  }
+
+  // JWT 세션 스토리지에 초기 세팅(로그인 화면 구현 후 변경 예정)
+  function setAdminToken() {
     axios
       .post("api/v1/login", {
         sendDate: "20240112113804899",
@@ -70,27 +84,11 @@ function Header() {
       .catch(function (error) {
         console.log(error);
       });
+  }
 
-    // api 요청 예제 post
-    let reqBody = {
-      sendDate: "20240112113804899",
-      systemId: "STUDY_0001",
-      id: "admin",
-    };
-    authClient
-      .post("/join/check-id", reqBody)
-      .then(function (response) {})
-      .catch(function (error) {
-        console.log(error);
-      });
-
-    // api 요청 예제 get
-    authClient
-      .get("/notice/1")
-      .then(function (response) {})
-      .catch(function (error) {
-        console.log(error);
-      });
+  useEffect(() => {
+    setAdminToken();
+    setLogoImg();
   });
 
   return (
@@ -103,8 +101,13 @@ function Header() {
             style={{ textDecoration: "none", color: "inherit" }}
           >
             {/* 조건부 로고 표출 */}
-            {false ? (
-              <img alt="Logo" width="32" height="32" />
+            {logo !== null ? (
+              <img
+                src={"data:image/png;base64," + logo}
+                alt="Logo"
+                width="32"
+                height="32"
+              />
             ) : (
               <HomeIcon fontSize="large" />
             )}
