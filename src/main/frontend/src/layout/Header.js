@@ -17,6 +17,7 @@ import { Link } from "react-router-dom";
 import { menuTree } from "../constants/constants";
 import axios from "axios";
 import { authClient } from "../services/APIService";
+import HomeIcon from "@mui/icons-material/Home";
 
 function Header() {
   const [anchorElStudy, setAnchorElStudy] = React.useState(null);
@@ -101,7 +102,12 @@ function Header() {
             to={menuTree.main.path}
             style={{ textDecoration: "none", color: "inherit" }}
           >
-            <img alt="Logo" width="32" height="32" />
+            {/* 조건부 로고 표출 */}
+            {false ? (
+              <img alt="Logo" width="32" height="32" />
+            ) : (
+              <HomeIcon fontSize="large" />
+            )}
           </Link>
           <Box
             sx={{
