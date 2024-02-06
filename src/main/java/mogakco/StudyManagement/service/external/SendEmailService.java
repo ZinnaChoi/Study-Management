@@ -1,56 +1,34 @@
 package mogakco.StudyManagement.service.external;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
-
-import lombok.RequiredArgsConstructor;
-import javax.mail.*;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
-import java.util.Properties;
 
 import mogakco.StudyManagement.enums.MessageType;
 
-@RequiredArgsConstructor
 @Service
-
 public class SendEmailService {
 
-    @Value("${email.username}")
-    private String username;
+    @Autowired
+    private JavaMailSender javaMailSender;
 
-    @Value("${email.password}")
-    private String password;
+    @Value("${email.username}")
+    private String fromEmail;
 
     public void sendEmail(String memberName, MessageType type, String toAddress) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom(fromEmail);
+        message.setTo(toAddress);
+        message.setSubject("안녕하세요. 모각코입니다");
+        message.setText(createContent(memberName, type));
 
         try {
-
-            Properties props = new Properties();
-            props.put("mail.smtp.auth", "true");
-            props.put("mail.smtp.starttls.enable", "true");
-            props.put("mail.smtp.host", "smtp.gmail.com");
-            props.put("mail.smtp.port", "587");
-
-            Authenticator authenticator = new Authenticator() {
-                protected PasswordAuthentication getPasswordAuthentication() {
-                    return new PasswordAuthentication(username, password);
-                }
-            };
-            Session session = Session.getInstance(props, authenticator);
-
-            Message message = new MimeMessage(session);
-            message.setFrom(new InternetAddress(username));
-            message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(toAddress));
-            message.setSubject("안녕하세요. 모각코입니다");
-            message.setText(createContent(memberName, type));
-
-            Transport.send(message);
-
+            javaMailSender.send(message);
             System.out.println("알림 이메일이 전송되었습니다.");
-
-        } catch (MessagingException e) {
-            System.out.println("알림 이메일 전송에 실패하였습니다." + e.getMessage());
+        } catch (Exception e) {
+            System.out.println("알림 이메일 전송에 실패하였습니다. " + e.getMessage());
         }
     }
 
