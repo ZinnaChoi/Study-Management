@@ -40,7 +40,10 @@ const AbsentSchedule = () => {
         setSelectedMembers(memberNames);
       })
       .catch((error) => {
-        console.error("스터디원 목록 조회 실패:", error);
+        alert(
+          "스터디원 목록 조회 실패: " +
+            (error.response?.data.retMsg || "Unknown error")
+        );
       });
   }, []);
 

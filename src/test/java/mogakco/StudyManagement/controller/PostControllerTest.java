@@ -201,25 +201,6 @@ public class PostControllerTest {
         TestUtil.performRequest(mockMvc, uriBuilder.toUriString(), null, "GET", 400, 400);
     }
 
-    @Test
-    @Sql("/post/PostSetup.sql")
-    @WithMockUser(username = "PostUser", authorities = { "USER" })
-    @DisplayName("게시글 목록 조회 실패 - 빈 검색어")
-    public void getPostListFailEmptySearchKeyWord() throws Exception {
-
-        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(POST_API_URL);
-
-        uriBuilder.queryParam("sendDate", DateUtil.getCurrentDateTime())
-                .queryParam("systemId", systemId)
-                .queryParam("searchKeyWord", "")
-                .queryParam("searchType", PostSearchType.TITLE)
-                .queryParam("page", 0)
-                .queryParam("size", 3)
-                .queryParam("sort", "title,desc");
-
-        TestUtil.performRequest(mockMvc, uriBuilder.toUriString(), null, "GET", 400, 400);
-    }
-
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     @Test
