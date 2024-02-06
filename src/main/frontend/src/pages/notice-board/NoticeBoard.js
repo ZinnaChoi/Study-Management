@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { getCurrentDateTime } from "../../util/DateUtil";
+import { getCurrentDateTime, parseDate } from "../../util/DateUtil";
 import { authClient } from "../../services/APIService";
+import Table from "../../components/Table";
+import Pagination from "../../components/Pagination";
 
 const NoticeBoard = () => {
   const [posts, setPosts] = useState([]);
@@ -30,18 +32,6 @@ const NoticeBoard = () => {
     } catch (error) {
       console.error("게시판 목록 조회 실패:", error);
     }
-  };
-
-  const parseDate = (dateString) => {
-    const year = parseInt(dateString.substring(0, 4), 10);
-    const month = parseInt(dateString.substring(4, 6), 10) - 1;
-    const day = parseInt(dateString.substring(6, 8), 10);
-    const hour = parseInt(dateString.substring(8, 10), 10);
-    const minute = parseInt(dateString.substring(10, 12), 10);
-    const second = parseInt(dateString.substring(12, 14), 10);
-    const millisecond = parseInt(dateString.substring(14, 17), 10);
-
-    return new Date(year, month, day, hour, minute, second, millisecond);
   };
 
   useEffect(() => {
@@ -86,25 +76,6 @@ const NoticeBoard = () => {
     ...selectAndInputBaseStyle,
   };
 
-  const tableStyle = {
-    width: "100%",
-    borderCollapse: "collapse",
-    marginTop: "20px",
-  };
-
-  const thStyle = {
-    backgroundColor: "#375582",
-    color: "white",
-    padding: "10px",
-    border: "1px solid #dee2e6",
-  };
-
-  const tdStyle = {
-    padding: "10px",
-    border: "1px solid #dee2e6",
-    textAlign: "center",
-  };
-
   const buttonStyle = {
     margin: "0 5px",
     padding: "5px 10px",
@@ -125,11 +96,34 @@ const NoticeBoard = () => {
     ...buttonStyle,
   };
 
-  const paginationContainerStyle = {
-    display: "flex",
-    justifyContent: "center",
-    margin: "20px 0",
-  };
+  const columns = [
+    {
+      Header: "좋아요 수",
+      accessor: "likes",
+    },
+    {
+      Header: "제목",
+      accessor: "title",
+    },
+    {
+      Header: "작성자",
+      accessor: "memberName",
+    },
+    {
+      Header: "댓글 수",
+      accessor: "commentCnt",
+    },
+    {
+      Header: "작성 시간",
+      accessor: "createdAt",
+      Cell: (content) => parseDate(content.createdAt).toLocaleString(),
+    },
+    {
+      Header: "업데이트 시간",
+      accessor: "updatedAt",
+      Cell: (content) => parseDate(content.updatedAt).toLocaleString(),
+    },
+  ];
 
   return (
     <div style={containerStyle}>
@@ -153,49 +147,12 @@ const NoticeBoard = () => {
         </button>
         <button style={addButtonStyle}>추가</button>
       </div>
-      <table style={tableStyle}>
-        <thead>
-          <tr>
-            <th style={thStyle}>좋아요 수</th>
-            <th style={thStyle}>제목</th>
-            <th style={thStyle}>작성자</th>
-            <th style={thStyle}>댓글 수</th>
-            <th style={thStyle}>작성 시간</th>
-            <th style={thStyle}>업데이트 시간</th>
-          </tr>
-        </thead>
-        <tbody>
-          {posts.map((post) => (
-            <tr key={post.postId}>
-              <td style={tdStyle}>{post.likes}</td>
-              <td style={tdStyle}>{post.title}</td>
-              <td style={tdStyle}>{post.memberName}</td>
-              <td style={tdStyle}>{post.commentCnt}</td>
-              <td style={tdStyle}>
-                {parseDate(post.createdAt).toLocaleString()}
-              </td>
-              <td style={tdStyle}>
-                {parseDate(post.updatedAt).toLocaleString()}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-      <div style={paginationContainerStyle}>
-        {Array.from({ length: totalPages }, (_, index) => (
-          <button
-            key={index}
-            onClick={() => handlePageChange(index)}
-            style={
-              index === page
-                ? { ...buttonStyle, backgroundColor: "#004085" }
-                : buttonStyle
-            }
-          >
-            {index + 1}
-          </button>
-        ))}
-      </div>
+      <Table columns={columns} contents={posts} />
+      <Pagination
+        totalPages={totalPages}
+        currentPage={page}
+        onPageChange={handlePageChange}
+      />
     </div>
   );
 };
