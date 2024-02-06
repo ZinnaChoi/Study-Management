@@ -22,11 +22,11 @@ function Header() {
   const [anchorElStudy, setAnchorElStudy] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
 
-  const handleOpenStudySubMenu = (event) => {
+  const handleOpenStatisticsSubMenu = (event) => {
     setAnchorElStudy(event.currentTarget);
   };
 
-  const handleCloseStudySubMenu = () => {
+  const handleClostStatisticsSubMenu = () => {
     setAnchorElStudy(null);
   };
 
@@ -38,14 +38,10 @@ function Header() {
     setAnchorElUser(null);
   };
 
-  // 스터디 내 서브메뉴
+  // 통계 내 서브메뉴
   const SubMenuItem = ({ menuItem, onCloseSubMenu }) => {
     return (
-      <MenuItem
-        key={menuItem.path}
-        onClick={onCloseSubMenu}
-        disabled={menuItem.disabled}
-      >
+      <MenuItem key={menuItem.path} onClick={onCloseSubMenu}>
         <Typography textAlign="center">
           <Link
             to={menuItem.path}
@@ -82,9 +78,7 @@ function Header() {
     };
     authClient
       .post("/join/check-id", reqBody)
-      .then(function (response) {
-        console.log(response);
-      })
+      .then(function (response) {})
       .catch(function (error) {
         console.log(error);
       });
@@ -92,9 +86,7 @@ function Header() {
     // api 요청 예제 get
     authClient
       .get("/notice/1")
-      .then(function (response) {
-        console.log(response);
-      })
+      .then(function (response) {})
       .catch(function (error) {
         console.log(error);
       });
@@ -131,14 +123,6 @@ function Header() {
                 {menuTree.absentSchedule.name}
               </Button>
             </Link>
-            {/* 스터디 메뉴 버튼 */}
-            <Button
-              key={menuTree.study.name}
-              onClick={handleOpenStudySubMenu}
-              sx={{ color: "black", display: "block" }}
-            >
-              {menuTree.study.name}
-            </Button>
             {/* 게시판 메뉴 버튼 */}
             <Link
               to={menuTree.noticeBoard.path}
@@ -151,7 +135,15 @@ function Header() {
                 {menuTree.noticeBoard.name}
               </Button>
             </Link>
-            {/* 스터디 서브 메뉴 */}
+            {/* 통계 메뉴 버튼 */}
+            <Button
+              key={menuTree.statistics.name}
+              onClick={handleOpenStatisticsSubMenu}
+              sx={{ color: "black", display: "block" }}
+            >
+              {menuTree.statistics.name}
+            </Button>
+            {/* 통계 서브 메뉴 */}
             <Menu
               sx={{
                 mt: "45px",
@@ -174,18 +166,35 @@ function Header() {
                 horizontal: "right",
               }}
               open={Boolean(anchorElStudy)}
-              onClose={handleCloseStudySubMenu}
+              onClose={handleClostStatisticsSubMenu}
             >
-              {Object.values(menuTree.study).map((menuItem) =>
-                menuItem !== "스터디" ? (
+              {Object.values(menuTree.statistics).map((menuItem) =>
+                menuItem !== "통계" ? (
                   <SubMenuItem
                     key={menuItem.path}
                     menuItem={menuItem}
-                    onCloseSubMenu={handleCloseStudySubMenu}
+                    onCloseSubMenu={handleClostStatisticsSubMenu}
                   />
                 ) : null
               )}
             </Menu>
+            {/* 스터디 관리 메뉴 버튼 */}
+            <Link
+              to={menuTree.management.path}
+              style={{
+                textDecoration: "none",
+                color: "inherit",
+                pointerEvents: menuTree.management.disabled ? "none" : "",
+              }}
+            >
+              <Button
+                key={menuTree.management.path}
+                sx={{ color: "black", display: "block" }}
+                disabled={menuTree.management.disabled}
+              >
+                {menuTree.management.name}
+              </Button>
+            </Link>
           </Box>
 
           <Box sx={{ flexGrow: 0 }}>

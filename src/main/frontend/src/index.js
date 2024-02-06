@@ -45,16 +45,16 @@ root.render(
                 element={<NoticeBoard />}
               ></Route>
               <Route
-                path={menuTree.study.attendanceStatistics.path}
+                path={menuTree.statistics.attendanceStatistics.path}
                 element={<AttendanceStatistics />}
               ></Route>
               <Route
-                path={menuTree.study.management.path}
-                element={<Management />}
+                path={menuTree.statistics.wakeupSuccessRate.path}
+                element={<WakeUpSuccessRate />}
               ></Route>
               <Route
-                path={menuTree.study.wakeupSuccessRate.path}
-                element={<WakeUpSuccessRate />}
+                path={menuTree.management.path}
+                element={<Management />}
               ></Route>
               {/* 상단에 위치하는 라우트들의 규칙을 모두 확인, 일치하는 라우트가 없는경우 처리 */}
               <Route

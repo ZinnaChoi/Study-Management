@@ -3,15 +3,15 @@ export const menuTree = {
   absentSchedule: { path: "/absent-schedule", name: "부재 일정" },
   myPage: { path: "/my-page", name: "내 정보" },
   noticeBoard: { path: "/notice-board", name: "게시판" },
-  study: {
-    name: "스터디",
+  statistics: {
+    name: "통계",
     attendanceStatistics: { path: "/attendance-statistics", name: "출석 통계" },
     wakeupSuccessRate: {
       path: "/wakeup-success-rate",
       name: "기상 통계",
     },
-    management: { path: "/management", name: "스터디 관리", disabled: true },
   },
+  management: { path: "/management", name: "스터디 관리", disabled: true },
   notFound: { path: "*", name: "not found" },
 };
 
