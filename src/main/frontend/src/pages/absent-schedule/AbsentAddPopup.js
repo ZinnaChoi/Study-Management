@@ -3,11 +3,13 @@ import { authClient } from "../../services/APIService";
 import { getCurrentDateTime, formatDateToYYYYMMDD } from "../../util/DateUtil";
 import Select from "react-select";
 
-const AbsentAddPopup = ({ selectedDate, onClose }) => {
+const AbsentAddPopup = ({ onClose }) => {
   const [schedules, setSchedules] = useState([]);
   const [selectedSchedules, setSelectedSchedules] = useState([]);
   const [description, setDescription] = useState("");
-  const [sendDate, setSendDate] = useState(formatDateToYYYYMMDD(new Date()));
+  const [absentDate, setAbsentDate] = useState(
+    formatDateToYYYYMMDD(new Date())
+  );
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
@@ -39,7 +41,7 @@ const AbsentAddPopup = ({ selectedDate, onClose }) => {
     const newAbsentData = {
       sendDate: getCurrentDateTime(),
       systemId: "STUDY_0001",
-      absentDate: selectedDate ? formatDateToYYYYMMDD(selectedDate) : sendDate,
+      absentDate: formatDateToYYYYMMDD(absentDate),
       description: description,
       scheduleNameList: selectedSchedules.map((schedule) => schedule.value),
     };
@@ -115,8 +117,8 @@ const AbsentAddPopup = ({ selectedDate, onClose }) => {
         <h3>부재 일정 등록</h3>
         <input
           type="date"
-          value={sendDate}
-          onChange={(e) => setSendDate(e.target.value)}
+          value={absentDate}
+          onChange={(e) => setAbsentDate(e.target.value)}
           style={inputStyle}
         />
         <div style={formStyle}>
