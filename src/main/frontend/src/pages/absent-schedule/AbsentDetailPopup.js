@@ -1,0 +1,117 @@
+import React, { useState, useEffect } from "react";
+import { authClient } from "../../services/APIService";
+import { getCurrentDateTime } from "../../util/DateUtil";
+import Table from "../../components/Table";
+
+const AbsentDetailPopup = ({ selectedDate, onClose }) => {
+  const [absentDetail, setAbsentDetail] = useState(null);
+
+  useEffect(() => {
+    if (selectedDate) {
+      const formatDateToYYYYMMDD = (date) => {
+        if (!(date instanceof Date)) {
+          date = new Date(date);
+        }
+        let month = "" + (date.getMonth() + 1);
+        let day = "" + date.getDate();
+        let year = date.getFullYear();
+
+        if (month.length < 2) month = "0" + month;
+        if (day.length < 2) day = "0" + day;
+
+        return [year, month, day].join("");
+      };
+
+      authClient
+        .get(`/absent/detail`, {
+          params: {
+            sendDate: getCurrentDateTime(),
+            systemId: "STUDY_0001",
+            absentDate: formatDateToYYYYMMDD(selectedDate),
+          },
+        })
+        .then((response) => {
+          setAbsentDetail(response.data.content);
+        })
+        .catch((error) => {
+          alert(
+            "상세 정보 조회 실패: " +
+              (error.response?.data.retMsg || "Unknown error")
+          );
+        });
+    }
+  }, [selectedDate]);
+
+  const details = absentDetail || [];
+  if (details.length == 0) {
+    return null;
+  }
+
+  const popupContainerStyle = {
+    position: "fixed",
+    top: "0",
+    left: "0",
+    width: "100%",
+    height: "100%",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.4)",
+    zIndex: "2",
+  };
+
+  const popupStyle = {
+    width: "auto",
+    maxHeight: "80vh",
+    overflowY: "auto",
+    background: "#fff",
+    padding: "20px",
+    borderRadius: "10px",
+    boxShadow: "0 2px 10px rgba(0, 0, 0, 0.3)",
+    zIndex: "3",
+  };
+
+  const columns = [
+    { Header: "멤버 이름", accessor: "memberName" },
+    {
+      Header: "부재 스케줄 리스트",
+      accessor: "scheduleNameList",
+      Cell: ({ scheduleNameList }) => scheduleNameList.join(", "),
+    },
+    { Header: "부재 사유", accessor: "description" },
+    {
+      Header: "조치",
+      accessor: "actions",
+      Cell: (detail) => (
+        <>
+          <button
+            onClick={() => {
+              /* 수정 */
+            }}
+          >
+            수정
+          </button>
+          <button
+            onClick={() => {
+              /* 삭제 */
+            }}
+          >
+            삭제
+          </button>
+        </>
+      ),
+    },
+  ];
+
+  return (
+    <div style={popupContainerStyle}>
+      <div style={popupStyle}>
+        <h3>부재 일정 상세 조회</h3>
+        <Table columns={columns} contents={absentDetail} />
+        <button onClick={onClose}>닫기</button>
+      </div>
+    </div>
+  );
+};
+
+export default AbsentDetailPopup;

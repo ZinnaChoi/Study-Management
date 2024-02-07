@@ -2,7 +2,12 @@ import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
 
-const AbsentCalendar = ({ events, getYearMonth, renderEventContent }) => {
+const AbsentCalendar = ({
+  events,
+  getYearMonth,
+  renderEventContent,
+  onDateClick,
+}) => {
   function renderEventContent(eventInfo) {
     return (
       <>
@@ -18,6 +23,7 @@ const AbsentCalendar = ({ events, getYearMonth, renderEventContent }) => {
       events={events}
       datesSet={getYearMonth}
       eventContent={renderEventContent}
+      dateClick={(event) => onDateClick(event.dateStr)}
     />
   );
 };

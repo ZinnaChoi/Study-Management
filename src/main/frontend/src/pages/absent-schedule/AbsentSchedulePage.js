@@ -4,6 +4,7 @@ import { authClient } from "../../services/APIService";
 import { getCurrentDateTime, getCurrentYearMonth } from "../../util/DateUtil";
 import MemberCheckbox from "../../components/MemberCheckbox";
 import AbsentCalendar from "./AbsentCalendar";
+import AbsentDetailPopup from "./AbsentDetailPopup";
 
 const AbsentSchedule = () => {
   const [events, setEvents] = useState([]);
@@ -12,6 +13,8 @@ const AbsentSchedule = () => {
   const [currentYearMonth, setCurrentYearMonth] = useState("");
   const [prevYearMonth, setPrevYearMonth] = useState("");
   const [colorMap, setColorMap] = useState({});
+  const [showPopup, setShowPopup] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(null);
 
   const getRandomPastelColor = () => {
     return `hsl(${360 * Math.random()}, ${25 + 70 * Math.random()}%, ${
@@ -22,6 +25,11 @@ const AbsentSchedule = () => {
   const getYearMonth = (dateInfo) => {
     const newYearMonth = getCurrentYearMonth(dateInfo);
     setCurrentYearMonth(newYearMonth);
+  };
+
+  const handleDateClick = (date) => {
+    setShowPopup(true);
+    setSelectedDate(date);
   };
 
   useEffect(() => {
@@ -133,8 +141,18 @@ const AbsentSchedule = () => {
         />
       </div>
       <div style={calendarContainerStyle}>
-        <AbsentCalendar events={events} getYearMonth={getYearMonth} />
+        <AbsentCalendar
+          events={events}
+          getYearMonth={getYearMonth}
+          onDateClick={handleDateClick}
+        />
       </div>
+      {showPopup && (
+        <AbsentDetailPopup
+          selectedDate={selectedDate}
+          onClose={() => setShowPopup(false)}
+        />
+      )}
     </div>
   );
 };
