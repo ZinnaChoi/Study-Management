@@ -18,7 +18,7 @@ const MemberCheckbox = ({
       .get("/members", { params: params })
       .then((response) => {
         const memberNames = response.data.content
-          .filter((member) => member.id !== "admin")
+          // .filter((member) => member.id !== "admin")  // TODO: 부재일정 추가 기능을 위한 임시 주석 처리. UI 로그인 기능 구현 후 주석 해제 필요
           .map((member) => member.name);
         setMembersList(memberNames);
         setSelectedMembers(memberNames);

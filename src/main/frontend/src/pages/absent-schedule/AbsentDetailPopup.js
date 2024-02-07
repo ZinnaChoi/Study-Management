@@ -94,7 +94,7 @@ const AbsentDetailPopup = ({ selectedDate, onClose }) => {
       <div style={popupStyle}>
         <div style={headerStyle}>
           <h3>부재 일정 상세 조회</h3>
-          <button onClick={() => {}}>부재일정 추가</button>
+          <button onClick={() => {}}>부재 일정 추가</button>
         </div>
         <Table columns={columns} contents={absentDetail} />
         <div style={closeButtonStyle}>
