@@ -124,7 +124,7 @@ public class AbsentController extends CommonController {
     @Operation(summary = "부재일정 삭제", description = "부재일정 삭제")
     @DeleteMapping("/absent")
     public DTOResCommon deleteAbsentSchedule(HttpServletRequest request,
-            @RequestParam @Pattern(regexp = "^[0-9]{8}$") String absentDate) {
+            @RequestParam(name = "absentDate") @Pattern(regexp = "^[0-9]{8}$") String absentDate) {
         DTOResCommon result = new DTOResCommon();
         try {
             startAPI(lo, null);
