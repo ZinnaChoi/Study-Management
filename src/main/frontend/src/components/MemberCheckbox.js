@@ -40,22 +40,18 @@ const MemberCheckbox = ({
     });
   };
 
-  return (
-    <div>
-      {membersList.map((memberName) => (
-        <div key={memberName}>
-          <label>
-            <input
-              type="checkbox"
-              checked={selectedMembers.includes(memberName)}
-              onChange={() => handleCheckboxChange(memberName)}
-            />
-            {memberName}
-          </label>
-        </div>
-      ))}
+  return membersList.map((memberName) => (
+    <div key={memberName}>
+      <label>
+        <input
+          type="checkbox"
+          checked={selectedMembers.includes(memberName)}
+          onChange={() => handleCheckboxChange(memberName)}
+        />
+        {memberName}
+      </label>
     </div>
-  );
+  ));
 };
 
 export default MemberCheckbox;
