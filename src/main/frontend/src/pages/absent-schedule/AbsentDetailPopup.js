@@ -57,12 +57,6 @@ const AbsentDetailPopup = ({ selectedDate, onClose }) => {
     zIndex: "3",
   };
 
-  const headerStyle = {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-  };
-
   const closeButtonStyle = {
     display: "flex",
     justifyContent: "center",
@@ -92,10 +86,7 @@ const AbsentDetailPopup = ({ selectedDate, onClose }) => {
   return (
     <div style={popupContainerStyle}>
       <div style={popupStyle}>
-        <div style={headerStyle}>
-          <h3>부재 일정 상세 조회</h3>
-          <button onClick={() => {}}>부재 일정 추가</button>
-        </div>
+        <h3>{selectedDate + " 부재 일정 상세"}</h3>
         <Table columns={columns} contents={absentDetail} />
         <div style={closeButtonStyle}>
           <button onClick={onClose}>닫기</button>
