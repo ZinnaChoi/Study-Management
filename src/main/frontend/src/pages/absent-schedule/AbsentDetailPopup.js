@@ -57,6 +57,18 @@ const AbsentDetailPopup = ({ selectedDate, onClose }) => {
     zIndex: "3",
   };
 
+  const headerStyle = {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+  };
+
+  const closeButtonStyle = {
+    display: "flex",
+    justifyContent: "center",
+    marginTop: "10px",
+  };
+
   const columns = [
     { Header: "멤버 이름", accessor: "memberName" },
     {
@@ -66,24 +78,12 @@ const AbsentDetailPopup = ({ selectedDate, onClose }) => {
     },
     { Header: "부재 사유", accessor: "description" },
     {
-      Header: "조치",
+      Header: "액션",
       accessor: "actions",
       Cell: (detail) => (
         <>
-          <button
-            onClick={() => {
-              /* 수정 */
-            }}
-          >
-            수정
-          </button>
-          <button
-            onClick={() => {
-              /* 삭제 */
-            }}
-          >
-            삭제
-          </button>
+          <button onClick={() => {}}>수정</button>
+          <button onClick={() => {}}>삭제</button>
         </>
       ),
     },
@@ -92,9 +92,14 @@ const AbsentDetailPopup = ({ selectedDate, onClose }) => {
   return (
     <div style={popupContainerStyle}>
       <div style={popupStyle}>
-        <h3>부재 일정 상세 조회</h3>
+        <div style={headerStyle}>
+          <h3>부재 일정 상세 조회</h3>
+          <button onClick={() => {}}>부재일정 추가</button>
+        </div>
         <Table columns={columns} contents={absentDetail} />
-        <button onClick={onClose}>닫기</button>
+        <div style={closeButtonStyle}>
+          <button onClick={onClose}>닫기</button>
+        </div>
       </div>
     </div>
   );

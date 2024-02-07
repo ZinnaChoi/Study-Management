@@ -6,11 +6,11 @@ import AbsentDetailPopup from "./AbsentDetailPopup";
 
 const AbsentSchedule = () => {
   const [selectedMembers, setSelectedMembers] = useState([]);
-  const [showPopup, setShowPopup] = useState(false);
+  const [showDetailPopup, setShowDetailPopup] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
 
   const handleDateClick = (date) => {
-    setShowPopup(true);
+    setShowDetailPopup(true);
     setSelectedDate(date);
   };
 
@@ -38,7 +38,7 @@ const AbsentSchedule = () => {
   return (
     <div style={containerStyle}>
       <div style={checkboxContainerStyle}>
-        <h3>스터디원 선택</h3>
+        <button>부재일정 추가</button> <h3>스터디원 선택</h3>
         <MemberCheckbox
           authClient={authClient}
           selectedMembers={selectedMembers}
@@ -52,10 +52,10 @@ const AbsentSchedule = () => {
           onDateClick={handleDateClick}
         />
       </div>
-      {showPopup && (
+      {showDetailPopup && (
         <AbsentDetailPopup
           selectedDate={selectedDate}
-          onClose={() => setShowPopup(false)}
+          onClose={() => setShowDetailPopup(false)}
         />
       )}
     </div>
