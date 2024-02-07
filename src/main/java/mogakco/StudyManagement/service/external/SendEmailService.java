@@ -14,12 +14,8 @@ public class SendEmailService {
     @Autowired
     private JavaMailSender javaMailSender;
 
-    @Value("${email.username}")
-    private String fromEmail;
-
     public void sendEmail(String memberName, MessageType type, String toAddress) {
         SimpleMailMessage message = new SimpleMailMessage();
-        message.setFrom(fromEmail);
         message.setTo(toAddress);
         message.setSubject("안녕하세요. 모각코입니다");
         message.setText(createContent(memberName, type));

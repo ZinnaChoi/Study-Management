@@ -26,6 +26,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import mogakco.StudyManagement.dto.NoticeReq;
 import mogakco.StudyManagement.scheduler.StartTimeMonitoringScheduler;
 import mogakco.StudyManagement.service.common.LoggingService;
+import mogakco.StudyManagement.service.external.SendEmailService;
 import mogakco.StudyManagement.service.notice.NoticeService;
 import mogakco.StudyManagement.util.DateUtil;
 import mogakco.StudyManagement.util.TestUtil;
@@ -44,6 +45,9 @@ public class NoticeControllerTest {
 
         @Mock
         private LoggingService loggingService;
+
+        @Mock
+        private SendEmailService sendEmailService;
 
         @InjectMocks
         private NoticeController noticeController;
