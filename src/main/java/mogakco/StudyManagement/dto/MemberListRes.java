@@ -9,7 +9,7 @@ import mogakco.StudyManagement.domain.Member;
 @Getter
 @Setter
 @NoArgsConstructor
-public class MemberListRes extends DTOResCommon {
+public class MemberListRes extends CommonRes {
 
     private List<Member> content;
 

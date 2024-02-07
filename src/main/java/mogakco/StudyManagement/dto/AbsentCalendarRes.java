@@ -8,7 +8,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class AbsentCalendarRes extends DTOResCommon {
+public class AbsentCalendarRes extends CommonRes {
 
     private List<AbsentCalendar> content;
 

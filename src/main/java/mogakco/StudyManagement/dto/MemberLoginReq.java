@@ -8,7 +8,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class MemberLoginReq extends DTOReqCommon {
+public class MemberLoginReq {
 
     @Schema(example = "admin")
     private String id;
@@ -16,8 +16,7 @@ public class MemberLoginReq extends DTOReqCommon {
     @Schema(example = "password")
     private String password;
 
-    public MemberLoginReq(String sendDate, String systemId, String id, String password) {
-        super(sendDate, systemId);
+    public MemberLoginReq(String id, String password) {
         this.id = id;
         this.password = password;
     }

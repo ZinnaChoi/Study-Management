@@ -20,13 +20,12 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import mogakco.StudyManagement.dto.DTOReqCommon;
 import mogakco.StudyManagement.enums.LogType;
 import mogakco.StudyManagement.scheduler.DailyAbsentScheduler;
 import mogakco.StudyManagement.service.common.LoggingService;
 import mogakco.StudyManagement.service.external.SendEmailService;
 import mogakco.StudyManagement.service.stat.StatService;
-import mogakco.StudyManagement.util.DateUtil;
+
 import mogakco.StudyManagement.util.TestUtil;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -76,8 +75,7 @@ public class StatControllerTest {
 
         UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(GET_STAT_API_URL);
 
-        uriBuilder.queryParam("sendDate", DateUtil.getCurrentDateTime())
-                .queryParam("systemId", systemId)
+        uriBuilder
                 .queryParam("type", LogType.WAKEUP)
                 .queryParam("page", 0)
                 .queryParam("size", 1)
@@ -99,8 +97,7 @@ public class StatControllerTest {
 
         UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(GET_STAT_API_URL);
 
-        uriBuilder.queryParam("sendDate", DateUtil.getCurrentDateTime())
-                .queryParam("systemId", systemId)
+        uriBuilder
                 .queryParam("type", LogType.WAKEUP)
                 .queryParam("page", 1)
                 .queryParam("size", 2)
@@ -117,17 +114,16 @@ public class StatControllerTest {
     @Test
     @Sql("/stat/StatListSetup.sql")
     @WithMockUser(username = "statUser3", authorities = { "USER" })
-    @DisplayName("통계 목록 조회 실패 - content가 존재하지 않음")
+    @DisplayName("통계 목록 조회 실패 - 존재하지 않는 field로 정렬")
     public void getStatListFailPage0Size1() throws Exception {
 
         UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(GET_STAT_API_URL);
 
-        uriBuilder.queryParam("sendDate", DateUtil.getCurrentDateTime())
-                .queryParam("systemId", systemId)
+        uriBuilder
                 .queryParam("type", LogType.ABSENT)
                 .queryParam("page", 0)
                 .queryParam("size", 1)
-                .queryParam("sort", "member");
+                .queryParam("sort", "invalid value");
 
         MvcResult result = TestUtil.performRequest(mockMvc, uriBuilder.toUriString(), null, "GET", 200, 404);
         JsonNode responseBody = objectMapper.readTree(result.getResponse().getContentAsString());
@@ -143,10 +139,9 @@ public class StatControllerTest {
     @WithMockUser(username = "absentUser1", authorities = { "USER" })
     @DisplayName("부재 로그 저장 성공")
     public void createAbsentDailyLogSuccess() throws Exception {
-        String requestBodyJson = objectMapper.writeValueAsString(
-                new DTOReqCommon(DateUtil.getCurrentDateTime(), systemId));
+
         MvcResult result = TestUtil.performRequest(mockMvc,
-                POST_ABSENT_STAT_API_URL, requestBodyJson, "POST", 200, 200);
+                POST_ABSENT_STAT_API_URL, null, "POST", 200, 200);
 
         JsonNode responseBody = objectMapper.readTree(result.getResponse().getContentAsString());
         int retCode = responseBody.path("retCode").asInt();

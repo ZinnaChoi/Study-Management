@@ -4,7 +4,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -18,8 +17,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
-import mogakco.StudyManagement.dto.DTOReqCommon;
-import mogakco.StudyManagement.dto.DTOResCommon;
+import mogakco.StudyManagement.dto.CommonRes;
 import mogakco.StudyManagement.dto.MemberIdDuplReq;
 import mogakco.StudyManagement.dto.MemberIdDuplRes;
 import mogakco.StudyManagement.dto.MemberInfoRes;
@@ -34,7 +32,6 @@ import mogakco.StudyManagement.dto.StudyMembersRes;
 import mogakco.StudyManagement.enums.ErrorCode;
 import mogakco.StudyManagement.service.common.LoggingService;
 import mogakco.StudyManagement.service.member.MemberService;
-import mogakco.StudyManagement.util.DateUtil;
 
 @Tag(name = "계정 및 권한", description = "계정 및 권한 관련 API 분류")
 @RequestMapping(path = "/api/v1")
@@ -56,7 +53,6 @@ public class MemberController extends CommonController {
         try {
             startAPI(lo, loginInfo);
             result = memberService.login(loginInfo, lo);
-            result.setSendDate(DateUtil.getCurrentDateTime());
             result.setSystemId(systemId);
         } catch (Exception e) {
             result = new MemberLoginRes(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
@@ -70,11 +66,11 @@ public class MemberController extends CommonController {
     @Operation(summary = "로그아웃", description = "로그아웃 통해 JWT 토큰 만료 처리")
     @SecurityRequirement(name = "bearer-key")
     @PostMapping("/logout")
-    public DTOResCommon doLogout(HttpServletRequest request, @Valid @RequestBody DTOReqCommon info) {
-        DTOResCommon result = new DTOResCommon();
+    public CommonRes doLogout(HttpServletRequest request) {
+        CommonRes result = new CommonRes();
 
         try {
-            startAPI(lo, info);
+            startAPI(lo, null);
             result = memberService.logout(lo);
         } catch (Exception e) {
             result = new MemberLoginRes(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
@@ -87,15 +83,15 @@ public class MemberController extends CommonController {
 
     @Operation(summary = "회원가입", description = "회원가입을 통해 사용자 정보 등록")
     @PostMapping("/join")
-    public DTOResCommon doJoin(HttpServletRequest request, @Valid @RequestBody MemberJoinReq joinInfo) {
-        DTOResCommon result = new DTOResCommon();
+    public CommonRes doJoin(HttpServletRequest request, @Valid @RequestBody MemberJoinReq joinInfo) {
+        CommonRes result = new CommonRes();
 
         try {
             startAPI(lo, joinInfo);
             result = memberService.join(joinInfo, lo);
         } catch (Exception e) {
             e.printStackTrace();
-            result = new DTOResCommon(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
+            result = new CommonRes(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
                     ErrorCode.INTERNAL_ERROR.getMessage());
         } finally {
             endAPI(request, findErrorCodeByCode(result.getRetCode()), lo, result);
@@ -126,13 +122,12 @@ public class MemberController extends CommonController {
     @Operation(summary = "MyPage 회원 정보 조회", description = "로그인 된 회원 정보 조회")
     @SecurityRequirement(name = "bearer-key")
     @GetMapping("/member")
-    public MemberInfoRes getMemberInfo(HttpServletRequest request, @Valid @ModelAttribute DTOReqCommon info) {
+    public MemberInfoRes getMemberInfo(HttpServletRequest request) {
         MemberInfoRes result = new MemberInfoRes();
 
         try {
-            startAPI(lo, info);
+            startAPI(lo, null);
             result = memberService.getMemberInfo(lo);
-            result.setSendDate(DateUtil.getCurrentDateTime());
         } catch (Exception e) {
             result = new MemberInfoRes(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
                     ErrorCode.INTERNAL_ERROR.getMessage(), null, null, null, null, null, null, null);
@@ -146,12 +141,11 @@ public class MemberController extends CommonController {
     @Operation(summary = "회원 목록 조회", description = "스터디에 가입한 회원 목록 조회")
     @SecurityRequirement(name = "bearer-key")
     @GetMapping("/members")
-    public MemberListRes getMemberList(HttpServletRequest request, @Valid @ModelAttribute DTOReqCommon info) {
+    public MemberListRes getMemberList(HttpServletRequest request) {
         MemberListRes result = new MemberListRes();
         try {
-            startAPI(lo, info);
+            startAPI(lo, null);
             result = memberService.getMemberList(lo);
-            result.setSendDate(info.getSendDate());
         } catch (Exception e) {
             result = new MemberListRes(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
                     ErrorCode.INTERNAL_ERROR.getMessage(), null);
@@ -164,15 +158,15 @@ public class MemberController extends CommonController {
     @Operation(summary = "MyPage 회원 정보변경", description = "로그인된 회원 정보 변경(이름 or 스터디 시간 or 기상 시간 or 비밀번호)")
     @SecurityRequirement(name = "bearer-key")
     @PatchMapping("/member")
-    public DTOResCommon setMemberInfo(HttpServletRequest request, @Valid @RequestBody MemberInfoUpdateReq updateInfo) {
-        DTOResCommon result = new DTOResCommon();
+    public CommonRes setMemberInfo(HttpServletRequest request, @Valid @RequestBody MemberInfoUpdateReq updateInfo) {
+        CommonRes result = new CommonRes();
 
         try {
             startAPI(lo, updateInfo);
             result = memberService.setMemberInfo(updateInfo, lo);
         } catch (Exception e) {
             e.printStackTrace();
-            result = new DTOResCommon(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
+            result = new CommonRes(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
                     ErrorCode.INTERNAL_ERROR.getMessage());
         } finally {
             endAPI(request, findErrorCodeByCode(result.getRetCode()), lo, result);
@@ -185,15 +179,13 @@ public class MemberController extends CommonController {
     @GetMapping("/members/schedule-name")
     public StudyMembersRes getMembersBySchedule(
             HttpServletRequest request,
-            @Parameter(name = "info", description = "요청 시 필수 값") @ModelAttribute @Valid DTOReqCommon info,
             @Parameter(name = "paging", description = "paging") @PageableDefault(size = 10, page = 0, sort = "memberId", direction = Sort.Direction.DESC) Pageable pageable,
             @RequestParam(name = "schedule", required = false) String schedule) {
 
         StudyMembersRes result = new StudyMembersRes();
         try {
-            startAPI(lo, info);
+            startAPI(lo, null);
             result = memberService.getMembersBySchedule(lo, schedule, pageable);
-            result.setSendDate(DateUtil.getCurrentDateTime());
             result.setSystemId(systemId);
         } catch (Exception e) {
             e.printStackTrace();
@@ -210,15 +202,13 @@ public class MemberController extends CommonController {
     @GetMapping("/members/wakeup-time")
     public StudyMembersRes getMembersByWakeup(
             HttpServletRequest request,
-            @Parameter(name = "info", description = "요청 시 필수 값") @ModelAttribute @Valid DTOReqCommon info,
             @Parameter(name = "paging", description = "paging") @PageableDefault(size = 10, page = 0, sort = "memberId", direction = Sort.Direction.DESC) Pageable pageable,
             @Parameter(description = "(HHmm) format") @RequestParam(name = "time", required = false) String time) {
 
         StudyMembersRes result = new StudyMembersRes();
         try {
-            startAPI(lo, info);
+            startAPI(lo, null);
             result = memberService.getMembersByWakeupTime(lo, time, pageable);
-            result.setSendDate(DateUtil.getCurrentDateTime());
             result.setSystemId(systemId);
         } catch (Exception e) {
             e.printStackTrace();
@@ -234,14 +224,12 @@ public class MemberController extends CommonController {
     @SecurityRequirement(name = "bearer-key")
     @GetMapping("/schedules")
     public RegistedScheduleRes getRegistedSchedule(
-            HttpServletRequest request,
-            @Parameter(name = "info", description = "요청 시 필수 값") @ModelAttribute @Valid DTOReqCommon info) {
+            HttpServletRequest request) {
 
         RegistedScheduleRes result = new RegistedScheduleRes();
         try {
-            startAPI(lo, info);
+            startAPI(lo, null);
             result = memberService.getRegistedSchedule(lo);
-            result.setSendDate(DateUtil.getCurrentDateTime());
             result.setSystemId(systemId);
         } catch (Exception e) {
             e.printStackTrace();
@@ -257,14 +245,12 @@ public class MemberController extends CommonController {
     @SecurityRequirement(name = "bearer-key")
     @GetMapping("/wakeup-times")
     public RegistedWakeupRes getRegistedWakeupTime(
-            HttpServletRequest request,
-            @Parameter(name = "info", description = "요청 시 필수 값") @ModelAttribute @Valid DTOReqCommon info) {
+            HttpServletRequest request) {
 
         RegistedWakeupRes result = new RegistedWakeupRes();
         try {
-            startAPI(lo, info);
+            startAPI(lo, null);
             result = memberService.getRegistedWakeup(lo);
-            result.setSendDate(DateUtil.getCurrentDateTime());
             result.setSystemId(systemId);
         } catch (Exception e) {
             e.printStackTrace();

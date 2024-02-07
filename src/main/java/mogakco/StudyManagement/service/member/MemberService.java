@@ -4,7 +4,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
-import mogakco.StudyManagement.dto.DTOResCommon;
+import mogakco.StudyManagement.dto.CommonRes;
 import mogakco.StudyManagement.dto.MemberIdDuplReq;
 import mogakco.StudyManagement.dto.MemberInfoRes;
 import mogakco.StudyManagement.dto.MemberInfoUpdateReq;
@@ -22,9 +22,9 @@ public interface MemberService {
 
     MemberLoginRes login(MemberLoginReq loginInfo, LoggingService lo);
 
-    DTOResCommon logout(LoggingService lo);
+    CommonRes logout(LoggingService lo);
 
-    DTOResCommon join(MemberJoinReq joinInfo, LoggingService lo);
+    CommonRes join(MemberJoinReq joinInfo, LoggingService lo);
 
     boolean isIdDuplicated(MemberIdDuplReq idInfo, LoggingService lo);
 
@@ -32,7 +32,7 @@ public interface MemberService {
 
     MemberListRes getMemberList(LoggingService lo);
 
-    DTOResCommon setMemberInfo(MemberInfoUpdateReq updateInfo, LoggingService lo);
+    CommonRes setMemberInfo(MemberInfoUpdateReq updateInfo, LoggingService lo);
 
     StudyMembersRes getMembersBySchedule(LoggingService lo, String schedule, Pageable pageable);
 

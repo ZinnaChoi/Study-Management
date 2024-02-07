@@ -11,7 +11,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class AbsentCalendarReq extends DTOReqCommon {
+public class AbsentCalendarReq {
 
     @Pattern(regexp = "^[0-9]{6}$", message = "yearMonth는 6자리 숫자 형식 (yyyyMM)이어야 합니다")
     @Schema(example = "202401")
@@ -20,8 +20,7 @@ public class AbsentCalendarReq extends DTOReqCommon {
     @Schema(example = "[\"지나\",\"엠마\",\"딘\"]")
     private List<String> memberNameList;
 
-    public AbsentCalendarReq(String sendDate, String systemId, String yearMonth, List<String> memberNameList) {
-        super(sendDate, systemId);
+    public AbsentCalendarReq(String yearMonth, List<String> memberNameList) {        
         this.yearMonth = yearMonth;
         this.memberNameList = memberNameList;
     }

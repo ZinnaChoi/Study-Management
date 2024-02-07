@@ -2,7 +2,7 @@ package mogakco.StudyManagement.util;
 
 import org.springframework.stereotype.Component;
 
-import mogakco.StudyManagement.dto.DTOResCommon;
+import mogakco.StudyManagement.dto.CommonRes;
 import mogakco.StudyManagement.enums.ErrorCode;
 import mogakco.StudyManagement.exception.ConflictException;
 import mogakco.StudyManagement.exception.InvalidRequestException;
@@ -12,7 +12,7 @@ import mogakco.StudyManagement.exception.UnauthorizedAccessException;
 @Component
 public class ExceptionUtil {
 
-    public static DTOResCommon handleException(RuntimeException e) {
+    public static CommonRes handleException(RuntimeException e) {
         ErrorCode errorCode;
         if (e instanceof NotFoundException) {
             errorCode = ErrorCode.NOT_FOUND;
@@ -23,7 +23,7 @@ public class ExceptionUtil {
         } else {
             errorCode = ErrorCode.INTERNAL_ERROR;
         }
-        return new DTOResCommon(null, errorCode.getCode(), e.getMessage());
+        return new CommonRes(null, errorCode.getCode(), e.getMessage());
     }
 
 }

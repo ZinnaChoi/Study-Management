@@ -27,6 +27,9 @@ public class TestUtil {
                 requestBuilder = MockMvcRequestBuilders.get(url).contentType(MediaType.APPLICATION_JSON);
                 break;
             case "POST":
+                if (requestBodyJson == null) {
+                    requestBodyJson = "";
+                }
                 requestBuilder = MockMvcRequestBuilders.post(url).contentType(MediaType.APPLICATION_JSON)
                         .content(requestBodyJson);
                 break;

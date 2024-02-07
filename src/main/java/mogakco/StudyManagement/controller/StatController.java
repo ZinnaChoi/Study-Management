@@ -14,7 +14,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
-import mogakco.StudyManagement.dto.DTOResCommon;
+import mogakco.StudyManagement.dto.CommonRes;
 import mogakco.StudyManagement.dto.StatGetRes;
 import mogakco.StudyManagement.enums.ErrorCode;
 import mogakco.StudyManagement.enums.LogType;
@@ -65,14 +65,14 @@ public class StatController extends CommonController {
     @PostMapping("/stat/absent")
     @Hidden
     // AbsentScheduleBatch.java 내 스케줄링의 기능 확인용 이므로 Hidden처리함.
-    public DTOResCommon createAbsentLog(HttpServletRequest request) {
+    public CommonRes createAbsentLog(HttpServletRequest request) {
 
-        DTOResCommon result = new DTOResCommon();
+        CommonRes result = new CommonRes();
         try {
             startAPI(lo, null);
             result = statService.createAbsentLog(lo);
         } catch (Exception e) {
-            result = new DTOResCommon(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
+            result = new CommonRes(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
                     ErrorCode.INTERNAL_ERROR.getMessage());
         } finally {
             endAPI(request, findErrorCodeByCode(result.getRetCode()), lo, result);
@@ -82,14 +82,14 @@ public class StatController extends CommonController {
 
     @Operation(summary = "기상 로그 저장", description = "통계 생성을 위한 기상 로그 업데이트")
     @PostMapping("/stat/wakeup")
-    public DTOResCommon createWakeUpLog(HttpServletRequest request) {
+    public CommonRes createWakeUpLog(HttpServletRequest request) {
 
-        DTOResCommon result = new DTOResCommon();
+        CommonRes result = new CommonRes();
         try {
             startAPI(lo, null);
             result = statService.createWakeUpLog(lo);
         } catch (Exception e) {
-            result = new DTOResCommon(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
+            result = new CommonRes(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
                     ErrorCode.INTERNAL_ERROR.getMessage());
         } finally {
             endAPI(request, findErrorCodeByCode(result.getRetCode()), lo, result);

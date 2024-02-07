@@ -11,7 +11,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class StatGetRes extends DTOResCommon {
+public class StatGetRes extends CommonRes {
 
     private List<StatList> content;
     private SimplePageable pageable;

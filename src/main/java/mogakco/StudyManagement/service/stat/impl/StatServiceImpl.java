@@ -32,7 +32,7 @@ import mogakco.StudyManagement.domain.AbsentSchedule;
 
 import mogakco.StudyManagement.domain.Member;
 import mogakco.StudyManagement.domain.WakeUp;
-import mogakco.StudyManagement.dto.DTOResCommon;
+import mogakco.StudyManagement.dto.CommonRes;
 import mogakco.StudyManagement.repository.AbsentScheduleRepository;
 import mogakco.StudyManagement.repository.DailyLogRepository;
 import mogakco.StudyManagement.repository.MemberRepository;
@@ -98,7 +98,7 @@ public class StatServiceImpl implements StatService {
 
     @Override
     @Transactional
-    public DTOResCommon createAbsentLog(LoggingService lo) {
+    public CommonRes createAbsentLog(LoggingService lo) {
 
         try {
             lo.setDBStart();
@@ -135,17 +135,17 @@ public class StatServiceImpl implements StatService {
                 }
 
             }
-            return new DTOResCommon(systemId, ErrorCode.OK.getCode(), "부재 일정 확인 및 로그 업데이트가 성공적으로 완료되었습니다.");
+            return new CommonRes(systemId, ErrorCode.OK.getCode(), "부재 일정 확인 및 로그 업데이트가 성공적으로 완료되었습니다.");
         } catch (Exception e) {
 
-            return new DTOResCommon(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
+            return new CommonRes(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
                     ErrorCode.INTERNAL_ERROR.getMessage("부재 일정 확인 및 로그 업데이트 중 오류"));
         }
     }
 
     @Override
     @Transactional
-    public DTOResCommon createWakeUpLog(LoggingService lo) {
+    public CommonRes createWakeUpLog(LoggingService lo) {
         try {
             Member member = getLoginMember();
             lo.setDBStart();
@@ -174,7 +174,7 @@ public class StatServiceImpl implements StatService {
 
             noticeService.createSpecificNotice(member, MessageType.WAKE_UP, lo);
 
-            return new DTOResCommon(systemId, ErrorCode.OK.getCode(), "기상 로그 업데이트가 성공적으로 완료되었습니다.");
+            return new CommonRes(systemId, ErrorCode.OK.getCode(), "기상 로그 업데이트가 성공적으로 완료되었습니다.");
         } catch (NotFoundException | InvalidRequestException e) {
             return ExceptionUtil.handleException(e);
         }

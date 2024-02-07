@@ -9,7 +9,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class RegistedWakeupRes extends DTOResCommon {
+public class RegistedWakeupRes extends CommonRes {
 
     private Set<String> registedWakeups;
 

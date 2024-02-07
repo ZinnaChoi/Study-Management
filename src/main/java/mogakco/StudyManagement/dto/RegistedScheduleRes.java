@@ -9,7 +9,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class RegistedScheduleRes extends DTOResCommon {
+public class RegistedScheduleRes extends CommonRes {
 
     private List<RegistedSchedule> registedSchedules;
 

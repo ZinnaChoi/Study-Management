@@ -22,7 +22,6 @@ import mogakco.StudyManagement.dto.PostCommentReq;
 import mogakco.StudyManagement.service.common.LoggingService;
 import mogakco.StudyManagement.service.external.SendEmailService;
 import mogakco.StudyManagement.service.post.PostCommentService;
-import mogakco.StudyManagement.util.DateUtil;
 import mogakco.StudyManagement.util.TestUtil;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -69,7 +68,7 @@ public class PostCommentControllerTest {
         @DisplayName("게시판 댓글 등록 성공")
         public void registerPostCommentSuccess() throws Exception {
                 String requestBodyJson = objectMapper
-                                .writeValueAsString(new PostCommentReq(DateUtil.getCurrentDateTime(), systemId,
+                                .writeValueAsString(new PostCommentReq(
                                                 "Thank you"));
                 String url = POST_COMMENT_CREATE_API_URL.replace("{postId}",
                                 getLatestPostIdByMemberId("PostUser").toString());
@@ -82,7 +81,7 @@ public class PostCommentControllerTest {
         @DisplayName("게시판 댓글 등록 실패 - 존재하지 않는 게시글 번호")
         public void registerPostCommentFailInvalidPostId() throws Exception {
                 String requestBodyJson = objectMapper
-                                .writeValueAsString(new PostCommentReq(DateUtil.getCurrentDateTime(), systemId,
+                                .writeValueAsString(new PostCommentReq(
                                                 "Thank you"));
                 String url = POST_COMMENT_CREATE_API_URL.replace("{postId}", "-1");
                 TestUtil.performRequest(mockMvc, url, requestBodyJson, "POST", 200, 404);
@@ -93,11 +92,9 @@ public class PostCommentControllerTest {
         @WithMockUser(username = "PostUser", authorities = { "USER" })
         @DisplayName("게시판 댓글 등록 실패 - 빈 댓글 요청")
         public void registerPostCommentFailEmptyContent() throws Exception {
-                String requestBodyJson = objectMapper
-                                .writeValueAsString(new PostCommentReq(DateUtil.getCurrentDateTime(), systemId, ""));
                 String url = POST_COMMENT_CREATE_API_URL.replace("{postId}",
                                 getLatestPostIdByMemberId("PostUser").toString());
-                TestUtil.performRequest(mockMvc, url, requestBodyJson, "POST", 400, 400);
+                TestUtil.performRequest(mockMvc, url, null, "POST", 400, 400);
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -109,7 +106,7 @@ public class PostCommentControllerTest {
         public void registerPostCommentReplySuccess() throws Exception {
                 String requestBodyJson = objectMapper
                                 .writeValueAsString(
-                                                new PostCommentReq(DateUtil.getCurrentDateTime(), systemId, "Good~!"));
+                                                new PostCommentReq("Good~!"));
                 String url = POST_COMMENT_REPLY_API_URL
                                 .replace("{postId}", getLatestPostIdByMemberId("PostUser").toString())
                                 .replace("{commentId}", getLatestCommentIdByContentAndMemberId("comment1", "PostUser")
@@ -125,7 +122,7 @@ public class PostCommentControllerTest {
         public void registerPostCommentReplyFailPostNotFound() throws Exception {
                 String requestBodyJson = objectMapper
                                 .writeValueAsString(
-                                                new PostCommentReq(DateUtil.getCurrentDateTime(), systemId, "Good~!"));
+                                                new PostCommentReq("Good~!"));
                 String url = POST_COMMENT_REPLY_API_URL.replace("{postId}", "-1")
                                 .replace("{commentId}", getLatestCommentIdByContentAndMemberId("comment1", "PostUser")
                                                 .toString());
@@ -141,7 +138,7 @@ public class PostCommentControllerTest {
         public void registerPostCommentReplyFailPostCommentNotFound() throws Exception {
                 String requestBodyJson = objectMapper
                                 .writeValueAsString(
-                                                new PostCommentReq(DateUtil.getCurrentDateTime(), systemId, "Good~!"));
+                                                new PostCommentReq("Good~!"));
                 String url = POST_COMMENT_REPLY_API_URL
                                 .replace("{postId}", getLatestPostIdByMemberId("PostUser").toString())
                                 .replace("{commentId}", "-1");
@@ -156,7 +153,7 @@ public class PostCommentControllerTest {
         public void registerPostCommentReplyFailInvalidRequest() throws Exception {
                 String requestBodyJson = objectMapper
                                 .writeValueAsString(
-                                                new PostCommentReq(DateUtil.getCurrentDateTime(), systemId, "Good~!"));
+                                                new PostCommentReq("Good~!"));
                 String url = POST_COMMENT_REPLY_API_URL
                                 .replace("{postId}", getLatestPostIdByMemberId("PostUser").toString())
                                 .replace("{commentId}", getLatestCommentIdByContentAndMemberId("reply1", "PostUser")
@@ -216,7 +213,7 @@ public class PostCommentControllerTest {
         @DisplayName("게시판 댓글(답글) 수정 성공")
         public void updatePostCommentSuccess() throws Exception {
                 String requestBodyJson = objectMapper.writeValueAsString(
-                                new PostCommentReq(DateUtil.getCurrentDateTime(), systemId, "Updated Content"));
+                                new PostCommentReq("Updated Content"));
 
                 String url = POST_COMMENT_UPDATE_DELETE_API_URL
                                 .replace("{postId}", getLatestPostIdByMemberId("PostUser").toString())
@@ -232,7 +229,7 @@ public class PostCommentControllerTest {
         @DisplayName("게시판 댓글(답글) 수정 실패 - 존재하지 않는 게시글")
         public void updatePostCommentFailPostNotFound() throws Exception {
                 String requestBodyJson = objectMapper.writeValueAsString(
-                                new PostCommentReq(DateUtil.getCurrentDateTime(), systemId, "Updated Content"));
+                                new PostCommentReq("Updated Content"));
 
                 String url = POST_COMMENT_UPDATE_DELETE_API_URL
                                 .replace("{postId}", "-1")
@@ -248,7 +245,7 @@ public class PostCommentControllerTest {
         @DisplayName("게시판 댓글(답글) 수정 실패 - 존재하지 않는 댓글")
         public void updatePostCommentFailCommentNotFound() throws Exception {
                 String requestBodyJson = objectMapper.writeValueAsString(
-                                new PostCommentReq(DateUtil.getCurrentDateTime(), systemId, "Updated Content"));
+                                new PostCommentReq("Updated Content"));
 
                 String url = POST_COMMENT_UPDATE_DELETE_API_URL
                                 .replace("{postId}", getLatestPostIdByMemberId("PostUser").toString())
@@ -263,7 +260,7 @@ public class PostCommentControllerTest {
         @DisplayName("게시판 댓글(답글) 수정 실패 - 작성하지 않은 댓글(답글)")
         public void updatePostCommentFailInvalidMember() throws Exception {
                 String requestBodyJson = objectMapper.writeValueAsString(
-                                new PostCommentReq(DateUtil.getCurrentDateTime(), systemId, "Updated Content"));
+                                new PostCommentReq("Updated Content"));
 
                 String url = POST_COMMENT_UPDATE_DELETE_API_URL
                                 .replace("{postId}", getLatestPostIdByMemberId("PostUser").toString())

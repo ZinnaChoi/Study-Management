@@ -11,7 +11,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 // Study Create, Update DTO
-public class StudyReq extends DTOReqCommon {
+public class StudyReq {
     @NotBlank(message = "스터디 이름은 반드시 있어야 합니다")
     @Schema(example = "모각코 스터디")
     private String studyName;

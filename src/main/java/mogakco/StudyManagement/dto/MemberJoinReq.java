@@ -14,7 +14,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class MemberJoinReq extends DTOReqCommon {
+public class MemberJoinReq {
 
     @Schema(example = "user1")
     @NotBlank(message = "아이디는 필수 입력 항목입니다.")

@@ -7,7 +7,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class NoticeReq extends DTOReqCommon {
+public class NoticeReq {
 
     private Boolean wakeup;
 
@@ -17,9 +17,8 @@ public class NoticeReq extends DTOReqCommon {
 
     private Boolean linkShare;
 
-    public NoticeReq(String sendDate, String systemId, Boolean wakeup, Boolean absent, Boolean newPost,
+    public NoticeReq(Boolean wakeup, Boolean absent, Boolean newPost,
             Boolean linkShare) {
-        super(sendDate, systemId);
         this.wakeup = wakeup;
         this.absent = absent;
         this.newPost = newPost;
