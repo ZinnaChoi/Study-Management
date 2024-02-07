@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import mogakco.StudyManagement.dto.PostCommentReq;
 import mogakco.StudyManagement.service.common.LoggingService;
+import mogakco.StudyManagement.service.external.SendEmailService;
 import mogakco.StudyManagement.service.post.PostCommentService;
 import mogakco.StudyManagement.util.DateUtil;
 import mogakco.StudyManagement.util.TestUtil;
@@ -39,6 +40,9 @@ public class PostCommentControllerTest {
 
         @Mock
         private LoggingService loggingService;
+
+        @Mock
+        private SendEmailService sendEmailService;
 
         @InjectMocks
         private PostCommentController postCommentController;
