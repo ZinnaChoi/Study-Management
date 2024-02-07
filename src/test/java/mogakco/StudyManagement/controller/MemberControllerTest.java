@@ -24,6 +24,7 @@ import mogakco.StudyManagement.dto.MemberInfoUpdateReq;
 import mogakco.StudyManagement.dto.MemberJoinReq;
 import mogakco.StudyManagement.dto.MemberLoginReq;
 import mogakco.StudyManagement.enums.MemberUpdateType;
+import mogakco.StudyManagement.service.external.SendEmailService;
 import mogakco.StudyManagement.service.member.impl.MemberServiceImpl;
 import mogakco.StudyManagement.util.DateUtil;
 import mogakco.StudyManagement.util.TestUtil;
@@ -40,6 +41,9 @@ public class MemberControllerTest {
 
     @Mock
     private MemberServiceImpl MemberServiceImpl;
+
+    @Mock
+    private SendEmailService sendEmailService;
 
     @InjectMocks
     private MemberController memberController;
