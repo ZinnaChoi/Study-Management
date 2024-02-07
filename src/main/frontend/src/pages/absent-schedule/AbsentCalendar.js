@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
@@ -10,6 +10,7 @@ const AbsentCalendar = ({ authClient, selectedMembers, onDateClick }) => {
   const [currentYearMonth, setCurrentYearMonth] = useState(
     getCurrentYearMonth({ start: new Date() })
   );
+  const [colorMap, setColorMap] = useState({});
 
   const getRandomPastelColor = () => {
     return `hsl(${360 * Math.random()}, ${25 + 70 * Math.random()}%, ${
@@ -31,11 +32,10 @@ const AbsentCalendar = ({ authClient, selectedMembers, onDateClick }) => {
           "/absent/calendar?" + qs.stringify(params, { arrayFormat: "repeat" })
         )
         .then((absentResponse) => {
-          const newColorMap = {};
+          const newColorMap = { ...colorMap };
           absentResponse.data.content.forEach((absentInfo) => {
-            const { scheduleName } = absentInfo;
-            if (!newColorMap[scheduleName]) {
-              newColorMap[scheduleName] = getRandomPastelColor();
+            if (!newColorMap[absentInfo.scheduleName]) {
+              newColorMap[absentInfo.scheduleName] = getRandomPastelColor();
             }
           });
 
@@ -58,7 +58,6 @@ const AbsentCalendar = ({ authClient, selectedMembers, onDateClick }) => {
             }));
 
           setEvents(filteredEvents);
-          setPrevYearMonth(currentYearMonth);
         })
         .catch((error) => {
           alert(

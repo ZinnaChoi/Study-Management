@@ -24,7 +24,7 @@ import mogakco.StudyManagement.dto.MemberInfoUpdateReq;
 import mogakco.StudyManagement.dto.MemberJoinReq;
 import mogakco.StudyManagement.dto.MemberLoginReq;
 import mogakco.StudyManagement.enums.MemberUpdateType;
-import mogakco.StudyManagement.service.member.impl.MemberServiceImpl;
+import mogakco.StudyManagement.service.member.MemberService;
 import mogakco.StudyManagement.util.DateUtil;
 import mogakco.StudyManagement.util.TestUtil;
 
@@ -39,7 +39,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 public class MemberControllerTest {
 
     @Mock
-    private MemberServiceImpl MemberServiceImpl;
+    private MemberService MemberService;
 
     @InjectMocks
     private MemberController memberController;

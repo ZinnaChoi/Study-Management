@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { authClient } from "../../services/APIService";
-import { getCurrentDateTime } from "../../util/DateUtil";
+import { getCurrentDateTime, formatDateToYYYYMMDD } from "../../util/DateUtil";
 import Table from "../../components/Table";
 
 const AbsentDetailPopup = ({ selectedDate, onClose }) => {
@@ -8,20 +8,6 @@ const AbsentDetailPopup = ({ selectedDate, onClose }) => {
 
   useEffect(() => {
     if (selectedDate) {
-      const formatDateToYYYYMMDD = (date) => {
-        if (!(date instanceof Date)) {
-          date = new Date(date);
-        }
-        let month = "" + (date.getMonth() + 1);
-        let day = "" + date.getDate();
-        let year = date.getFullYear();
-
-        if (month.length < 2) month = "0" + month;
-        if (day.length < 2) day = "0" + day;
-
-        return [year, month, day].join("");
-      };
-
       authClient
         .get(`/absent/detail`, {
           params: {
@@ -35,7 +21,7 @@ const AbsentDetailPopup = ({ selectedDate, onClose }) => {
         })
         .catch((error) => {
           alert(
-            "상세 정보 조회 실패: " +
+            "부재일정 상세 정보 조회 실패: " +
               (error.response?.data.retMsg || "Unknown error")
           );
         });
