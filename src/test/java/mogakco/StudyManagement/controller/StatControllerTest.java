@@ -24,6 +24,7 @@ import mogakco.StudyManagement.dto.DTOReqCommon;
 import mogakco.StudyManagement.enums.LogType;
 import mogakco.StudyManagement.scheduler.DailyAbsentScheduler;
 import mogakco.StudyManagement.service.common.LoggingService;
+import mogakco.StudyManagement.service.external.SendEmailService;
 import mogakco.StudyManagement.service.stat.StatService;
 import mogakco.StudyManagement.util.DateUtil;
 import mogakco.StudyManagement.util.TestUtil;
@@ -47,6 +48,9 @@ public class StatControllerTest {
 
     @Mock
     private LoggingService loggingService;
+
+    @Mock
+    private SendEmailService sendEmailService;
 
     @InjectMocks
     private StatController statController;
