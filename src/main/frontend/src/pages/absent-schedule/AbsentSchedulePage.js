@@ -1,113 +1,18 @@
 import React, { useState, useEffect } from "react";
-import qs from "qs";
 import { authClient } from "../../services/APIService";
-import { getCurrentDateTime, getCurrentYearMonth } from "../../util/DateUtil";
 import MemberCheckbox from "../../components/MemberCheckbox";
 import AbsentCalendar from "./AbsentCalendar";
 import AbsentDetailPopup from "./AbsentDetailPopup";
 
 const AbsentSchedule = () => {
-  const [events, setEvents] = useState([]);
-  const [membersList, setMembersList] = useState([]);
   const [selectedMembers, setSelectedMembers] = useState([]);
-  const [currentYearMonth, setCurrentYearMonth] = useState("");
-  const [prevYearMonth, setPrevYearMonth] = useState("");
-  const [colorMap, setColorMap] = useState({});
   const [showPopup, setShowPopup] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
-
-  const getRandomPastelColor = () => {
-    return `hsl(${360 * Math.random()}, ${25 + 70 * Math.random()}%, ${
-      85 + 10 * Math.random()
-    }%)`;
-  };
-
-  const getYearMonth = (dateInfo) => {
-    const newYearMonth = getCurrentYearMonth(dateInfo);
-    setCurrentYearMonth(newYearMonth);
-  };
 
   const handleDateClick = (date) => {
     setShowPopup(true);
     setSelectedDate(date);
   };
-
-  useEffect(() => {
-    const params = {
-      sendDate: getCurrentDateTime(),
-      systemId: "STUDY_0001",
-    };
-    authClient
-      .get("/members", { params: params })
-      .then((response) => {
-        const memberNames = response.data.content
-          .filter((member) => member.id !== "admin")
-          .map((member) => member.name);
-
-        setMembersList(memberNames);
-        setSelectedMembers(memberNames);
-      })
-      .catch((error) => {
-        alert(
-          "스터디원 목록 조회 실패: " +
-            (error.response?.data.retMsg || "Unknown error")
-        );
-      });
-  }, []);
-
-  useEffect(() => {
-    if (
-      currentYearMonth &&
-      (currentYearMonth !== prevYearMonth || selectedMembers.length > 0)
-    ) {
-      const params = {
-        sendDate: getCurrentDateTime(),
-        systemId: "STUDY_0001",
-        yearMonth: currentYearMonth,
-        memberNameList: selectedMembers,
-      };
-
-      authClient
-        .get(
-          "/absent/calendar?" + qs.stringify(params, { arrayFormat: "repeat" })
-        )
-        .then((absentResponse) => {
-          const newColorMap = absentResponse.data.content.reduce(
-            (map, absentInfo) => {
-              const { scheduleName } = absentInfo;
-              map[scheduleName] = map[scheduleName] || getRandomPastelColor();
-              return map;
-            },
-            colorMap
-          );
-          setColorMap(newColorMap);
-
-          const newEvents = absentResponse.data.content
-            .filter(
-              (absentInfo) =>
-                selectedMembers.length === 0 ||
-                absentInfo.memberNameList.some((name) =>
-                  selectedMembers.includes(name)
-                )
-            )
-            .map((absentInfo) => ({
-              title: `${
-                absentInfo.scheduleName
-              }: ${absentInfo.memberNameList.join(", ")}`,
-              start: absentInfo.absentDate,
-              backgroundColor: newColorMap[absentInfo.scheduleName],
-              borderColor: newColorMap[absentInfo.scheduleName],
-              display: "block",
-            }));
-
-          setEvents(newEvents);
-          setPrevYearMonth(currentYearMonth);
-        })
-        .catch((error) => {
-          console.error("데이터 조회 실패:", error);
-        });
-    }
-  }, [currentYearMonth, selectedMembers]);
 
   const containerStyle = {
     display: "flex",
@@ -135,15 +40,15 @@ const AbsentSchedule = () => {
       <div style={checkboxContainerStyle}>
         <h3>스터디원 선택</h3>
         <MemberCheckbox
-          membersList={membersList}
+          authClient={authClient}
           selectedMembers={selectedMembers}
           setSelectedMembers={setSelectedMembers}
         />
       </div>
       <div style={calendarContainerStyle}>
         <AbsentCalendar
-          events={events}
-          getYearMonth={getYearMonth}
+          authClient={authClient}
+          selectedMembers={selectedMembers}
           onDateClick={handleDateClick}
         />
       </div>
