@@ -14,17 +14,17 @@ const AbsentAddPopup = ({ onClose }) => {
 
   useEffect(() => {
     authClient
-      .get("/schedules", {
+      .get("/member", {
         params: {
           sendDate: getCurrentDateTime(),
           systemId: "STUDY_0001",
         },
       })
       .then((response) => {
-        const scheduleOptions = response.data.registedSchedules.map(
-          (schedule) => ({
-            value: schedule.scheduleName,
-            label: schedule.scheduleName,
+        const scheduleOptions = response.data.scheduleName.map(
+          (scheduleName) => ({
+            value: scheduleName,
+            label: scheduleName,
           })
         );
         setSchedules(scheduleOptions);

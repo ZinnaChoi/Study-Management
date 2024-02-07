@@ -10,6 +10,7 @@ const AbsentSchedule = () => {
   const [showDetailPopup, setShowDetailPopup] = useState(false);
   const [showAddPopup, setShowAddPopup] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
+  const [refreshKey, setRefreshKey] = useState(Date.now());
 
   const handleDateClick = (date) => {
     setShowDetailPopup(true);
@@ -18,6 +19,10 @@ const AbsentSchedule = () => {
 
   const handleAddClick = () => {
     setShowAddPopup(true);
+  };
+
+  const handleReFetch = () => {
+    setRefreshKey(Date.now());
   };
 
   const containerStyle = {
@@ -57,6 +62,7 @@ const AbsentSchedule = () => {
           authClient={authClient}
           selectedMembers={selectedMembers}
           onDateClick={handleDateClick}
+          refreshKey={refreshKey}
         />
       </div>
       {showDetailPopup && (
@@ -68,7 +74,10 @@ const AbsentSchedule = () => {
       {showAddPopup && (
         <AbsentAddPopup
           selectedDate={selectedDate}
-          onClose={() => setShowAddPopup(false)}
+          onClose={() => {
+            setShowAddPopup(false);
+            handleReFetch();
+          }}
         />
       )}
     </div>

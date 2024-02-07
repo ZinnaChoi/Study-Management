@@ -5,7 +5,12 @@ import interactionPlugin from "@fullcalendar/interaction";
 import { getCurrentDateTime, getCurrentYearMonth } from "../../util/DateUtil";
 import qs from "qs";
 
-const AbsentCalendar = ({ authClient, selectedMembers, onDateClick }) => {
+const AbsentCalendar = ({
+  authClient,
+  selectedMembers,
+  onDateClick,
+  refreshKey,
+}) => {
   const [events, setEvents] = useState([]);
   const [currentYearMonth, setCurrentYearMonth] = useState(
     getCurrentYearMonth({ start: new Date() })
@@ -66,7 +71,7 @@ const AbsentCalendar = ({ authClient, selectedMembers, onDateClick }) => {
           );
         });
     }
-  }, [authClient, currentYearMonth, selectedMembers]);
+  }, [authClient, currentYearMonth, selectedMembers, refreshKey]);
 
   return (
     <FullCalendar
