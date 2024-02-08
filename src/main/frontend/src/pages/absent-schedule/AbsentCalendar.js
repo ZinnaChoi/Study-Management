@@ -2,7 +2,6 @@ import React, { useEffect, useState, useRef } from "react";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
-import "../../styles/AbsentSchedule.css";
 import { getCurrentYearMonth } from "../../util/DateUtil";
 import qs from "qs";
 

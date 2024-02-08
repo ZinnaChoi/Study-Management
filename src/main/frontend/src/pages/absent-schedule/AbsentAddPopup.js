@@ -3,6 +3,7 @@ import CommonDialog from "../../components/CommonDialog";
 import { authClient } from "../../services/APIService";
 import { formatDateToYYYYMMDD } from "../../util/DateUtil";
 import Select from "react-select";
+import "../../styles/AbsentSchedule.css";
 
 const AbsentAddPopup = ({ onClose, onRefresh }) => {
   const [schedules, setSchedules] = useState([]);
@@ -68,15 +69,22 @@ const AbsentAddPopup = ({ onClose, onRefresh }) => {
       inputTypes={["date", "text"]}
       showButton={true}
       extraComponents={
-        <>
+        <div className="absent-select">
+          <div className="absent-select-title">부재 스케줄</div>
           <Select
             options={schedules}
             isMulti
             value={selectedSchedules}
             onChange={setSelectedSchedules}
-            placeholder="부재 스케줄 선택"
+            placeholder="스케줄 선택"
+            styles={{
+              container: (provided) => ({
+                ...provided,
+                width: "65%",
+              }),
+            }}
           />
-        </>
+        </div>
       }
     />
   );
