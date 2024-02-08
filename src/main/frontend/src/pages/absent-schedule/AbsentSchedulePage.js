@@ -4,6 +4,7 @@ import MemberCheckbox from "../../components/MemberCheckbox";
 import AbsentCalendar from "./AbsentCalendar";
 import AbsentDetailPopup from "./AbsentDetailPopup";
 import AbsentAddPopup from "./AbsentAddPopup";
+import "../../styles/AbsentSchedule.css";
 
 const AbsentSchedule = () => {
   const [selectedMembers, setSelectedMembers] = useState([]);
@@ -13,43 +14,30 @@ const AbsentSchedule = () => {
   const [refreshKey, setRefreshKey] = useState(Date.now());
 
   const handleDateClick = (date) => {
-    setShowDetailPopup(true);
     setSelectedDate(date);
+    setShowDetailPopup(true);
   };
 
-  const handleAddClick = () => {
-    setShowAddPopup(true);
+  const handleCloseDetailPopup = () => {
+    setShowDetailPopup(false);
   };
 
-  const handleReFetch = () => {
+  const handleCloseAddPopup = () => {
+    setShowAddPopup(false);
+  };
+
+  const refreshCalendar = () => {
     setRefreshKey(Date.now());
   };
 
-  const containerStyle = {
-    display: "flex",
-    flexDirection: "row",
-  };
-
-  const checkboxStyle = {
-    flex: 1,
-    borderRight: "1px solid #ccc",
-    paddingRight: "20px",
-    marginRight: "20px",
-  };
-
-  const calendarStyle = {
-    flex: 5,
-    height: "100vh",
-    maxWidth: "100%",
-    padding: 0,
-    margin: 0,
-    fontSize: "1.0em",
-  };
-
   return (
-    <div style={containerStyle}>
-      <div style={checkboxStyle}>
-        <button onClick={handleAddClick}>부재일정 추가</button>{" "}
+    <div className="container">
+      <div className="checkbox">
+        <AbsentAddPopup
+          open={showAddPopup}
+          onClose={handleCloseAddPopup}
+          onRefresh={refreshCalendar}
+        />
         <h3>스터디원 선택</h3>
         <MemberCheckbox
           authClient={authClient}
@@ -57,7 +45,7 @@ const AbsentSchedule = () => {
           setSelectedMembers={setSelectedMembers}
         />
       </div>
-      <div style={calendarStyle}>
+      <div className="calendar">
         <AbsentCalendar
           authClient={authClient}
           selectedMembers={selectedMembers}
@@ -68,7 +56,7 @@ const AbsentSchedule = () => {
       {showDetailPopup && (
         <AbsentDetailPopup
           selectedDate={selectedDate}
-          onClose={() => setShowDetailPopup(false)}
+          onClose={handleCloseDetailPopup}
         />
       )}
       {showAddPopup && (
@@ -76,7 +64,6 @@ const AbsentSchedule = () => {
           selectedDate={selectedDate}
           onClose={() => {
             setShowAddPopup(false);
-            handleReFetch();
           }}
         />
       )}

@@ -1,0 +1,31 @@
+/* css 적용시 주의사항 -> Material-UI에서 제공하는 컴포넌트에 적용할 경우 !important 필수 */
+.dialog-content {
+  display: flex !important;
+  align-items: center !important;
+}
+
+.dialog-input {
+  margin-left: auto !important;
+}
+
+.dialog-title {
+  font-size: 16px !important;
+  justify-content: center !important;
+  text-align: center !important;
+  padding-top: 10px !important;
+  padding-bottom: 0px !important;
+  font-weight: 600 !important;
+}
+
+.title-under-line {
+  width: 85%;
+}
+
+.action-btn {
+  justify-content: center !important;
+}
+
+.input-key {
+  font-size: 14px !important;
+  margin-bottom: 20px !important;
+}

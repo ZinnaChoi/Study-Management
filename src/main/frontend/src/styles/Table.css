@@ -1,0 +1,12 @@
+.th {
+  background-color: #c9e4ff;
+  color: black;
+  padding: 10px;
+  border: 1px solid #dee2e6;
+}
+
+.td {
+  padding: 10px;
+  border: 1px solid #dee2e6;
+  text-align: center;
+}

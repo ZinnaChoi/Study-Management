@@ -1,0 +1,29 @@
+/* css 적용시 주의사항 -> Material-UI에서 제공하는 컴포넌트에 적용할 경우 !important 필수 */
+.accept-btn {
+  background-color: #a8d08c !important;
+  color: white !important;
+  font-weight: 600 !important;
+  font-size: 12px !important;
+}
+
+.cancel-btn {
+  background-color: #f4b081 !important;
+  color: white !important;
+  font-weight: 600 !important;
+  font-size: 12px !important;
+}
+
+.page-btn {
+  margin: 0 3px;
+  padding: 5px 10px;
+  border: none;
+  border-radius: 5px;
+  background-color: #b2bde6;
+  color: white !important;
+  cursor: pointer;
+}
+
+.page-btn.active {
+  background-color: #2c5dff !important;
+  color: white !important;
+}
