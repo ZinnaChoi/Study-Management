@@ -62,6 +62,7 @@ const AbsentDetailPopup = ({ selectedDate, onClose }) => {
       ...prevEditingMembers,
       [memberName]: true,
     }));
+
     try {
       const response = await authClient.get(`/absent/detail`, {
         params: {
@@ -71,13 +72,21 @@ const AbsentDetailPopup = ({ selectedDate, onClose }) => {
       const memberDetail = response.data.content.find(
         (detail) => detail.memberName === memberName
       );
-      const scheduleOptions = memberDetail.scheduleNameList.map(
-        (name) => schedules[name]
+
+      const allScheduleOptions = Object.values(schedules);
+
+      const selectedScheduleOptions = memberDetail.scheduleNameList.map(
+        (name) => ({
+          value: name,
+          label: name,
+        })
       );
+
       setEditFormData({
         ...editFormData,
         [memberName]: {
-          scheduleNameList: scheduleOptions,
+          scheduleNameList: selectedScheduleOptions,
+          allSchedules: allScheduleOptions,
           description: memberDetail.description,
         },
       });
@@ -140,7 +149,7 @@ const AbsentDetailPopup = ({ selectedDate, onClose }) => {
     ),
     scheduleNameList: editingMembers[detail.memberName] ? (
       <Select
-        options={editFormData[detail.memberName]?.scheduleNameList}
+        options={editFormData[detail.memberName]?.allSchedules}
         isMulti
         value={editFormData[detail.memberName]?.scheduleNameList}
         onChange={(value) =>
