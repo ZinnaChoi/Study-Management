@@ -3,6 +3,7 @@ import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import { getCurrentDateTime, getCurrentYearMonth } from "../../util/DateUtil";
+import "../../styles/AbsentSchedule.css";
 import qs from "qs";
 
 const AbsentCalendar = ({

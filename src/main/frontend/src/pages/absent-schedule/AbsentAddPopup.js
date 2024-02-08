@@ -75,15 +75,22 @@ const AbsentAddPopup = ({ onClose, onRefresh }) => {
       inputTypes={["date", "text"]}
       showButton={true}
       extraComponents={
-        <>
+        <div className="absent-select">
+          <div className="absent-select-title">부재 스케줄</div>
           <Select
             options={schedules}
             isMulti
             value={selectedSchedules}
             onChange={setSelectedSchedules}
-            placeholder="부재 스케줄 선택"
+            placeholder="스케줄 선택"
+            styles={{
+              container: (provided) => ({
+                ...provided,
+                width: "65%",
+              }),
+            }}
           />
-        </>
+        </div>
       }
     />
   );
