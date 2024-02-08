@@ -12,7 +12,7 @@
         </encoder>
         <!-- 매일 자정 로그 파일을 그날 날짜로 저장하고, 새로운 초기 로그 파일 생성 -->
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>logs/logfile-%d{yyyy-MM-dd}.log</fileNamePattern>
+            <fileNamePattern>logs/logfile-%d{yyyy-MM-dd.SSS}.log</fileNamePattern>
             <!-- 30일 지난 로그는 삭제 -->
             <maxHistory>30</maxHistory>
         </rollingPolicy>

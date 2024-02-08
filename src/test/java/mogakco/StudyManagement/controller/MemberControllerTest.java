@@ -193,9 +193,6 @@ public class MemberControllerTest {
 
         UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(MEMBER_INFO_URL);
 
-        uriBuilder.queryParam("sendDate", DateUtil.getCurrentDateTime())
-                .queryParam("systemId", "SYS_01");
-
         MvcResult result = TestUtil.performRequest(mockMvc, uriBuilder.toUriString(), null, "GET", 200, 200);
         System.out.println(result.getResponse().getContentAsString());
         assertEquals(200, result.getResponse().getStatus());
@@ -208,9 +205,6 @@ public class MemberControllerTest {
     @DisplayName("회원 목록 조회 성공")
     public void getMemberList_Success() throws Exception {
         UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(MEMEBER_LIST_URL);
-
-        uriBuilder.queryParam("sendDate", DateUtil.getCurrentDateTime())
-                .queryParam("systemId", "SYS_01");
 
         TestUtil.performRequest(mockMvc, uriBuilder.toUriString(), null, "GET", 200, 200);
     }
