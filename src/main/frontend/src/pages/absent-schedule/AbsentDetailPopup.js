@@ -61,7 +61,7 @@ const AbsentDetailPopup = ({ selectedDate, onClose }) => {
     extraComponents: <Table columns={columns} contents={absentDetail} />,
   };
 
-  return <CommonDialog {...dialogProps} />;
+  return absentDetail.length > 0 ? <CommonDialog {...dialogProps} /> : null;
 };
 
 export default AbsentDetailPopup;
