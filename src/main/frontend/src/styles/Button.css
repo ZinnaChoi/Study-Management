@@ -12,3 +12,18 @@
   font-weight: 600 !important;
   font-size: 12px !important;
 }
+
+.page-btn {
+  margin: 0 3px;
+  padding: 5px 10px;
+  border: none;
+  border-radius: 5px;
+  background-color: #b2bde6;
+  color: white !important;
+  cursor: pointer;
+}
+
+.page-btn.active {
+  background-color: #2c5dff !important;
+  color: white !important;
+}

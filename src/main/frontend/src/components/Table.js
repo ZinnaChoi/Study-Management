@@ -1,17 +1,6 @@
+import "../styles/Table.css";
+
 const Table = ({ columns, contents }) => {
-  const thStyle = {
-    backgroundColor: "#375582",
-    color: "white",
-    padding: "10px",
-    border: "1px solid #dee2e6",
-  };
-
-  const tdStyle = {
-    padding: "10px",
-    border: "1px solid #dee2e6",
-    textAlign: "center",
-  };
-
   return (
     <table
       style={{ width: "100%", borderCollapse: "collapse", marginTop: "20px" }}
@@ -19,7 +8,7 @@ const Table = ({ columns, contents }) => {
       <thead>
         <tr>
           {columns.map((column) => (
-            <th key={column.accessor} style={thStyle}>
+            <th key={column.accessor} className="th">
               {column.Header}
             </th>
           ))}
@@ -29,7 +18,7 @@ const Table = ({ columns, contents }) => {
         {contents.map((content, index) => (
           <tr key={index}>
             {columns.map((column) => (
-              <td key={column.accessor} style={tdStyle}>
+              <td key={column.accessor} className="td">
                 {column.Cell ? column.Cell(content) : content[column.accessor]}
               </td>
             ))}

@@ -1,16 +1,7 @@
 import React from "react";
+import "../styles/Button.css";
 
 const Pagination = ({ totalPages, currentPage, onPageChange }) => {
-  const buttonStyle = {
-    margin: "0 5px",
-    padding: "5px 10px",
-    border: "none",
-    borderRadius: "5px",
-    backgroundColor: "#375582",
-    color: "white",
-    cursor: "pointer",
-  };
-
   return (
     <div
       style={{ display: "flex", justifyContent: "center", margin: "20px 0" }}
@@ -19,11 +10,7 @@ const Pagination = ({ totalPages, currentPage, onPageChange }) => {
         <button
           key={index}
           onClick={() => onPageChange(index)}
-          style={
-            index === currentPage
-              ? { ...buttonStyle, backgroundColor: "#004085" }
-              : buttonStyle
-          }
+          className={index === currentPage ? "page-btn active" : "page-btn"}
         >
           {index + 1}
         </button>
