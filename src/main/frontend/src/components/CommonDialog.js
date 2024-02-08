@@ -1,5 +1,4 @@
-import React from "react";
-
+import React, { useState, useEffect } from "react";
 import "../styles/Dialog.css";
 import "../styles/Button.css";
 import {
@@ -12,24 +11,41 @@ import {
 } from "@mui/material";
 
 export default function CommonDialog(props) {
-  const [open, setOpen] = React.useState(false);
+  const [internalOpen, setInternalOpen] = useState(false);
+  const isControlled = props.open !== undefined;
+  const open = isControlled ? props.open : internalOpen;
 
-  const handleClickOpen = () => {
-    setOpen(true);
+  const handleOpen = () => {
+    if (!isControlled) {
+      setInternalOpen(true);
+    }
   };
 
-  const handleClose = (event, reason) => {
+  const handleClose = (reason) => {
     if (reason && reason === "backdropClick") {
       return;
     }
-    setOpen(false);
+    if (!isControlled) {
+      setInternalOpen(false);
+    }
+    if (props.onClose) {
+      props.onClose();
+    }
   };
+
+  useEffect(() => {
+    if (isControlled) {
+      setInternalOpen(props.open);
+    }
+  }, [props.open, isControlled]);
 
   return (
     <React.Fragment>
-      <Button variant="outlined" onClick={handleClickOpen}>
-        {props.btnTitle}
-      </Button>
+      {props.btnTitle && (
+        <Button variant="outlined" onClick={handleOpen}>
+          {props.btnTitle}
+        </Button>
+      )}
 
       <Dialog
         open={open}

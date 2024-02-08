@@ -13,12 +13,12 @@ const AbsentSchedule = () => {
   const [refreshKey, setRefreshKey] = useState(Date.now());
 
   const handleDateClick = (date) => {
-    setShowDetailPopup(true);
     setSelectedDate(date);
+    setShowDetailPopup(true);
   };
 
-  const handleOpenAddPopup = () => {
-    setShowAddPopup(true);
+  const handleCloseDetailPopup = () => {
+    setShowDetailPopup(false);
   };
 
   const handleCloseAddPopup = () => {
@@ -76,7 +76,7 @@ const AbsentSchedule = () => {
       {showDetailPopup && (
         <AbsentDetailPopup
           selectedDate={selectedDate}
-          onClose={() => setShowDetailPopup(false)}
+          onClose={handleCloseDetailPopup}
         />
       )}
       {showAddPopup && (
