@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { getCurrentDateTime, parseDate } from "../../util/DateUtil";
+import { parseDate } from "../../util/DateUtil";
 import { authClient } from "../../services/APIService";
 import Table from "../../components/Table";
 import Pagination from "../../components/Pagination";
@@ -19,8 +19,6 @@ const NoticeBoard = () => {
     currentSearchKeyword = searchKeyword
   ) => {
     const params = {
-      sendDate: getCurrentDateTime(),
-      systemId: "STUDY_0001",
       page: currentPage,
       size: currentSize,
       sort: "postId,desc",

@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 import mogakco.StudyManagement.domain.Member;
 import mogakco.StudyManagement.domain.Post;
 import mogakco.StudyManagement.domain.PostComment;
-import mogakco.StudyManagement.dto.DTOResCommon;
+import mogakco.StudyManagement.dto.CommonRes;
 import mogakco.StudyManagement.dto.PostCommentReply;
 import mogakco.StudyManagement.dto.PostCommentReplyRes;
 import mogakco.StudyManagement.dto.PostCommentReq;
@@ -38,7 +38,7 @@ public class PostCommentServiceImpl extends PostCommonService implements PostCom
 
     @Override
     @Transactional
-    public DTOResCommon createPostComment(Long postId, PostCommentReq postCommentReq, LoggingService lo) {
+    public CommonRes createPostComment(Long postId, PostCommentReq postCommentReq, LoggingService lo) {
         try {
             lo.setDBStart();
             Member member = getLoginMember();
@@ -53,7 +53,7 @@ public class PostCommentServiceImpl extends PostCommonService implements PostCom
             postCommentRepository.save(comment);
             lo.setDBEnd();
 
-            return new DTOResCommon(null, ErrorCode.CREATED.getCode(), ErrorCode.CREATED.getMessage("게시판 댓글"));
+            return new CommonRes(null, ErrorCode.CREATED.getCode(), ErrorCode.CREATED.getMessage("게시판 댓글"));
 
         } catch (NotFoundException e) {
             return ExceptionUtil.handleException(e);
@@ -62,7 +62,7 @@ public class PostCommentServiceImpl extends PostCommonService implements PostCom
 
     @Override
     @Transactional
-    public DTOResCommon createPostCommentReply(Long postId, Long commentId, PostCommentReq postCommentReq,
+    public CommonRes createPostCommentReply(Long postId, Long commentId, PostCommentReq postCommentReq,
             LoggingService lo) {
         try {
             lo.setDBStart();
@@ -83,7 +83,7 @@ public class PostCommentServiceImpl extends PostCommonService implements PostCom
             postCommentRepository.save(reply);
             lo.setDBEnd();
 
-            return new DTOResCommon(null, ErrorCode.CREATED.getCode(), ErrorCode.CREATED.getMessage("게시판 답글"));
+            return new CommonRes(null, ErrorCode.CREATED.getCode(), ErrorCode.CREATED.getMessage("게시판 답글"));
 
         } catch (NotFoundException | InvalidRequestException e) {
             return ExceptionUtil.handleException(e);
@@ -113,16 +113,16 @@ public class PostCommentServiceImpl extends PostCommonService implements PostCom
                     postCommentReplies);
 
         } catch (NotFoundException | InvalidRequestException e) {
-            DTOResCommon res = ExceptionUtil.handleException(e);
+            CommonRes res = ExceptionUtil.handleException(e);
             return new PostCommentReplyRes(res.getSystemId(), res.getRetCode(), res.getRetMsg(), null);
         }
     }
 
     @Override
     @Transactional
-    public DTOResCommon updatePostComment(Long postId, Long commentId, PostCommentReq postCommentReq,
+    public CommonRes updatePostComment(Long postId, Long commentId, PostCommentReq postCommentReq,
             LoggingService lo) {
-        DTOResCommon result = new DTOResCommon();
+        CommonRes result = new CommonRes();
         try {
             lo.setDBStart();
             isPostExistById(postId);
@@ -155,7 +155,7 @@ public class PostCommentServiceImpl extends PostCommonService implements PostCom
 
     @Override
     @Transactional
-    public DTOResCommon deletePostComment(Long postId, Long commentId, LoggingService lo) {
+    public CommonRes deletePostComment(Long postId, Long commentId, LoggingService lo) {
         try {
             lo.setDBStart();
             isPostExistById(postId);
@@ -171,7 +171,7 @@ public class PostCommentServiceImpl extends PostCommonService implements PostCom
             postCommentRepository.delete(postComment);
             lo.setDBEnd();
 
-            return new DTOResCommon(null, ErrorCode.DELETED.getCode(),
+            return new CommonRes(null, ErrorCode.DELETED.getCode(),
                     ErrorCode.DELETED.getMessage("게시판 댓글(답글)"));
 
         } catch (NotFoundException | UnauthorizedAccessException e) {

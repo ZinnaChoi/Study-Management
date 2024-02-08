@@ -6,7 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import mogakco.StudyManagement.domain.Member;
 import mogakco.StudyManagement.domain.Post;
 import mogakco.StudyManagement.domain.PostLike;
-import mogakco.StudyManagement.dto.DTOResCommon;
+import mogakco.StudyManagement.dto.CommonRes;
 import mogakco.StudyManagement.enums.ErrorCode;
 import mogakco.StudyManagement.exception.ConflictException;
 import mogakco.StudyManagement.exception.NotFoundException;
@@ -31,7 +31,7 @@ public class PostLikeServiceImpl extends PostCommonService implements PostLikeSe
 
     @Override
     @Transactional
-    public DTOResCommon createPostLike(Long postId, LoggingService lo) {
+    public CommonRes createPostLike(Long postId, LoggingService lo) {
 
         try {
             lo.setDBStart();
@@ -50,7 +50,7 @@ public class PostLikeServiceImpl extends PostCommonService implements PostLikeSe
             postLikeRepository.save(newPostLike);
             lo.setDBEnd();
 
-            return new DTOResCommon(null, ErrorCode.CREATED.getCode(), ErrorCode.CREATED.getMessage("게시글 좋아요"));
+            return new CommonRes(null, ErrorCode.CREATED.getCode(), ErrorCode.CREATED.getMessage("게시글 좋아요"));
 
         } catch (NotFoundException | ConflictException e) {
             return ExceptionUtil.handleException(e);
@@ -60,7 +60,7 @@ public class PostLikeServiceImpl extends PostCommonService implements PostLikeSe
 
     @Override
     @Transactional
-    public DTOResCommon deletePostLike(Long postId, LoggingService lo) {
+    public CommonRes deletePostLike(Long postId, LoggingService lo) {
         try {
             lo.setDBStart();
             Member member = getLoginMember();
@@ -76,7 +76,7 @@ public class PostLikeServiceImpl extends PostCommonService implements PostLikeSe
             postLikeRepository.delete(postLike);
             lo.setDBEnd();
 
-            return new DTOResCommon(null, ErrorCode.DELETED.getCode(), ErrorCode.DELETED.getMessage("게시글 좋아요"));
+            return new CommonRes(null, ErrorCode.DELETED.getCode(), ErrorCode.DELETED.getMessage("게시글 좋아요"));
 
         } catch (NotFoundException e) {
             return ExceptionUtil.handleException(e);

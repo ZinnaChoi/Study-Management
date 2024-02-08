@@ -14,7 +14,7 @@ import mogakco.StudyManagement.enums.MemberUpdateType;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class MemberInfoUpdateReq extends DTOReqCommon {
+public class MemberInfoUpdateReq {
 
     @Schema(example = "NAME")
     private MemberUpdateType type;

@@ -14,13 +14,12 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
-import mogakco.StudyManagement.dto.DTOResCommon;
+import mogakco.StudyManagement.dto.CommonRes;
 import mogakco.StudyManagement.dto.NoticeGetRes;
 import mogakco.StudyManagement.dto.NoticeReq;
 import mogakco.StudyManagement.enums.ErrorCode;
 import mogakco.StudyManagement.service.common.LoggingService;
 import mogakco.StudyManagement.service.notice.NoticeService;
-import mogakco.StudyManagement.util.DateUtil;
 
 @Tag(name = "알림", description = "알림 관련 API 분류")
 @SecurityRequirement(name = "bearer-key")
@@ -59,19 +58,18 @@ public class NoticeController extends CommonController {
     @Operation(summary = "알림 상태 수정", description = "개인별 알림 수신 여부 상태 수정")
     @SecurityRequirement(name = "bearer-key")
     @PatchMapping(value = "/notice/{memberId}")
-    public DTOResCommon updateNotice(HttpServletRequest request,
+    public CommonRes updateNotice(HttpServletRequest request,
             @PathVariable(name = "memberId", required = true) Long memberId,
             @RequestBody @Valid NoticeReq noticeReq) {
-        DTOResCommon result = new DTOResCommon();
+        CommonRes result = new CommonRes();
 
         try {
             startAPI(lo, null);
             result = noticeService.updateNotice(memberId, noticeReq, lo);
-            result.setSendDate(DateUtil.getCurrentDateTime());
             result.setSystemId(systemId);
         } catch (Exception e) {
             e.printStackTrace();
-            result = new DTOResCommon(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
+            result = new CommonRes(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
                     ErrorCode.INTERNAL_ERROR.getMessage());
         } finally {
             endAPI(request, ErrorCode.OK, lo, result);
@@ -84,14 +82,14 @@ public class NoticeController extends CommonController {
     @PostMapping("/notice/general")
     @Hidden
     // ScheduleStartTimeMonitoring.java 내 스케줄링의 기능 확인용 이므로 Hidden처리함.
-    public DTOResCommon createGeneralNotice(HttpServletRequest request) {
+    public CommonRes createGeneralNotice(HttpServletRequest request) {
 
-        DTOResCommon result = new DTOResCommon();
+        CommonRes result = new CommonRes();
         try {
             startAPI(lo, null);
             result = noticeService.createGeneralNotice(lo);
         } catch (Exception e) {
-            result = new DTOResCommon(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
+            result = new CommonRes(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
                     ErrorCode.INTERNAL_ERROR.getMessage());
         } finally {
             endAPI(request, findErrorCodeByCode(result.getRetCode()), lo, result);

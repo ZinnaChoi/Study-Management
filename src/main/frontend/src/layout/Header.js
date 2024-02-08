@@ -18,7 +18,6 @@ import { menuTree } from "../constants/constants";
 import axios from "axios";
 import { authClient } from "../services/APIService";
 import HomeIcon from "@mui/icons-material/Home";
-import { getCurrentDateTime } from "../util/DateUtil";
 
 function Header() {
   const [anchorElStudy, setAnchorElStudy] = React.useState(null);
@@ -58,9 +57,8 @@ function Header() {
   };
 
   function setLogoImg() {
-    const curDateParam = "sendDate=" + getCurrentDateTime();
     authClient
-      .get("/study?" + curDateParam)
+      .get("/study")
       .then(function (response) {
         setLogo(response.data?.logo);
       })
@@ -73,8 +71,6 @@ function Header() {
   function setAdminToken() {
     axios
       .post("api/v1/login", {
-        sendDate: "20240112113804899",
-        systemId: "STUDY_0001",
         id: "admin",
         password: "password",
       })

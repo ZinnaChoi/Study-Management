@@ -9,7 +9,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class StudyInfoRes extends DTOResCommon {
+public class StudyInfoRes extends CommonRes {
 
     private Long studyId;
 

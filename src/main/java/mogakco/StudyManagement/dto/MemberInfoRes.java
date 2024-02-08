@@ -12,7 +12,7 @@ import mogakco.StudyManagement.enums.MemberRole;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class MemberInfoRes extends DTOResCommon {
+public class MemberInfoRes extends CommonRes {
 
     @Schema(example = "user1")
     private String id;

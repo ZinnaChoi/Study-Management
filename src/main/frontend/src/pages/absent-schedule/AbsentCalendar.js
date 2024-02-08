@@ -2,8 +2,8 @@ import React, { useEffect, useState, useRef } from "react";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
-import { getCurrentDateTime, getCurrentYearMonth } from "../../util/DateUtil";
 import "../../styles/AbsentSchedule.css";
+import { getCurrentYearMonth } from "../../util/DateUtil";
 import qs from "qs";
 
 const AbsentCalendar = ({
@@ -27,8 +27,6 @@ const AbsentCalendar = ({
   useEffect(() => {
     if (currentYearMonth && selectedMembers.length > 0) {
       const params = {
-        sendDate: getCurrentDateTime(),
-        systemId: "STUDY_0001",
         yearMonth: currentYearMonth,
         memberNameList: selectedMembers,
       };

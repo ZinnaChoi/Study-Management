@@ -13,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import mogakco.StudyManagement.domain.Member;
 import mogakco.StudyManagement.domain.Notice;
 import mogakco.StudyManagement.domain.Schedule;
-import mogakco.StudyManagement.dto.DTOResCommon;
+import mogakco.StudyManagement.dto.CommonRes;
 import mogakco.StudyManagement.dto.NoticeGetRes;
 import mogakco.StudyManagement.dto.NoticeList;
 import mogakco.StudyManagement.dto.NoticeReq;
@@ -81,10 +81,10 @@ public class NoticeServiceImpl implements NoticeService {
 
     @Override
     @Transactional
-    public DTOResCommon updateNotice(Long memberId, NoticeReq noticeReq, LoggingService lo) {
+    public CommonRes updateNotice(Long memberId, NoticeReq noticeReq, LoggingService lo) {
 
         try {
-            DTOResCommon result = new DTOResCommon();
+            CommonRes result = new CommonRes();
             lo.setDBStart();
             Optional<Notice> noticeOptional = noticeRepository.findByMember_MemberId(memberId);
 
@@ -113,9 +113,9 @@ public class NoticeServiceImpl implements NoticeService {
 
     @Override
     @Transactional
-    public DTOResCommon createGeneralNotice(LoggingService lo) {
+    public CommonRes createGeneralNotice(LoggingService lo) {
         try {
-            DTOResCommon result = new DTOResCommon();
+            CommonRes result = new CommonRes();
 
             String formattedTime = LocalDateTime.now().plusMinutes(10).format(DateTimeFormatter.ofPattern("HH:mm"));
 

@@ -7,7 +7,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class PostDetailRes extends DTOResCommon {
+public class PostDetailRes extends CommonRes {
 
     private PostDetail postDetail;
 

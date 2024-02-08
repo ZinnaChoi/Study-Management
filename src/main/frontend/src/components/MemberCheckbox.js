@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { getCurrentDateTime } from "../util/DateUtil";
 import qs from "qs";
 
 const MemberCheckbox = ({
@@ -10,12 +9,8 @@ const MemberCheckbox = ({
   const [membersList, setMembersList] = useState([]);
 
   useEffect(() => {
-    const params = {
-      sendDate: getCurrentDateTime(),
-      systemId: "STUDY_0001",
-    };
     authClient
-      .get("/members", { params: params })
+      .get("/members")
       .then((response) => {
         const memberNames = response.data.content
           // .filter((member) => member.id !== "admin")  // TODO: 부재일정 추가 기능을 위한 임시 주석 처리. UI 로그인 기능 구현 후 주석 해제 필요

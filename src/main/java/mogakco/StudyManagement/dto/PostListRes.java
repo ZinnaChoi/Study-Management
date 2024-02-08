@@ -8,7 +8,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class PostListRes extends DTOResCommon {
+public class PostListRes extends CommonRes {
 
     private List<PostList> content;
     private SimplePageable pageable;

@@ -8,7 +8,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class AbsentDetailRes extends DTOResCommon {
+public class AbsentDetailRes extends CommonRes {
 
     private List<AbsentDetail> content;
 

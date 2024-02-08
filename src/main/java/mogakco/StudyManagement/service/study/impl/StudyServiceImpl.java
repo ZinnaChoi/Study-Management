@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 
 import mogakco.StudyManagement.domain.Schedule;
 import mogakco.StudyManagement.domain.StudyInfo;
-import mogakco.StudyManagement.dto.DTOResCommon;
+import mogakco.StudyManagement.dto.CommonRes;
 import mogakco.StudyManagement.dto.ScheduleReq;
 import mogakco.StudyManagement.dto.ScheduleRes;
 import mogakco.StudyManagement.dto.StudyInfoRes;
@@ -64,7 +64,7 @@ public class StudyServiceImpl implements StudyService {
                 StudyInfo studyInfo = studyInfoRepository.findTopBy();
                 lo.setDBEnd();
                 if (studyInfo == null) {
-                        DTOResCommon res = ExceptionUtil.handleException(
+                        CommonRes res = ExceptionUtil.handleException(
                                         new NotFoundException("등록된 스터디가 없습니다."));
                         return new StudyInfoRes(systemId, res.getRetCode(), res.getRetMsg(), null, null,
                                         null, null);
@@ -87,11 +87,11 @@ public class StudyServiceImpl implements StudyService {
 
         @Override
         @Transactional
-        public DTOResCommon createStudy(StudyReq studyReq, MultipartFile imageFile, LoggingService lo)
+        public CommonRes createStudy(StudyReq studyReq, MultipartFile imageFile, LoggingService lo)
                         throws IOException {
-                DTOResCommon result = new DTOResCommon(systemId, ErrorCode.OK.getCode(), ErrorCode.OK.getMessage());
+                CommonRes result = new CommonRes(systemId, ErrorCode.OK.getCode(), ErrorCode.OK.getMessage());
                 if (studyInfoRepository.existsByStudyName(studyReq.getStudyName())) {
-                        return new DTOResCommon(systemId, ErrorCode.BAD_REQUEST.getCode(),
+                        return new CommonRes(systemId, ErrorCode.BAD_REQUEST.getCode(),
                                         ErrorCode.BAD_REQUEST.getMessage(
                                                         studyReq.getStudyName() + "스터디 이름이 이미 존재합니다."));
                 }
@@ -105,7 +105,7 @@ public class StudyServiceImpl implements StudyService {
                         List<String> existScheduleNames = existSchedules.stream()
                                         .map(Schedule::getScheduleName)
                                         .collect(Collectors.toList());
-                        return new DTOResCommon(systemId, ErrorCode.BAD_REQUEST.getCode(),
+                        return new CommonRes(systemId, ErrorCode.BAD_REQUEST.getCode(),
                                         ErrorCode.BAD_REQUEST.getMessage(
                                                         existScheduleNames.toString() + " schedule_name이 이미 존재합니다."));
                 }
@@ -133,7 +133,7 @@ public class StudyServiceImpl implements StudyService {
 
         @Override
         @Transactional
-        public DTOResCommon updateStudy(StudyReq studyReq, MultipartFile imageFile, LoggingService lo) {
+        public CommonRes updateStudy(StudyReq studyReq, MultipartFile imageFile, LoggingService lo) {
 
                 List<Schedule> allSchedules = scheduleRepository.findAll();
                 List<Schedule> reqSchedules = studyReq.getSchedules().stream()
@@ -195,12 +195,12 @@ public class StudyServiceImpl implements StudyService {
                 scheduleRepository.saveAll(schedulesToInsert);
                 lo.setDBEnd();
 
-                return new DTOResCommon(systemId, ErrorCode.OK.getCode(), ErrorCode.OK.getMessage());
+                return new CommonRes(systemId, ErrorCode.OK.getCode(), ErrorCode.OK.getMessage());
         }
 
         @Override
         @Transactional
-        public DTOResCommon deleteStudy(Long studyId, LoggingService lo) {
+        public CommonRes deleteStudy(Long studyId, LoggingService lo) {
 
                 lo.setDBStart();
                 StudyInfo studyInfo = studyInfoRepository.findByStudyId(studyId);
@@ -216,6 +216,6 @@ public class StudyServiceImpl implements StudyService {
                 scheduleRepository.deleteAll();
                 lo.setDBEnd();
 
-                return new DTOResCommon(systemId, ErrorCode.OK.getCode(), ErrorCode.OK.getMessage());
+                return new CommonRes(systemId, ErrorCode.OK.getCode(), ErrorCode.OK.getMessage());
         }
 }

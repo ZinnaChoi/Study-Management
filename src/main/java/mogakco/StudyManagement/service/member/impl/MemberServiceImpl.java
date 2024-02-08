@@ -26,7 +26,7 @@ import mogakco.StudyManagement.domain.MemberSchedule;
 import mogakco.StudyManagement.domain.Schedule;
 import mogakco.StudyManagement.domain.StudyInfo;
 import mogakco.StudyManagement.domain.WakeUp;
-import mogakco.StudyManagement.dto.DTOResCommon;
+import mogakco.StudyManagement.dto.CommonRes;
 import mogakco.StudyManagement.dto.MemberDetails;
 import mogakco.StudyManagement.dto.MemberIdDuplReq;
 import mogakco.StudyManagement.dto.MemberInfo;
@@ -141,7 +141,7 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
     }
 
     @Override
-    public DTOResCommon logout(LoggingService lo) {
+    public CommonRes logout(LoggingService lo) {
         String loginUserId = SecurityUtil.getLoginUserId();
 
         lo.setDBStart();
@@ -151,13 +151,13 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
         }
         lo.setDBEnd();
 
-        return new DTOResCommon(systemId, ErrorCode.OK.getCode(), ErrorCode.OK.getMessage());
+        return new CommonRes(systemId, ErrorCode.OK.getCode(), ErrorCode.OK.getMessage());
     }
 
     @Override
     @Transactional
-    public DTOResCommon join(MemberJoinReq joinInfo, LoggingService lo) {
-        DTOResCommon result = new DTOResCommon(systemId, ErrorCode.OK.getCode(), ErrorCode.OK.getMessage());
+    public CommonRes join(MemberJoinReq joinInfo, LoggingService lo) {
+        CommonRes result = new CommonRes(systemId, ErrorCode.OK.getCode(), ErrorCode.OK.getMessage());
         Member member = Member.builder()
                 .id(joinInfo.getId())
                 .password(bCryptPasswordEncoder.encode(joinInfo.getPassword()))
@@ -191,7 +191,7 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
             memberScheduleRepository.saveAll(mSchedules);
             lo.setDBEnd();
         } else {
-            result = new DTOResCommon(systemId, ErrorCode.BAD_REQUEST.getCode(),
+            result = new CommonRes(systemId, ErrorCode.BAD_REQUEST.getCode(),
                     ErrorCode.BAD_REQUEST.getMessage(joinInfo.getScheduleNames() + " Schedule is Not Regist"));
         }
 
@@ -254,8 +254,8 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
 
     @Override
     @Transactional
-    public DTOResCommon setMemberInfo(MemberInfoUpdateReq updateInfo, LoggingService lo) {
-        DTOResCommon result = new DTOResCommon(systemId, ErrorCode.OK.getCode(), ErrorCode.OK.getMessage());
+    public CommonRes setMemberInfo(MemberInfoUpdateReq updateInfo, LoggingService lo) {
+        CommonRes result = new CommonRes(systemId, ErrorCode.OK.getCode(), ErrorCode.OK.getMessage());
 
         Member member = memberRepository.findById(SecurityUtil.getLoginUserId());
         switch (updateInfo.getType()) {

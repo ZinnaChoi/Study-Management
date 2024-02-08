@@ -10,7 +10,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class MemberLoginRes extends DTOResCommon {
+public class MemberLoginRes extends CommonRes {
 
     @Schema(example = "aaaaa.bbbbb.ccccc")
     private String token;

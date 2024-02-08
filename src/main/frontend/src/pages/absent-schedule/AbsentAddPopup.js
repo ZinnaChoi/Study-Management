@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import CommonDialog from "../../components/CommonDialog";
 import { authClient } from "../../services/APIService";
-import { getCurrentDateTime, formatDateToYYYYMMDD } from "../../util/DateUtil";
+import { formatDateToYYYYMMDD } from "../../util/DateUtil";
 import Select from "react-select";
 
 const AbsentAddPopup = ({ onClose, onRefresh }) => {
@@ -10,12 +10,7 @@ const AbsentAddPopup = ({ onClose, onRefresh }) => {
 
   useEffect(() => {
     authClient
-      .get("/member", {
-        params: {
-          sendDate: getCurrentDateTime(),
-          systemId: "STUDY_0001",
-        },
-      })
+      .get("/member")
       .then((response) => {
         const scheduleOptions = response.data.scheduleName.map(
           (scheduleName) => ({
@@ -41,8 +36,6 @@ const AbsentAddPopup = ({ onClose, onRefresh }) => {
     );
 
     const newAbsentData = {
-      sendDate: getCurrentDateTime(),
-      systemId: "STUDY_0001",
       absentDate: formattedAbsentDate,
       description: formJson["부재 사유"],
       scheduleNameList: selectedScheduleValues,
@@ -75,22 +68,15 @@ const AbsentAddPopup = ({ onClose, onRefresh }) => {
       inputTypes={["date", "text"]}
       showButton={true}
       extraComponents={
-        <div className="absent-select">
-          <div className="absent-select-title">부재 스케줄</div>
+        <>
           <Select
             options={schedules}
             isMulti
             value={selectedSchedules}
             onChange={setSelectedSchedules}
-            placeholder="스케줄 선택"
-            styles={{
-              container: (provided) => ({
-                ...provided,
-                width: "65%",
-              }),
-            }}
+            placeholder="부재 스케줄 선택"
           />
-        </div>
+        </>
       }
     />
   );

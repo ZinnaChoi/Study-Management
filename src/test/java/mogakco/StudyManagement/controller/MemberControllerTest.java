@@ -26,7 +26,6 @@ import mogakco.StudyManagement.dto.MemberLoginReq;
 import mogakco.StudyManagement.enums.MemberUpdateType;
 import mogakco.StudyManagement.service.external.SendEmailService;
 import mogakco.StudyManagement.service.member.MemberService;
-import mogakco.StudyManagement.util.DateUtil;
 import mogakco.StudyManagement.util.TestUtil;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -75,7 +74,7 @@ public class MemberControllerTest {
     @WithMockUser(authorities = "ADMIN")
     @DisplayName("로그인 API 성공")
     void loginSuccess() throws Exception {
-        MemberLoginReq req = new MemberLoginReq(DateUtil.getCurrentDateTime(), "SYS_01", adminId, password);
+        MemberLoginReq req = new MemberLoginReq(adminId, password);
         String requestBodyJson = objectMapper.writeValueAsString(req);
 
         TestUtil.performRequest(mockMvc, LOGIN_URL, requestBodyJson, "POST", 200, 200);
@@ -83,20 +82,10 @@ public class MemberControllerTest {
 
     @Test
     @WithMockUser(authorities = "ADMIN")
-    @DisplayName("로그인 API 실패_not include sendDate")
-    void loginFail_NotIncludeSendDate() throws Exception {
-        MemberLoginReq req = new MemberLoginReq(null, "SYS_01", adminId, password);
-        String requestBodyJson = objectMapper.writeValueAsString(req);
-
-        TestUtil.performRequest(mockMvc, LOGIN_URL, requestBodyJson, "POST", 400, 400);
-    }
-
-    @Test
-    @WithMockUser(authorities = "ADMIN")
     @DisplayName("로그인 API 실패_incorrect ID")
     void loginFail_IncorrectId() throws Exception {
         String wrongId = "asdkawqwrjajsd12312";
-        MemberLoginReq req = new MemberLoginReq(DateUtil.getCurrentDateTime(), "SYS_01", wrongId, password);
+        MemberLoginReq req = new MemberLoginReq(wrongId, password);
         String requestBodyJson = objectMapper.writeValueAsString(req);
 
         TestUtil.performRequest(mockMvc, LOGIN_URL, requestBodyJson, "POST", 200, 404);
@@ -107,7 +96,7 @@ public class MemberControllerTest {
     @DisplayName("로그인 API 실패_incorrect PWD")
     void loginFail_IncorrectPwd() throws Exception {
         String wrongPwd = "asdkawqwrjajsd12312";
-        MemberLoginReq req = new MemberLoginReq(DateUtil.getCurrentDateTime(), "SYS_01", adminId, wrongPwd);
+        MemberLoginReq req = new MemberLoginReq(adminId, wrongPwd);
         String requestBodyJson = objectMapper.writeValueAsString(req);
 
         TestUtil.performRequest(mockMvc, LOGIN_URL, requestBodyJson, "POST", 200, 400);
@@ -119,20 +108,10 @@ public class MemberControllerTest {
     @WithMockUser(authorities = "ADMIN")
     @DisplayName("로그아웃 API 성공")
     void logoutSuccess() throws Exception {
-        MemberLoginReq req = new MemberLoginReq(DateUtil.getCurrentDateTime(), "SYS_01", adminId, password);
+        MemberLoginReq req = new MemberLoginReq(adminId, password);
         String requestBodyJson = objectMapper.writeValueAsString(req);
 
         TestUtil.performRequest(mockMvc, LOGOUT_URL, requestBodyJson, "POST", 200, 200);
-    }
-
-    @Test
-    @WithMockUser(authorities = "ADMIN")
-    @DisplayName("로그아웃 API 실패_not include sendDate")
-    void logoutFail_NotIncludeSendDate() throws Exception {
-        MemberLoginReq req = new MemberLoginReq(null, "SYS_01", adminId, password);
-        String requestBodyJson = objectMapper.writeValueAsString(req);
-
-        TestUtil.performRequest(mockMvc, LOGOUT_URL, requestBodyJson, "POST", 400, 400);
     }
 
     /////////////////////////////////////////////////////////////////
@@ -146,25 +125,10 @@ public class MemberControllerTest {
         MemberJoinReq req = new MemberJoinReq("user90919239", "password123!", "HongGilDong", "01011112222", "모각코 스터디",
                 Arrays.asList("AM1", "AM2"),
                 "1530");
-        req.setSendDate(DateUtil.getCurrentDateTime());
-        req.setSystemId("SYS_01");
+
         String requestBodyJson = objectMapper.writeValueAsString(req);
 
         TestUtil.performRequest(mockMvc, JOIN_URL, requestBodyJson, "POST", 200, 200);
-    }
-
-    @Test
-    @WithMockUser(authorities = "ADMIN")
-    @DisplayName("회원가입 API 실패_not include sendDate")
-    void joinFail_NotIncludeSendDate() throws Exception {
-        MemberJoinReq req = new MemberJoinReq("user1", "password123!", "HongGilDong", "01011112222", "모각코 스터디",
-                Arrays.asList("AM1", "AM2"),
-                "1530");
-        req.setSendDate(null);
-        req.setSystemId("SYS_01");
-        String requestBodyJson = objectMapper.writeValueAsString(req);
-
-        TestUtil.performRequest(mockMvc, JOIN_URL, requestBodyJson, "POST", 400, 400);
     }
 
     @Test
@@ -175,8 +139,7 @@ public class MemberControllerTest {
         MemberJoinReq req = new MemberJoinReq(invaildId, "password123!", "HongGilDong", "01011112222", "모각코 스터디",
                 Arrays.asList("AM1", "AM2"),
                 "1530");
-        req.setSendDate(DateUtil.getCurrentDateTime());
-        req.setSystemId("SYS_01");
+
         String requestBodyJson = objectMapper.writeValueAsString(req);
 
         TestUtil.performRequest(mockMvc, JOIN_URL, requestBodyJson, "POST", 400, 400);
@@ -190,8 +153,7 @@ public class MemberControllerTest {
         MemberJoinReq req = new MemberJoinReq("user1", invaildPwd, "HongGilDong", "01011112222", "모각코 스터디",
                 Arrays.asList("AM1", "AM2"),
                 "1530");
-        req.setSendDate(DateUtil.getCurrentDateTime());
-        req.setSystemId("SYS_01");
+
         String requestBodyJson = objectMapper.writeValueAsString(req);
 
         TestUtil.performRequest(mockMvc, JOIN_URL, requestBodyJson, "POST", 400, 400);
@@ -203,8 +165,7 @@ public class MemberControllerTest {
     @DisplayName("아이디 중복 API 성공_중복")
     void idDuplicatedSuccess_dupl() throws Exception {
         MemberIdDuplReq req = new MemberIdDuplReq(adminId);
-        req.setSendDate(DateUtil.getCurrentDateTime());
-        req.setSystemId("SYS_01");
+
         String requestBodyJson = objectMapper.writeValueAsString(req);
 
         TestUtil.performRequest(mockMvc, ID_DUPLICATED_CHECK_URL, requestBodyJson, "POST", 200, 200);
@@ -216,23 +177,10 @@ public class MemberControllerTest {
     void idDuplicatedSuccess_notDupl() throws Exception {
         String wrongId = "aawadowajdqjdqwdas";
         MemberIdDuplReq req = new MemberIdDuplReq(wrongId);
-        req.setSendDate(DateUtil.getCurrentDateTime());
-        req.setSystemId("SYS_01");
+
         String requestBodyJson = objectMapper.writeValueAsString(req);
 
         TestUtil.performRequest(mockMvc, ID_DUPLICATED_CHECK_URL, requestBodyJson, "POST", 200, 200);
-    }
-
-    @Test
-    @WithMockUser(authorities = "ADMIN")
-    @DisplayName("아이디 중복 API 실패_not include sendDate")
-    void idDuplicatedFail_NotIncludeSendDate() throws Exception {
-        MemberIdDuplReq req = new MemberIdDuplReq(adminId);
-        req.setSendDate(null);
-        req.setSystemId("SYS_01");
-        String requestBodyJson = objectMapper.writeValueAsString(req);
-
-        TestUtil.performRequest(mockMvc, ID_DUPLICATED_CHECK_URL, requestBodyJson, "POST", 400, 400);
     }
 
     /////////////////////////////////////////////////////////////////
@@ -244,26 +192,11 @@ public class MemberControllerTest {
 
         UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(MEMBER_INFO_URL);
 
-        uriBuilder.queryParam("sendDate", DateUtil.getCurrentDateTime())
-                .queryParam("systemId", "SYS_01");
-
         MvcResult result = TestUtil.performRequest(mockMvc, uriBuilder.toUriString(), null, "GET", 200, 200);
         System.out.println(result.getResponse().getContentAsString());
         assertEquals(200, result.getResponse().getStatus());
     }
 
-    @Test
-    @WithMockUser(username = "admin", authorities = { "ADMIN" })
-    @DisplayName("단일 회원정보 조회 실패_not include sendDate")
-    public void getMemberInfo_NotIncludeSendDate() throws Exception {
-
-        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(MEMBER_INFO_URL);
-
-        uriBuilder.queryParam("systemId", "SYS_01");
-
-        MvcResult result = TestUtil.performRequest(mockMvc, uriBuilder.toUriString(), null, "GET", 400, 400);
-        assertEquals(400, result.getResponse().getStatus());
-    }
     /////////////////////////////////////////////////////////////////
 
     @Test
@@ -271,9 +204,6 @@ public class MemberControllerTest {
     @DisplayName("회원 목록 조회 성공")
     public void getMemberList_Success() throws Exception {
         UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(MEMEBER_LIST_URL);
-
-        uriBuilder.queryParam("sendDate", DateUtil.getCurrentDateTime())
-                .queryParam("systemId", "SYS_01");
 
         TestUtil.performRequest(mockMvc, uriBuilder.toUriString(), null, "GET", 200, 200);
     }
@@ -287,8 +217,7 @@ public class MemberControllerTest {
     void setMemberInfo_Success() throws Exception {
         MemberInfoUpdateReq req = new MemberInfoUpdateReq(MemberUpdateType.SCHEDULE_NAMES, "아무개", "010-1111-1111",
                 Arrays.asList("AM1", "AM2", "AM3", "AM4"), "1930", "password123!");
-        req.setSendDate(DateUtil.getCurrentDateTime());
-        req.setSystemId("SYS_01");
+
         String requestBodyJson = objectMapper.writeValueAsString(req);
 
         TestUtil.performRequest(mockMvc, MEMBER_INFO_URL, requestBodyJson, "PATCH", 200, 200);
@@ -303,8 +232,7 @@ public class MemberControllerTest {
     void setMemberInfo_EmptyName() throws Exception {
         MemberInfoUpdateReq req = new MemberInfoUpdateReq(MemberUpdateType.NAME, "", "010-1111-1111",
                 Arrays.asList("AM1", "AM2", "AM3", "AM4"), "1930", "password123!");
-        req.setSendDate(DateUtil.getCurrentDateTime());
-        req.setSystemId("SYS_01");
+
         String requestBodyJson = objectMapper.writeValueAsString(req);
 
         TestUtil.performRequest(mockMvc, MEMBER_INFO_URL, requestBodyJson, "PATCH", 200, 400);
@@ -319,8 +247,7 @@ public class MemberControllerTest {
         String wrongPwd = "p1";
         MemberInfoUpdateReq req = new MemberInfoUpdateReq(MemberUpdateType.PASSWORD, "", "010-1111-1111",
                 Arrays.asList("AM1"), "1930", wrongPwd);
-        req.setSendDate(DateUtil.getCurrentDateTime());
-        req.setSystemId("SYS_01");
+
         String requestBodyJson = objectMapper.writeValueAsString(req);
 
         TestUtil.performRequest(mockMvc, MEMBER_INFO_URL, requestBodyJson, "PATCH", 400, 400);
@@ -337,32 +264,13 @@ public class MemberControllerTest {
 
         UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(MEMBERS_INFO_BY_SCHEDULE_URL);
 
-        uriBuilder.queryParam("sendDate", DateUtil.getCurrentDateTime())
-                .queryParam("systemId", "SYS_01")
+        uriBuilder
                 .queryParam("schedule", "AM1")
                 .queryParam("page", 0)
                 .queryParam("size", 10)
                 .queryParam("sort", "memberId,desc");
 
         TestUtil.performRequest(mockMvc, uriBuilder.toUriString(), null, "GET", 200, 200);
-    }
-
-    @Test
-    @Transactional
-    @Sql("/member/MemberSetup.sql")
-    @WithMockUser(username = "user1", authorities = { "USER" })
-    @DisplayName("운영 타입별 다수 회원 이름, 아이디 조회 실패_not include sendDate")
-    public void getMembersBySchedule__NotIncludeSendDate() throws Exception {
-
-        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(MEMBERS_INFO_BY_SCHEDULE_URL);
-
-        uriBuilder.queryParam("systemId", "SYS_01")
-                .queryParam("schedule", "AM1")
-                .queryParam("page", 0)
-                .queryParam("size", 10)
-                .queryParam("sort", "memberId,desc");
-
-        TestUtil.performRequest(mockMvc, uriBuilder.toUriString(), null, "GET", 400, 400);
     }
 
     /////////////////////////////////////////////////////////////////
@@ -376,32 +284,13 @@ public class MemberControllerTest {
 
         UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(MEMBERS_INFO_BY_WAKEUP_URL);
 
-        uriBuilder.queryParam("sendDate", DateUtil.getCurrentDateTime())
-                .queryParam("systemId", "SYS_01")
+        uriBuilder
                 .queryParam("time", "1530")
                 .queryParam("page", 0)
                 .queryParam("size", 10)
                 .queryParam("sort", "memberId,desc");
 
         TestUtil.performRequest(mockMvc, uriBuilder.toUriString(), null, "GET", 200, 200);
-    }
-
-    @Test
-    @Transactional
-    @Sql("/member/MemberSetup.sql")
-    @WithMockUser(username = "user1", authorities = { "USER" })
-    @DisplayName("기상 시간별 다수 회원 이름, 아이디 조회 실패_not include sendDate")
-    public void getMembersByWakeup_NotIncludeSendDate() throws Exception {
-
-        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(MEMBERS_INFO_BY_WAKEUP_URL);
-
-        uriBuilder.queryParam("systemId", "SYS_01")
-                .queryParam("time", "1530")
-                .queryParam("page", 0)
-                .queryParam("size", 10)
-                .queryParam("sort", "memberId,desc");
-
-        TestUtil.performRequest(mockMvc, uriBuilder.toUriString(), null, "GET", 400, 400);
     }
 
     ////////////////////////////////////////////////////////////////////
@@ -412,25 +301,9 @@ public class MemberControllerTest {
 
         UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(GET_SCHEDULES_URL);
 
-        uriBuilder.queryParam("sendDate", DateUtil.getCurrentDateTime())
-                .queryParam("systemId", "SYS_01");
-
         MvcResult result = TestUtil.performRequest(mockMvc, uriBuilder.toUriString(), null, "GET", 200, 200);
         System.out.println(result.getResponse().getContentAsString());
         assertEquals(200, result.getResponse().getStatus());
-    }
-
-    @Test
-    @WithMockUser(username = "admin", authorities = { "ADMIN" })
-    @DisplayName("등록 스케줄 조회 실패_not include sendDate")
-    public void getRegistedSchedules_NotIncludeSendDate() throws Exception {
-
-        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(GET_SCHEDULES_URL);
-
-        uriBuilder.queryParam("systemId", "SYS_01");
-
-        MvcResult result = TestUtil.performRequest(mockMvc, uriBuilder.toUriString(), null, "GET", 400, 400);
-        assertEquals(400, result.getResponse().getStatus());
     }
 
     ////////////////////////////////////////////////////////////////////
@@ -441,24 +314,9 @@ public class MemberControllerTest {
 
         UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(GET_WAKEUPS_URL);
 
-        uriBuilder.queryParam("sendDate", DateUtil.getCurrentDateTime())
-                .queryParam("systemId", "SYS_01");
-
         MvcResult result = TestUtil.performRequest(mockMvc, uriBuilder.toUriString(), null, "GET", 200, 200);
         System.out.println(result.getResponse().getContentAsString());
         assertEquals(200, result.getResponse().getStatus());
     }
 
-    @Test
-    @WithMockUser(username = "admin", authorities = { "ADMIN" })
-    @DisplayName("등록 기상 시간 조회 실패_not include sendDate")
-    public void getRegistedWakeup_NotIncludeSendDate() throws Exception {
-
-        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(GET_WAKEUPS_URL);
-
-        uriBuilder.queryParam("systemId", "SYS_01");
-
-        MvcResult result = TestUtil.performRequest(mockMvc, uriBuilder.toUriString(), null, "GET", 400, 400);
-        assertEquals(400, result.getResponse().getStatus());
-    }
 }

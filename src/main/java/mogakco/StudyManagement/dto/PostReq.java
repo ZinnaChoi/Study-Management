@@ -10,7 +10,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class PostReq extends DTOReqCommon {
+public class PostReq {
 
     @NotBlank(message = "게시글의 제목은 반드시 있어야 합니다")
     @Pattern(regexp = "^.{1,60}$", message = "게시글의 제목은 60자 이하여야 합니다")
@@ -22,8 +22,7 @@ public class PostReq extends DTOReqCommon {
     @Schema(example = "chatGPT 5.0 도입")
     private String content;
 
-    public PostReq(String sendDate, String systemId, String title, String content) {
-        super(sendDate, systemId);
+    public PostReq( String title, String content) {
         this.title = title;
         this.content = content;
     }
