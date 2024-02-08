@@ -17,11 +17,15 @@ const AbsentSchedule = () => {
     setSelectedDate(date);
   };
 
-  const handleAddClick = () => {
+  const handleOpenAddPopup = () => {
     setShowAddPopup(true);
   };
 
-  const handleReFetch = () => {
+  const handleCloseAddPopup = () => {
+    setShowAddPopup(false);
+  };
+
+  const refreshCalendar = () => {
     setRefreshKey(Date.now());
   };
 
@@ -49,7 +53,11 @@ const AbsentSchedule = () => {
   return (
     <div style={containerStyle}>
       <div style={checkboxStyle}>
-        <button onClick={handleAddClick}>부재일정 추가</button>{" "}
+        <AbsentAddPopup
+          open={showAddPopup}
+          onClose={handleCloseAddPopup}
+          onRefresh={refreshCalendar}
+        />
         <h3>스터디원 선택</h3>
         <MemberCheckbox
           authClient={authClient}
@@ -76,7 +84,6 @@ const AbsentSchedule = () => {
           selectedDate={selectedDate}
           onClose={() => {
             setShowAddPopup(false);
-            handleReFetch();
           }}
         />
       )}

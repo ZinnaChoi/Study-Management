@@ -1,16 +1,12 @@
 import React, { useState, useEffect } from "react";
+import CommonDialog from "../../components/CommonDialog";
 import { authClient } from "../../services/APIService";
 import { getCurrentDateTime, formatDateToYYYYMMDD } from "../../util/DateUtil";
 import Select from "react-select";
 
-const AbsentAddPopup = ({ onClose }) => {
+const AbsentAddPopup = ({ onClose, onRefresh }) => {
   const [schedules, setSchedules] = useState([]);
   const [selectedSchedules, setSelectedSchedules] = useState([]);
-  const [description, setDescription] = useState("");
-  const [absentDate, setAbsentDate] = useState(
-    formatDateToYYYYMMDD(new Date())
-  );
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     authClient
@@ -37,21 +33,25 @@ const AbsentAddPopup = ({ onClose }) => {
       });
   }, []);
 
-  const handleAddAbsent = () => {
+  const handleAddAbsent = (formJson) => {
+    const dateValue = new Date(formJson["부재 일자"]);
+    const formattedAbsentDate = formatDateToYYYYMMDD(dateValue);
+    const selectedScheduleValues = selectedSchedules.map(
+      (schedule) => schedule.value
+    );
+
     const newAbsentData = {
       sendDate: getCurrentDateTime(),
       systemId: "STUDY_0001",
-      absentDate: formatDateToYYYYMMDD(absentDate),
-      description: description,
-      scheduleNameList: selectedSchedules.map((schedule) => schedule.value),
+      absentDate: formattedAbsentDate,
+      description: formJson["부재 사유"],
+      scheduleNameList: selectedScheduleValues,
     };
-
-    setIsSubmitting(true);
     authClient
       .post("/absent", newAbsentData)
       .then((response) => {
         alert(response.data.retMsg);
-        setIsSubmitting(false);
+        onRefresh();
         onClose();
       })
       .catch((error) => {
@@ -59,92 +59,32 @@ const AbsentAddPopup = ({ onClose }) => {
           "부재일정 등록 실패: " +
             (error.response?.data.retMsg || "Unknown error")
         );
-        setIsSubmitting(false);
       });
   };
 
-  const popupContainerStyle = {
-    position: "fixed",
-    top: "0",
-    left: "0",
-    width: "100%",
-    height: "100%",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.4)",
-    zIndex: "4",
-  };
-
-  const popupStyle = {
-    width: "auto",
-    maxHeight: "80vh",
-    overflowY: "auto",
-    background: "#fff",
-    padding: "20px",
-    borderRadius: "10px",
-    boxShadow: "0 2px 10px rgba(0, 0, 0, 0.3)",
-    zIndex: "5",
-  };
-
-  const formStyle = {
-    display: "flex",
-    flexDirection: "column",
-    marginBottom: "20px",
-  };
-
-  const buttonGroupStyle = {
-    display: "flex",
-    justifyContent: "center",
-    gap: "10px",
-  };
-
-  const customStyles = {
-    control: (base) => ({
-      ...base,
-      marginBottom: "20px",
-    }),
-  };
-
-  const inputStyle = {
-    marginBottom: "20px",
-    width: "100%",
-  };
-
   return (
-    <div style={popupContainerStyle}>
-      <div style={popupStyle}>
-        <h3>부재 일정 등록</h3>
-        <input
-          type="date"
-          value={absentDate}
-          onChange={(e) => setAbsentDate(e.target.value)}
-          style={inputStyle}
-        />
-        <div style={formStyle}>
+    <CommonDialog
+      btnTitle="부재일정 추가"
+      title="부재일정 추가"
+      submitEvt={handleAddAbsent}
+      acceptStr="등록"
+      cancleStr="취소"
+      names={["부재 일자", "부재 사유"]}
+      isRequireds={[true, false]}
+      descriptions={["Choose a date", "Enter a description"]}
+      inputTypes={["date", "text"]}
+      extraComponents={
+        <>
           <Select
             options={schedules}
             isMulti
+            value={selectedSchedules}
             onChange={setSelectedSchedules}
             placeholder="부재 스케줄 선택"
-            styles={customStyles}
           />
-          <input
-            type="text"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            placeholder="부재 사유 입력"
-            style={inputStyle}
-          />
-        </div>
-        <div style={buttonGroupStyle}>
-          <button onClick={handleAddAbsent} disabled={isSubmitting}>
-            등록
-          </button>
-          <button onClick={onClose}>취소</button>
-        </div>
-      </div>
-    </div>
+        </>
+      }
+    />
   );
 };
 
