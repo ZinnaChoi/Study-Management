@@ -137,26 +137,56 @@ const AbsentDetailPopup = ({ selectedDate, onClose, onRefresh }) => {
       });
   };
 
+  const handleDelete = (memberName) => {
+    const confirmation = window.confirm(
+      `${selectedDate}${memberName}'s absence will be deleted. Are you sure?`
+    );
+    if (confirmation) {
+      authClient
+        .delete(`/absent`, {
+          params: {
+            absentDate: formatDateToYYYYMMDD(selectedDate),
+          },
+        })
+        .then(() => {
+          onRefresh();
+        })
+        .catch((error) => {
+          alert(
+            "Failed to delete the absence: " +
+              (error.response?.data.retMsg || "Unknown error")
+          );
+        });
+    }
+  };
+
   const tableContents = absentDetail.map((detail) => {
     const isEditing = editingMembers[detail.memberName];
     const isCurrentUser = detail.memberName === loginMemberName;
 
     return {
       ...detail,
-      actions: isCurrentUser ? (
-        isEditing ? (
-          <div onClick={(e) => e.stopPropagation()}>
-            <button onClick={() => handleSaveClick(detail.memberName)}>
-              저장
-            </button>
-          </div>
-        ) : (
-          <button onClick={() => handleEditClick(detail.memberName)}>
-            수정
-          </button>
-        )
-      ) : (
-        <button disabled>수정</button>
+      actions: (
+        <div onClick={(e) => e.stopPropagation()}>
+          {isCurrentUser && (
+            <>
+              {isEditing ? (
+                <button onClick={() => handleSaveClick(detail.memberName)}>
+                  저장
+                </button>
+              ) : (
+                <>
+                  <button onClick={() => handleEditClick(detail.memberName)}>
+                    수정
+                  </button>
+                  <button onClick={() => handleDelete(detail.memberName)}>
+                    삭제
+                  </button>
+                </>
+              )}
+            </>
+          )}
+        </div>
       ),
       scheduleNameList: editingMembers[detail.memberName] ? (
         <Select
@@ -206,19 +236,18 @@ const AbsentDetailPopup = ({ selectedDate, onClose, onRefresh }) => {
     },
   ];
 
-  const dialogProps = {
-    open: true,
-    btnTitle: "부재 일정 상세보기",
-    title: selectedDate + " 부재 일정 상세",
-    submitEvt: () => {},
-    acceptStr: "",
-    cancleStr: "닫기",
-    showButton: false,
-    onClose: onClose,
-    extraComponents: <Table columns={columns} contents={tableContents} />,
-  };
-
-  return absentDetail.length > 0 ? <CommonDialog {...dialogProps} /> : null;
+  return (
+    <CommonDialog
+      open={absentDetail.length > 0}
+      btnTitle="부재 일정 상세보기"
+      title={`${selectedDate} 부재 일정 상세`}
+      submitEvt={() => {}}
+      cancleStr="닫기"
+      showButton={false}
+      extraComponents={<Table columns={columns} contents={tableContents} />}
+      onClose={onClose}
+    />
+  );
 };
 
 export default AbsentDetailPopup;

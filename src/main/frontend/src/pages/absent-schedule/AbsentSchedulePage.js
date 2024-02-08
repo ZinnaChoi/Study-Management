@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { authClient } from "../../services/APIService";
 import MemberCheckbox from "../../components/MemberCheckbox";
 import AbsentCalendar from "./AbsentCalendar";
