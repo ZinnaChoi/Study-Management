@@ -77,6 +77,7 @@ export default function CommonDialog(props) {
                   variant="outlined"
                   className="dialog-input"
                   sx={{
+                    width: "65%",
                     "& .MuiInputBase-root": {
                       height: 32,
                     },
