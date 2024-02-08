@@ -5,11 +5,12 @@ import { formatDateToYYYYMMDD } from "../../util/DateUtil";
 import Table from "../../components/Table";
 import Select from "react-select";
 
-const AbsentDetailPopup = ({ selectedDate, onClose }) => {
+const AbsentDetailPopup = ({ selectedDate, onClose, onRefresh }) => {
   const [absentDetail, setAbsentDetail] = useState([]);
   const [editingMembers, setEditingMembers] = useState({});
   const [schedules, setSchedules] = useState({});
   const [editFormData, setEditFormData] = useState({});
+  const [loginMemberName, setLoginMemberName] = useState({});
 
   useEffect(() => {
     authClient
@@ -22,6 +23,7 @@ const AbsentDetailPopup = ({ selectedDate, onClose }) => {
             label: scheduleName,
           };
         });
+        setLoginMemberName(response.data.name);
         setSchedules(scheduleOptions);
       })
       .catch((error) => {
@@ -121,56 +123,78 @@ const AbsentDetailPopup = ({ selectedDate, onClose }) => {
     authClient
       .patch("/absent", updatedData)
       .then((response) => {
-        setEditingMembers((prevEditingMembers) => ({
-          ...prevEditingMembers,
-          [memberName]: false,
-        }));
-        setAbsentDetail((prevDetails) =>
-          prevDetails.map((detail) =>
-            detail.memberName === memberName
-              ? { ...detail, ...updatedData }
-              : detail
-          )
-        );
+        if (response.data.retCode == 400) {
+          alert(response.data.retMsg);
+        } else {
+          setEditingMembers((prevEditingMembers) => ({
+            ...prevEditingMembers,
+            [memberName]: false,
+          }));
+          setAbsentDetail((prevDetails) =>
+            prevDetails.map((detail) =>
+              detail.memberName === memberName
+                ? { ...detail, ...updatedData }
+                : detail
+            )
+          );
+          onRefresh();
+        }
       })
       .catch((error) => {
         alert("수정 실패: " + (error.response?.data.retMsg || "Unknown error"));
       });
   };
 
-  const tableContents = absentDetail.map((detail) => ({
-    ...detail,
-    actions: editingMembers[detail.memberName] ? (
-      <div onClick={(e) => e.stopPropagation()}>
-        <button onClick={() => handleSaveClick(detail.memberName)}>저장</button>
-      </div>
-    ) : (
-      <button onClick={() => handleEditClick(detail.memberName)}>수정</button>
-    ),
-    scheduleNameList: editingMembers[detail.memberName] ? (
-      <Select
-        options={editFormData[detail.memberName]?.allSchedules}
-        isMulti
-        value={editFormData[detail.memberName]?.scheduleNameList}
-        onChange={(value) =>
-          handleEditFormChange(detail.memberName, "scheduleNameList", value)
-        }
-      />
-    ) : (
-      detail.scheduleNameList.join(", ")
-    ),
-    description: editingMembers[detail.memberName] ? (
-      <input
-        type="text"
-        value={editFormData[detail.memberName]?.description || ""}
-        onChange={(e) =>
-          handleEditFormChange(detail.memberName, "description", e.target.value)
-        }
-      />
-    ) : (
-      detail.description
-    ),
-  }));
+  const tableContents = absentDetail.map((detail) => {
+    const isEditing = editingMembers[detail.memberName];
+    const isCurrentUser = detail.memberName === loginMemberName;
+
+    return {
+      ...detail,
+      actions: isCurrentUser ? (
+        isEditing ? (
+          <div onClick={(e) => e.stopPropagation()}>
+            <button onClick={() => handleSaveClick(detail.memberName)}>
+              저장
+            </button>
+          </div>
+        ) : (
+          <button onClick={() => handleEditClick(detail.memberName)}>
+            수정
+          </button>
+        )
+      ) : (
+        <button disabled>수정</button>
+      ),
+      scheduleNameList: editingMembers[detail.memberName] ? (
+        <Select
+          options={editFormData[detail.memberName]?.allSchedules}
+          isMulti
+          value={editFormData[detail.memberName]?.scheduleNameList}
+          onChange={(value) =>
+            handleEditFormChange(detail.memberName, "scheduleNameList", value)
+          }
+        />
+      ) : (
+        detail.scheduleNameList.join(", ")
+      ),
+      description: editingMembers[detail.memberName] ? (
+        <input
+          type="text"
+          value={editFormData[detail.memberName]?.description || ""}
+          onChange={(e) =>
+            handleEditFormChange(
+              detail.memberName,
+              "description",
+              e.target.value
+            )
+          }
+        />
+      ) : (
+        detail.description
+      ),
+    };
+  });
 
   const columns = [
     { Header: "멤버 이름", accessor: "memberName" },

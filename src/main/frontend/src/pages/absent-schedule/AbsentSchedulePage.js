@@ -57,6 +57,7 @@ const AbsentSchedule = () => {
         <AbsentDetailPopup
           selectedDate={selectedDate}
           onClose={handleCloseDetailPopup}
+          onRefresh={refreshCalendar}
         />
       )}
       {showAddPopup && (
