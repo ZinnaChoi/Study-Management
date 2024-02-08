@@ -26,7 +26,6 @@ import mogakco.StudyManagement.dto.MemberLoginReq;
 import mogakco.StudyManagement.enums.MemberUpdateType;
 import mogakco.StudyManagement.service.external.SendEmailService;
 import mogakco.StudyManagement.service.member.MemberService;
-import mogakco.StudyManagement.util.DateUtil;
 import mogakco.StudyManagement.util.TestUtil;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -314,9 +313,6 @@ public class MemberControllerTest {
     public void getRegistedWakeup_Success() throws Exception {
 
         UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(GET_WAKEUPS_URL);
-
-        uriBuilder.queryParam("sendDate", DateUtil.getCurrentDateTime())
-                .queryParam("systemId", "SYS_01");
 
         MvcResult result = TestUtil.performRequest(mockMvc, uriBuilder.toUriString(), null, "GET", 200, 200);
         System.out.println(result.getResponse().getContentAsString());
