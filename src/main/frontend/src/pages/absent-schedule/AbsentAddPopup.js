@@ -73,6 +73,7 @@ const AbsentAddPopup = ({ onClose, onRefresh }) => {
       isRequireds={[true, false]}
       descriptions={["Choose a date", "Enter a description"]}
       inputTypes={["date", "text"]}
+      showButton={true}
       extraComponents={
         <>
           <Select

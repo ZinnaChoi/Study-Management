@@ -4,7 +4,7 @@ import Table from "../../components/Table";
 import { authClient } from "../../services/APIService";
 import { getCurrentDateTime, formatDateToYYYYMMDD } from "../../util/DateUtil";
 
-const AbsentDetailPopup = ({ selectedDate }) => {
+const AbsentDetailPopup = ({ selectedDate, onClose }) => {
   const [absentDetail, setAbsentDetail] = useState([]);
 
   useEffect(() => {
@@ -56,6 +56,8 @@ const AbsentDetailPopup = ({ selectedDate }) => {
     submitEvt: () => {},
     acceptStr: "",
     cancleStr: "닫기",
+    showButton: false,
+    onClose: onClose,
     extraComponents: <Table columns={columns} contents={absentDetail} />,
   };
 

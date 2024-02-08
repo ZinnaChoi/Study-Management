@@ -21,7 +21,7 @@ export default function CommonDialog(props) {
     }
   };
 
-  const handleClose = (reason) => {
+  const handleClose = (event, reason) => {
     if (reason && reason === "backdropClick") {
       return;
     }
@@ -29,10 +29,9 @@ export default function CommonDialog(props) {
       setInternalOpen(false);
     }
     if (props.onClose) {
-      props.onClose();
+      props.onClose(event, reason);
     }
   };
-
   useEffect(() => {
     if (isControlled) {
       setInternalOpen(props.open);
@@ -41,23 +40,22 @@ export default function CommonDialog(props) {
 
   return (
     <React.Fragment>
-      {props.btnTitle && (
+      {props.showButton && props.btnTitle && (
         <Button variant="outlined" onClick={handleOpen}>
           {props.btnTitle}
         </Button>
       )}
-
       <Dialog
         open={open}
         onClose={handleClose}
         PaperProps={{
           component: "form",
-          onSubmit: (event) => {
+          onSubmit: (event, reason) => {
             event.preventDefault();
             const formData = new FormData(event.currentTarget);
             const formJson = Object.fromEntries(formData.entries());
             props.submitEvt(formJson);
-            handleClose();
+            handleClose(event, reason);
           },
         }}
       >
