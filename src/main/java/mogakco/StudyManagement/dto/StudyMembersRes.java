@@ -8,7 +8,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class StudyMembersRes extends DTOResCommon {
+public class StudyMembersRes extends CommonRes {
 
     private List<MemberInfo> members;
 

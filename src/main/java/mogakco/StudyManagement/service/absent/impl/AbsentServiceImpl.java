@@ -25,7 +25,7 @@ import mogakco.StudyManagement.dto.AbsentDetail;
 import mogakco.StudyManagement.dto.AbsentDetailReq;
 import mogakco.StudyManagement.dto.AbsentDetailRes;
 import mogakco.StudyManagement.dto.AbsentReq;
-import mogakco.StudyManagement.dto.DTOResCommon;
+import mogakco.StudyManagement.dto.CommonRes;
 import mogakco.StudyManagement.enums.ErrorCode;
 import mogakco.StudyManagement.enums.MessageType;
 import mogakco.StudyManagement.repository.AbsentScheduleRepository;
@@ -66,7 +66,7 @@ public class AbsentServiceImpl implements AbsentService {
 
     @Override
     @Transactional
-    public DTOResCommon registerAbsentSchedule(AbsentReq absentReq, LoggingService lo) {
+    public CommonRes registerAbsentSchedule(AbsentReq absentReq, LoggingService lo) {
         try {
             lo.setDBStart();
             Member member = memberRepository.findById(SecurityUtil.getLoginUserId());
@@ -116,7 +116,7 @@ public class AbsentServiceImpl implements AbsentService {
             }
             noticeService.createSpecificNotice(member, MessageType.ABSENT, lo);
 
-            return new DTOResCommon(null, ErrorCode.CREATED.getCode(), ErrorCode.CREATED.getMessage("부재 일정"));
+            return new CommonRes(null, ErrorCode.CREATED.getCode(), ErrorCode.CREATED.getMessage("부재 일정"));
         } catch (NotFoundException | InvalidRequestException | ConflictException e) {
             return ExceptionUtil.handleException(e);
         }
@@ -177,7 +177,7 @@ public class AbsentServiceImpl implements AbsentService {
             return new AbsentCalendarRes(null, ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), sortedCalendarList);
 
         } catch (NotFoundException e) {
-            DTOResCommon res = ExceptionUtil.handleException(e);
+            CommonRes res = ExceptionUtil.handleException(e);
             return new AbsentCalendarRes(res.getSystemId(), res.getRetCode(), res.getRetMsg(), null);
         }
     }
@@ -207,9 +207,9 @@ public class AbsentServiceImpl implements AbsentService {
 
     @Override
     @Transactional
-    public DTOResCommon updateAbsentSchedule(AbsentReq absentReq, LoggingService lo) {
+    public CommonRes updateAbsentSchedule(AbsentReq absentReq, LoggingService lo) {
 
-        DTOResCommon result = new DTOResCommon();
+        CommonRes result = new CommonRes();
         try {
             if (absentReq.getScheduleNameList().isEmpty()) {
                 throw new InvalidRequestException("하나 이상의 스터디 시간을 선택해야 합니다");
@@ -286,7 +286,7 @@ public class AbsentServiceImpl implements AbsentService {
 
     @Override
     @Transactional
-    public DTOResCommon deleteAbsentSchedule(String absentDate, LoggingService lo) {
+    public CommonRes deleteAbsentSchedule(String absentDate, LoggingService lo) {
 
         try {
             lo.setDBStart();
@@ -305,7 +305,7 @@ public class AbsentServiceImpl implements AbsentService {
                 lo.setDBEnd();
             }
 
-            return new DTOResCommon(null, ErrorCode.DELETED.getCode(),
+            return new CommonRes(null, ErrorCode.DELETED.getCode(),
                     ErrorCode.DELETED.getMessage("부재일정"));
         } catch (NotFoundException e) {
             return ExceptionUtil.handleException(e);

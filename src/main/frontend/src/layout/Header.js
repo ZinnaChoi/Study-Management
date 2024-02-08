@@ -62,8 +62,6 @@ function Header() {
     // JWT 세션 스토리지에 초기 세팅(로그인 화면 구현 후 변경 예정)
     axios
       .post("api/v1/login", {
-        sendDate: "20240112113804899",
-        systemId: "STUDY_0001",
         id: "admin",
         password: "password",
       })
@@ -76,8 +74,6 @@ function Header() {
 
     // api 요청 예제 post
     let reqBody = {
-      sendDate: "20240112113804899",
-      systemId: "STUDY_0001",
       id: "admin",
     };
     authClient

@@ -21,11 +21,10 @@ import mogakco.StudyManagement.dto.AbsentDetailRes;
 import mogakco.StudyManagement.dto.AbsentCalendarReq;
 import mogakco.StudyManagement.dto.AbsentCalendarRes;
 import mogakco.StudyManagement.dto.AbsentReq;
-import mogakco.StudyManagement.dto.DTOResCommon;
+import mogakco.StudyManagement.dto.CommonRes;
 import mogakco.StudyManagement.enums.ErrorCode;
 import mogakco.StudyManagement.service.absent.AbsentService;
 import mogakco.StudyManagement.service.common.LoggingService;
-import mogakco.StudyManagement.util.DateUtil;
 
 @Tag(name = "부재 일정", description = "부재일정 관련 API 분류")
 @SecurityRequirement(name = "bearer-key")
@@ -42,17 +41,16 @@ public class AbsentController extends CommonController {
 
     @Operation(summary = "부재일정 등록", description = "새 부재일정 등록")
     @PostMapping("/absent")
-    public DTOResCommon registerAbsentSchedule(HttpServletRequest request,
+    public CommonRes registerAbsentSchedule(HttpServletRequest request,
             @RequestBody @Valid AbsentReq absentReq) {
 
-        DTOResCommon result = new DTOResCommon();
+        CommonRes result = new CommonRes();
         try {
             startAPI(lo, absentReq);
             result = absentService.registerAbsentSchedule(absentReq, lo);
             result.setSystemId(systemId);
-            result.setSendDate(DateUtil.getCurrentDateTime());
         } catch (Exception e) {
-            result = new DTOResCommon(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
+            result = new CommonRes(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
                     ErrorCode.INTERNAL_ERROR.getMessage());
         } finally {
             endAPI(request, findErrorCodeByCode(result.getRetCode()), lo, result);
@@ -69,7 +67,6 @@ public class AbsentController extends CommonController {
         try {
             startAPI(lo, absentCalendarReq);
             result = absentService.getAbsentScheduleByMonth(absentCalendarReq, lo);
-            result.setSendDate(DateUtil.getCurrentDateTime());
             result.setSystemId(systemId);
         } catch (Exception e) {
             result = new AbsentCalendarRes(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
@@ -89,7 +86,6 @@ public class AbsentController extends CommonController {
         try {
             startAPI(lo, absentDetailReq);
             result = absentService.getAbsentScheduleDetail(absentDetailReq, lo);
-            result.setSendDate(DateUtil.getCurrentDateTime());
             result.setSystemId(systemId);
         } catch (Exception e) {
             result = new AbsentDetailRes(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
@@ -102,17 +98,16 @@ public class AbsentController extends CommonController {
 
     @Operation(summary = "부재일정 수정", description = "부재일정 상세 수정")
     @PatchMapping("/absent")
-    public DTOResCommon updateAbsentSchedule(HttpServletRequest request,
+    public CommonRes updateAbsentSchedule(HttpServletRequest request,
             @RequestBody @Valid AbsentReq absentReq) {
 
-        DTOResCommon result = new DTOResCommon();
+        CommonRes result = new CommonRes();
         try {
             startAPI(lo, absentReq);
             result = absentService.updateAbsentSchedule(absentReq, lo);
-            result.setSendDate(DateUtil.getCurrentDateTime());
             result.setSystemId(systemId);
         } catch (Exception e) {
-            result = new DTOResCommon(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
+            result = new CommonRes(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
                     ErrorCode.INTERNAL_ERROR.getMessage());
         } finally {
             endAPI(request, findErrorCodeByCode(result.getRetCode()), lo, result);
@@ -123,16 +118,16 @@ public class AbsentController extends CommonController {
 
     @Operation(summary = "부재일정 삭제", description = "부재일정 삭제")
     @DeleteMapping("/absent")
-    public DTOResCommon deleteAbsentSchedule(HttpServletRequest request,
+    public CommonRes deleteAbsentSchedule(HttpServletRequest request,
             @RequestParam(name = "absentDate") @Pattern(regexp = "^[0-9]{8}$") String absentDate) {
-        DTOResCommon result = new DTOResCommon();
+        CommonRes result = new CommonRes();
+
         try {
             startAPI(lo, null);
             result = absentService.deleteAbsentSchedule(absentDate, lo);
-            result.setSendDate(DateUtil.getCurrentDateTime());
             result.setSystemId(systemId);
         } catch (Exception e) {
-            result = new DTOResCommon(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
+            result = new CommonRes(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
                     ErrorCode.INTERNAL_ERROR.getMessage());
         } finally {
             endAPI(request, findErrorCodeByCode(result.getRetCode()), lo, result);

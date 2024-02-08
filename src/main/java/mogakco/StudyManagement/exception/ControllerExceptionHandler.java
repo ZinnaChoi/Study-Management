@@ -11,7 +11,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 
 import jakarta.servlet.http.HttpServletRequest;
 import mogakco.StudyManagement.controller.CommonController;
-import mogakco.StudyManagement.dto.DTOResCommon;
+import mogakco.StudyManagement.dto.CommonRes;
 import mogakco.StudyManagement.enums.ErrorCode;
 import mogakco.StudyManagement.service.common.LoggingService;
 
@@ -26,7 +26,7 @@ public class ControllerExceptionHandler extends CommonController {
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<DTOResCommon> handleValidationExceptions(HttpServletRequest request,
+    public ResponseEntity<CommonRes> handleValidationExceptions(HttpServletRequest request,
             MethodArgumentNotValidException ex)
             throws JsonProcessingException {
         startAPI(lo, ex.getBindingResult().getTarget());
@@ -37,18 +37,18 @@ public class ControllerExceptionHandler extends CommonController {
             errors.put(fieldName, errorMessage);
         });
         String errorString = mapper.writeValueAsString(errors);
-        DTOResCommon result = new DTOResCommon(systemId, ErrorCode.BAD_REQUEST.getCode(), errorString);
+        CommonRes result = new CommonRes(systemId, ErrorCode.BAD_REQUEST.getCode(), errorString);
         endAPI(request, ErrorCode.BAD_REQUEST, lo, result);
         return ResponseEntity.status(ErrorCode.BAD_REQUEST.getHttpStatus())
                 .body(result);
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
-    public ResponseEntity<DTOResCommon> handleHttpMessageNotReadableException(HttpServletRequest request,
+    public ResponseEntity<CommonRes> handleHttpMessageNotReadableException(HttpServletRequest request,
             HttpMessageNotReadableException ex) {
         startAPI(lo, "Invalid Json Input");
         String errorString = ex.getLocalizedMessage();
-        DTOResCommon result = new DTOResCommon(systemId, ErrorCode.BAD_REQUEST.getCode(), errorString);
+        CommonRes result = new CommonRes(systemId, ErrorCode.BAD_REQUEST.getCode(), errorString);
         endAPI(request, ErrorCode.BAD_REQUEST, lo, result);
         return ResponseEntity.status(ErrorCode.BAD_REQUEST.getHttpStatus())
                 .body(result);

@@ -10,7 +10,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class MemberIdDuplReq extends DTOReqCommon {
+public class MemberIdDuplReq {
     @Schema(example = "admin")
     private String id;
 }

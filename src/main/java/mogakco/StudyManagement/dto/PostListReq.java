@@ -9,15 +9,14 @@ import mogakco.StudyManagement.enums.PostSearchType;
 @Getter
 @Setter
 @NoArgsConstructor
-public class PostListReq extends DTOReqCommon {
+public class PostListReq {
 
     @Schema(example = "관리자")
     private String searchKeyWord;
 
     private PostSearchType searchType;
 
-    public PostListReq(String sendDate, String systemId, String searchKeyWord, PostSearchType searchType) {
-        super(sendDate, systemId);
+    public PostListReq(String searchKeyWord, PostSearchType searchType) {
         this.searchKeyWord = searchKeyWord;
         this.searchType = searchType;
     }

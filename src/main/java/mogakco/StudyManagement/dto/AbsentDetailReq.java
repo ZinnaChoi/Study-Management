@@ -9,14 +9,13 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class AbsentDetailReq extends DTOReqCommon {
+public class AbsentDetailReq {
 
     @Pattern(regexp = "^[0-9]{8}$", message = "absentDate는 8자리 숫자 형식 (yyyyMMdd)이어야 합니다")
     @Schema(example = "20240116")
     private String absentDate;
 
-    public AbsentDetailReq(String sendDate, String systemId, String absentDate) {
-        super(sendDate, systemId);
+    public AbsentDetailReq(String absentDate) {
         this.absentDate = absentDate;
     }
 }

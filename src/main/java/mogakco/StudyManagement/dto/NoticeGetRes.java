@@ -11,7 +11,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class NoticeGetRes extends DTOResCommon {
+public class NoticeGetRes extends CommonRes {
 
     private List<NoticeList> content;
 

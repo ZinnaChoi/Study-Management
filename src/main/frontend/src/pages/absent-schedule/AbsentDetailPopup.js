@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { authClient } from "../../services/APIService";
-import { getCurrentDateTime, formatDateToYYYYMMDD } from "../../util/DateUtil";
+import { formatDateToYYYYMMDD } from "../../util/DateUtil";
 import Table from "../../components/Table";
 
 const AbsentDetailPopup = ({ selectedDate, onClose }) => {
@@ -11,8 +11,6 @@ const AbsentDetailPopup = ({ selectedDate, onClose }) => {
       authClient
         .get(`/absent/detail`, {
           params: {
-            sendDate: getCurrentDateTime(),
-            systemId: "STUDY_0001",
             absentDate: formatDateToYYYYMMDD(selectedDate),
           },
         })

@@ -31,7 +31,6 @@ import mogakco.StudyManagement.dto.StudyReq;
 import mogakco.StudyManagement.service.common.LoggingService;
 import mogakco.StudyManagement.service.external.SendEmailService;
 import mogakco.StudyManagement.service.study.StudyService;
-import mogakco.StudyManagement.util.DateUtil;
 import mogakco.StudyManagement.util.TestUtil;
 
 @ActiveProfiles("test")
@@ -70,24 +69,10 @@ public class StudyControllerTest {
         public void getStudyInfo_Success() throws Exception {
 
                 UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(STUDY_API_URL);
-                uriBuilder.queryParam("sendDate", DateUtil.getCurrentDateTime())
-                                .queryParam("systemId", "SYS_01");
 
                 MvcResult result = TestUtil.performRequest(mockMvc, uriBuilder.toUriString(), null, "GET", 200, 200);
                 System.out.println(result.getResponse().getContentAsString());
                 assertEquals(200, result.getResponse().getStatus());
-        }
-
-        @Test
-        @WithMockUser(username = "admin", authorities = { "ADMIN" })
-        @DisplayName("스터디 정보 조회 실패_not include sendDate")
-        public void getStudyInfo_NotIncludeSendDate() throws Exception {
-
-                UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(STUDY_API_URL);
-                uriBuilder.queryParam("systemId", "SYS_01");
-
-                MvcResult result = TestUtil.performRequest(mockMvc, uriBuilder.toUriString(), null, "GET", 400, 400);
-                assertEquals(400, result.getResponse().getStatus());
         }
 
         @Test
@@ -97,8 +82,6 @@ public class StudyControllerTest {
         public void getStudyInfo_AuthenticationSuccess() throws Exception {
 
                 UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(STUDY_API_URL);
-                uriBuilder.queryParam("sendDate", DateUtil.getCurrentDateTime())
-                                .queryParam("systemId", "SYS_01");
 
                 MvcResult result = TestUtil.performRequest(mockMvc, uriBuilder.toUriString(), null, "GET", 200, null);
                 assertEquals(200, result.getResponse().getStatus());
@@ -118,8 +101,7 @@ public class StudyControllerTest {
 
                 StudyReq studyReq = new StudyReq(
                                 "NotExistStudyName", "10.10.10.110", "admin", "password", schedules);
-                studyReq.setSendDate(DateUtil.getCurrentDateTime());
-                studyReq.setSystemId("SYS_01");
+
                 String requestBodyJson = objectMapper.writeValueAsString(studyReq);
 
                 MockMultipartFile jsonFile = new MockMultipartFile("studyReq", "", "application/json",
@@ -142,8 +124,7 @@ public class StudyControllerTest {
 
                 StudyReq studyReq = new StudyReq(
                                 "NotExistStudyName", "10.10.10.110", "admin", "password", schedules);
-                studyReq.setSendDate(DateUtil.getCurrentDateTime());
-                studyReq.setSystemId("SYS_01");
+
                 String requestBodyJson = objectMapper.writeValueAsString(studyReq);
 
                 MockMultipartFile jsonFile = new MockMultipartFile("studyReq", "", "application/json",
@@ -166,8 +147,7 @@ public class StudyControllerTest {
 
                 StudyReq studyReq = new StudyReq(
                                 "NotExistStudyName", "10.10.10.110", "admin", "password", schedules);
-                studyReq.setSendDate(DateUtil.getCurrentDateTime());
-                studyReq.setSystemId("SYS_01");
+
                 String requestBodyJson = objectMapper.writeValueAsString(studyReq);
 
                 MockMultipartFile jsonFile = new MockMultipartFile("studyReq", "", "application/json",
@@ -192,8 +172,7 @@ public class StudyControllerTest {
 
                 StudyReq studyReq = new StudyReq(
                                 getStudyName(), "10.10.10.110", "admin", "password", schedules);
-                studyReq.setSendDate(DateUtil.getCurrentDateTime());
-                studyReq.setSystemId("SYS_01");
+
                 String requestBodyJson = objectMapper.writeValueAsString(studyReq);
 
                 MockMultipartFile jsonFile = new MockMultipartFile("studyReq", "", "application/json",
@@ -215,8 +194,7 @@ public class StudyControllerTest {
 
                 StudyReq studyReq = new StudyReq(
                                 "NotExistStudyName", "10.10.10.110", "admin", "password", schedules);
-                studyReq.setSendDate(DateUtil.getCurrentDateTime());
-                studyReq.setSystemId("SYS_01");
+
                 String requestBodyJson = objectMapper.writeValueAsString(studyReq);
 
                 MockMultipartFile jsonFile = new MockMultipartFile("studyReq", "", "application/json",

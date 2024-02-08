@@ -11,7 +11,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class AbsentReq extends DTOReqCommon {
+public class AbsentReq {
 
     @Pattern(regexp = "^[0-9]{8}$", message = "부재 일자는 8자리 숫자 형식 (yyyyMMdd)이어야 합니다")
     @Schema(example = "20240116")
@@ -24,9 +24,8 @@ public class AbsentReq extends DTOReqCommon {
     @Schema(example = "[\"PM1\",\"PM2\"]")
     private List<String> scheduleNameList;
 
-    public AbsentReq(String sendDate, String systemId, String absentDate, String description,
-            List<String> scheduleNameList) {
-        super(sendDate, systemId);
+    public AbsentReq(String absentDate, String description,
+            List<String> scheduleNameList) {      
         this.absentDate = absentDate;
         this.description = description;
         this.scheduleNameList = scheduleNameList;

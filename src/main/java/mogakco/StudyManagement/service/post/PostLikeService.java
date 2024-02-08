@@ -1,12 +1,12 @@
 package mogakco.StudyManagement.service.post;
 
-import mogakco.StudyManagement.dto.DTOResCommon;
+import mogakco.StudyManagement.dto.CommonRes;
 import mogakco.StudyManagement.service.common.LoggingService;
 
 public interface PostLikeService {
 
-    DTOResCommon createPostLike(Long postId, LoggingService lo);
+    CommonRes createPostLike(Long postId, LoggingService lo);
 
-    DTOResCommon deletePostLike(Long postId, LoggingService lo);
+    CommonRes deletePostLike(Long postId, LoggingService lo);
 
 }

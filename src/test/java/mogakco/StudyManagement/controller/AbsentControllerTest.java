@@ -24,7 +24,7 @@ import mogakco.StudyManagement.dto.AbsentReq;
 import mogakco.StudyManagement.service.absent.AbsentService;
 import mogakco.StudyManagement.service.common.LoggingService;
 import mogakco.StudyManagement.service.external.SendEmailService;
-import mogakco.StudyManagement.util.DateUtil;
+
 import mogakco.StudyManagement.util.TestUtil;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -67,7 +67,7 @@ public class AbsentControllerTest {
     @WithMockUser(username = "AbsentUser", authorities = { "USER" })
     @DisplayName("부재일정 등록 성공")
     public void registerAbsentScheduleSuccess() throws Exception {
-        AbsentReq request = new AbsentReq(DateUtil.getCurrentDateTime(), systemId, "20240117", "개인 사유",
+        AbsentReq request = new AbsentReq("20240117", "개인 사유",
                 Arrays.asList("TESTPM1", "TESTPM3"));
         String requestBodyJson = objectMapper.writeValueAsString(request);
 
@@ -79,7 +79,7 @@ public class AbsentControllerTest {
     @WithMockUser(username = "AbsentUser", authorities = { "USER" })
     @DisplayName("부재일정 등록 실패 - 존재하지 않는 이벤트 이름")
     public void registerAbsentScheduleFailNotFound() throws Exception {
-        AbsentReq request = new AbsentReq(DateUtil.getCurrentDateTime(), systemId, "20240117", "개인 사유",
+        AbsentReq request = new AbsentReq("20240117", "개인 사유",
                 Arrays.asList("TESTAM1", "TESTAM3"));
         String requestBodyJson = objectMapper.writeValueAsString(request);
 
@@ -91,7 +91,7 @@ public class AbsentControllerTest {
     @WithMockUser(username = "AbsentUser", authorities = { "USER" })
     @DisplayName("부재일정 등록 실패 - 참여하지 않는 스터디 타임에 부재 요청")
     public void registerAbsentScheduleFailInvalidRequest() throws Exception {
-        AbsentReq request = new AbsentReq(DateUtil.getCurrentDateTime(), systemId, "20240117", "개인 사유",
+        AbsentReq request = new AbsentReq("20240117", "개인 사유",
                 Arrays.asList("TESTPM9"));
         String requestBodyJson = objectMapper.writeValueAsString(request);
 
@@ -103,7 +103,7 @@ public class AbsentControllerTest {
     @WithMockUser(username = "AbsentUser", authorities = { "USER" })
     @DisplayName("부재일정 등록 실패 - 이미 등록된 부재 일정")
     public void registerAbsentScheduleFailConflict() throws Exception {
-        AbsentReq request = new AbsentReq(DateUtil.getCurrentDateTime(), systemId, "20240116", "개인 사유",
+        AbsentReq request = new AbsentReq("20240116", "개인 사유",
                 Arrays.asList("TESTPM1"));
         String requestBodyJson = objectMapper.writeValueAsString(request);
 
@@ -115,7 +115,7 @@ public class AbsentControllerTest {
     @WithMockUser(username = "AbsentUser", authorities = { "USER" })
     @DisplayName("부재일정 등록 실패 - 부재 일자 형식 불일치")
     public void registerAbsentScheduleFailInvalidDate() throws Exception {
-        AbsentReq request = new AbsentReq(DateUtil.getCurrentDateTime(), systemId, "2024-01-17", "개인 사유",
+        AbsentReq request = new AbsentReq("2024-01-17", "개인 사유",
                 Arrays.asList("TESTPM1"));
         String requestBodyJson = objectMapper.writeValueAsString(request);
 
@@ -131,8 +131,7 @@ public class AbsentControllerTest {
     @DisplayName("부재일정 등록 실패 - scheduleNameList 형식 불일치")
     public void registerAbsentScheduleFailInvalidScheduleNameList() throws Exception {
         String invalidScheduleNameList = "\"TESTPM1\"";
-        String requestBodyJson = "{\"sendDate\":\"" + DateUtil.getCurrentDateTime() + "\", \"systemId\":\"" + systemId
-                + "\", \"absentDate\":\"20240117\", \"description\":\"개인 사유\", \"scheduleNameList\":"
+        String requestBodyJson = "{\"absentDate\":\"20240117\", \"description\":\"개인 사유\", \"scheduleNameList\":"
                 + invalidScheduleNameList + "}";
 
         MvcResult result = TestUtil.performRequest(mockMvc, ABSENT_API_URL, requestBodyJson, "POST", 400, 400);
@@ -146,7 +145,7 @@ public class AbsentControllerTest {
     @WithMockUser(username = "AbsentUser", authorities = { "USER" })
     @DisplayName("부재일정 등록 실패 - 빈 scheduleNameList 요청")
     public void registerAbsentScheduleFailEmptyScheduleNameList() throws Exception {
-        AbsentReq request = new AbsentReq(DateUtil.getCurrentDateTime(), systemId, "20240117", "개인 사유",
+        AbsentReq request = new AbsentReq("20240117", "개인 사유",
                 Arrays.asList());
         String requestBodyJson = objectMapper.writeValueAsString(request);
 
@@ -164,8 +163,7 @@ public class AbsentControllerTest {
 
         UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(ABSENT_CALENDAR_GET_URL);
 
-        uriBuilder.queryParam("sendDate", DateUtil.getCurrentDateTime())
-                .queryParam("systemId", systemId)
+        uriBuilder
                 .queryParam("yearMonth", "202401")
                 .queryParam("memberNameList", Arrays.asList());
 
@@ -180,8 +178,7 @@ public class AbsentControllerTest {
     public void getAbsentScheduleSuccesSpecificMembers() throws Exception {
         UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(ABSENT_CALENDAR_GET_URL);
 
-        uriBuilder.queryParam("sendDate", DateUtil.getCurrentDateTime())
-                .queryParam("systemId", systemId)
+        uriBuilder
                 .queryParam("yearMonth", "202401")
                 .queryParam("memberNameList", Arrays.asList("AbsentUser", "AbsentUser2"));
 
@@ -199,8 +196,7 @@ public class AbsentControllerTest {
     public void getAbsentScheduleFailMemberNotFound() throws Exception {
         UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(ABSENT_CALENDAR_GET_URL);
 
-        uriBuilder.queryParam("sendDate", DateUtil.getCurrentDateTime())
-                .queryParam("systemId", systemId)
+        uriBuilder
                 .queryParam("yearMonth", "202401")
                 .queryParam("memberNameList", Arrays.asList("NotValidUser"));
 
@@ -214,8 +210,7 @@ public class AbsentControllerTest {
     public void getAbsentScheduleFailInvalidYearMonthFormat() throws Exception {
         UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(ABSENT_CALENDAR_GET_URL);
 
-        uriBuilder.queryParam("sendDate", DateUtil.getCurrentDateTime())
-                .queryParam("systemId", systemId)
+        uriBuilder
                 .queryParam("yearMonth", "2024-01")
                 .queryParam("memberNameList", Arrays.asList());
 
@@ -230,8 +225,7 @@ public class AbsentControllerTest {
     public void getAbsentScheduleDetailSuccessAll() throws Exception {
         UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(ABSENT_DETAIL_GET_URL);
 
-        uriBuilder.queryParam("sendDate", DateUtil.getCurrentDateTime())
-                .queryParam("systemId", systemId)
+        uriBuilder
                 .queryParam("absentDate", "20240116");
 
         TestUtil.performRequest(mockMvc, uriBuilder.toUriString(), null, "GET", 200, 200);
@@ -244,8 +238,7 @@ public class AbsentControllerTest {
     public void getAbsentScheduleDetailFailInvalidAbsentDateFormat() throws Exception {
         UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(ABSENT_DETAIL_GET_URL);
 
-        uriBuilder.queryParam("sendDate", DateUtil.getCurrentDateTime())
-                .queryParam("systemId", systemId)
+        uriBuilder
                 .queryParam("absentDate", "2024-01-16");
 
         TestUtil.performRequest(mockMvc, uriBuilder.toUriString(), null, "GET", 400, 400);
@@ -258,7 +251,7 @@ public class AbsentControllerTest {
     @WithMockUser(username = "AbsentUser", authorities = { "USER" })
     @DisplayName("부재일정 수정 성공 - 새로운 부재일정 추가")
     public void updateAbsentScheduleSuccessAddSchedule() throws Exception {
-        AbsentReq request = new AbsentReq(DateUtil.getCurrentDateTime(), systemId, "20240116", "가족여행",
+        AbsentReq request = new AbsentReq("20240116", "가족여행",
                 Arrays.asList("TESTPM1", "TESTPM7"));
         String requestBodyJson = objectMapper.writeValueAsString(request);
 
@@ -270,7 +263,7 @@ public class AbsentControllerTest {
     @WithMockUser(username = "AbsentUser2", authorities = { "USER" })
     @DisplayName("부재일정 수정 성공 - 부재일정 일부 삭제")
     public void updateAbsentScheduleSuccessRemoveSomeSchedule() throws Exception {
-        AbsentReq request = new AbsentReq(DateUtil.getCurrentDateTime(), systemId, "20240116", "가족여행",
+        AbsentReq request = new AbsentReq("20240116", "가족여행",
                 Arrays.asList("TESTPM1"));
         String requestBodyJson = objectMapper.writeValueAsString(request);
 
@@ -282,7 +275,7 @@ public class AbsentControllerTest {
     @WithMockUser(username = "AbsentUser", authorities = { "USER" })
     @DisplayName("부재일정 수정 성공 - 부재사유 변경")
     public void updateAbsentScheduleSuccessChangeDescription() throws Exception {
-        AbsentReq request = new AbsentReq(DateUtil.getCurrentDateTime(), systemId, "20240116", "개인 사유",
+        AbsentReq request = new AbsentReq("20240116", "개인 사유",
                 Arrays.asList("TESTPM1"));
         String requestBodyJson = objectMapper.writeValueAsString(request);
 
@@ -294,7 +287,7 @@ public class AbsentControllerTest {
     @WithMockUser(username = "AbsentUser", authorities = { "USER" })
     @DisplayName("부재일정 수정 안됨 - 변경사항 없음")
     public void updateAbsentScheduleFailNotChanged() throws Exception {
-        AbsentReq request = new AbsentReq(DateUtil.getCurrentDateTime(), systemId, "20240116", "가족여행",
+        AbsentReq request = new AbsentReq("20240116", "가족여행",
                 Arrays.asList("TESTPM1"));
         String requestBodyJson = objectMapper.writeValueAsString(request);
 
@@ -306,7 +299,7 @@ public class AbsentControllerTest {
     @WithMockUser(username = "AbsentUser", authorities = { "USER" })
     @DisplayName("부재일정 수정 실패 - 잘못된 부재 일자 형식")
     public void updateAbsentScheduleFailInvalidAbsentDateFormat() throws Exception {
-        AbsentReq request = new AbsentReq(DateUtil.getCurrentDateTime(), systemId, "2024-01-16", "가족여행",
+        AbsentReq request = new AbsentReq("2024-01-16", "가족여행",
                 Arrays.asList("TESTPM1"));
         String requestBodyJson = objectMapper.writeValueAsString(request);
 
@@ -318,7 +311,7 @@ public class AbsentControllerTest {
     @WithMockUser(username = "AbsentUser", authorities = { "USER" })
     @DisplayName("부재일정 수정 실패 - 빈 스터디 시간")
     public void updateAbsentScheduleFailInvalidEmptyScheduleTime() throws Exception {
-        AbsentReq request = new AbsentReq(DateUtil.getCurrentDateTime(), systemId, "20240116", "가족여행",
+        AbsentReq request = new AbsentReq("20240116", "가족여행",
                 Arrays.asList());
         String requestBodyJson = objectMapper.writeValueAsString(request);
 
@@ -330,7 +323,7 @@ public class AbsentControllerTest {
     @WithMockUser(username = "AbsentUser", authorities = { "USER" })
     @DisplayName("부재일정 수정 실패 - 존재하지 않는 스터디 시간")
     public void updateAbsentScheduleFailNotFoundScheduleName() throws Exception {
-        AbsentReq request = new AbsentReq(DateUtil.getCurrentDateTime(), systemId, "20240116", "가족여행",
+        AbsentReq request = new AbsentReq("20240116", "가족여행",
                 Arrays.asList("INVALID TESTTIME"));
         String requestBodyJson = objectMapper.writeValueAsString(request);
 

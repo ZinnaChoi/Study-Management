@@ -15,7 +15,7 @@ import mogakco.StudyManagement.domain.Member;
 import mogakco.StudyManagement.domain.Post;
 import mogakco.StudyManagement.domain.PostComment;
 import mogakco.StudyManagement.dto.PostReq;
-import mogakco.StudyManagement.dto.DTOResCommon;
+import mogakco.StudyManagement.dto.CommonRes;
 import mogakco.StudyManagement.dto.PostDetail;
 import mogakco.StudyManagement.dto.PostDetailComment;
 import mogakco.StudyManagement.dto.PostDetailRes;
@@ -143,16 +143,16 @@ public class PostServiceImpl extends PostCommonService implements PostService {
             return new PostDetailRes(null, ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(),
                     new PostDetail(post, likeCount, postCommentList));
         } catch (NotFoundException e) {
-            DTOResCommon res = ExceptionUtil.handleException(e);
+            CommonRes res = ExceptionUtil.handleException(e);
             return new PostDetailRes(res.getSystemId(), res.getRetCode(), res.getRetMsg(), null);
         }
     }
 
     @Override
     @Transactional
-    public DTOResCommon updatePost(Long postId, PostReq postUpdateReq, LoggingService lo) {
+    public CommonRes updatePost(Long postId, PostReq postUpdateReq, LoggingService lo) {
         try {
-            DTOResCommon result = new DTOResCommon();
+            CommonRes result = new CommonRes();
             lo.setDBStart();
             Post post = getPostById(postId);
             Member loginMember = getLoginMember();
@@ -181,7 +181,7 @@ public class PostServiceImpl extends PostCommonService implements PostService {
 
     @Override
     @Transactional
-    public DTOResCommon deletePost(Long postId, LoggingService lo) {
+    public CommonRes deletePost(Long postId, LoggingService lo) {
         try {
             lo.setDBStart();
             Post post = getPostById(postId);
@@ -196,7 +196,7 @@ public class PostServiceImpl extends PostCommonService implements PostService {
             postRepository.delete(post);
             lo.setDBEnd();
 
-            return new DTOResCommon(null, ErrorCode.DELETED.getCode(),
+            return new CommonRes(null, ErrorCode.DELETED.getCode(),
                     ErrorCode.DELETED.getMessage("게시글"));
         } catch (NotFoundException | UnauthorizedAccessException e) {
             return ExceptionUtil.handleException(e);

@@ -8,7 +8,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class PostCommentReplyRes extends DTOResCommon {
+public class PostCommentReplyRes extends CommonRes {
 
     private List<PostCommentReply> postCommentReplies;
 

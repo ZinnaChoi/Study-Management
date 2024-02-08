@@ -10,7 +10,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class MemberIdDuplRes extends DTOResCommon {
+public class MemberIdDuplRes extends CommonRes {
 
     @Schema(example = "false")
     private boolean isDuplicated;

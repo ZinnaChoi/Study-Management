@@ -25,7 +25,6 @@ import mogakco.StudyManagement.enums.PostSearchType;
 import mogakco.StudyManagement.service.common.LoggingService;
 import mogakco.StudyManagement.service.external.SendEmailService;
 import mogakco.StudyManagement.service.post.PostService;
-import mogakco.StudyManagement.util.DateUtil;
 import mogakco.StudyManagement.util.TestUtil;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -70,7 +69,7 @@ public class PostControllerTest {
     @DisplayName("게시글 등록 성공")
     public void createPostSuccess() throws Exception {
         String requestBodyJson = objectMapper
-                .writeValueAsString(new PostReq(DateUtil.getCurrentDateTime(), systemId, "2024 2월 개발 뉴스 공유드립니다",
+                .writeValueAsString(new PostReq("2024 2월 개발 뉴스 공유드립니다",
                         "chatGPT 5.0 도입"));
         TestUtil.performRequest(mockMvc, POST_API_URL, requestBodyJson, "POST", 200, 201);
     }
@@ -81,7 +80,7 @@ public class PostControllerTest {
     @DisplayName("게시글 등록 실패 - 빈 제목")
     public void createPostFailEmptyTitle() throws Exception {
         String requestBodyJson = objectMapper
-                .writeValueAsString(new PostReq(DateUtil.getCurrentDateTime(), systemId, null, "chatGPT 5.0 도입"));
+                .writeValueAsString(new PostReq(null, "chatGPT 5.0 도입"));
         TestUtil.performRequest(mockMvc, POST_API_URL, requestBodyJson, "POST", 400, 400);
     }
 
@@ -91,8 +90,6 @@ public class PostControllerTest {
     @DisplayName("게시글 등록 실패 - 잘못된 요청 JSON 형식")
     public void createPostFailInvalidJson() throws Exception {
         String invalidJson = "{\n" +
-                "  \"sendDate\": \"20240112132910401\",\n" +
-                "  \"systemId\": \"ABC\",\n" +
                 "  \"title\": \"2024 2월 개발 뉴스 공유드립니다\",\n" +
                 "  \"content\": \"chatGPT 5.0 도입\"\n"; // Bad Request (Missing closing brace)
 
@@ -109,8 +106,7 @@ public class PostControllerTest {
 
         UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(POST_API_URL);
 
-        uriBuilder.queryParam("sendDate", DateUtil.getCurrentDateTime())
-                .queryParam("systemId", systemId)
+        uriBuilder
                 .queryParam("searchKeyWord", "post")
                 .queryParam("searchType", PostSearchType.TITLE)
                 .queryParam("page", 0)
@@ -138,8 +134,7 @@ public class PostControllerTest {
 
         UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(POST_API_URL);
 
-        uriBuilder.queryParam("sendDate", DateUtil.getCurrentDateTime())
-                .queryParam("systemId", systemId)
+        uriBuilder
                 .queryParam("searchKeyWord", "PostUser")
                 .queryParam("searchType", PostSearchType.MEMBER)
                 .queryParam("page", 0)
@@ -161,8 +156,7 @@ public class PostControllerTest {
 
         UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(POST_API_URL);
 
-        uriBuilder.queryParam("sendDate", DateUtil.getCurrentDateTime())
-                .queryParam("systemId", systemId)
+        uriBuilder
                 .queryParam("searchKeyWord", "post")
                 .queryParam("searchType", PostSearchType.TITLE)
                 .queryParam("page", 1)
@@ -194,8 +188,7 @@ public class PostControllerTest {
 
         UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(POST_API_URL);
 
-        uriBuilder.queryParam("sendDate", DateUtil.getCurrentDateTime())
-                .queryParam("systemId", systemId)
+        uriBuilder
                 .queryParam("searchKeyWord", "post")
                 .queryParam("searchType", "INVALID_TYPE") // Invalid SearchType
                 .queryParam("page", 0)
@@ -245,7 +238,7 @@ public class PostControllerTest {
     public void updatePostSuccess() throws Exception {
 
         String requestBodyJson = objectMapper.writeValueAsString(
-                new PostReq(DateUtil.getCurrentDateTime(), systemId, "Updated Title", "Updated Content"));
+                new PostReq("Updated Title", "Updated Content"));
 
         MvcResult result = TestUtil.performRequest(mockMvc,
                 POST_API_URL + "/" + getLatestPostIdByMemberId("PostUser"), requestBodyJson, "PATCH", 200, 200);
@@ -264,7 +257,7 @@ public class PostControllerTest {
     @DisplayName("게시글 수정 실패 - 잘못된 게시글 번호")
     public void updatePostFailPostNotFound() throws Exception {
         String requestBodyJson = objectMapper.writeValueAsString(
-                new PostReq(DateUtil.getCurrentDateTime(), systemId, "Updated Title", "Updated Content"));
+                new PostReq("Updated Title", "Updated Content"));
 
         TestUtil.performRequest(mockMvc,
                 POST_API_URL + "/" + -1, requestBodyJson, "PATCH", 200, 404);
@@ -277,7 +270,7 @@ public class PostControllerTest {
     public void updatePostFailPostDiffMember() throws Exception {
 
         String requestBodyJson = objectMapper.writeValueAsString(
-                new PostReq(DateUtil.getCurrentDateTime(), systemId, "Updated Title", "Updated Content"));
+                new PostReq("Updated Title", "Updated Content"));
 
         TestUtil.performRequest(mockMvc,
                 POST_API_URL + "/" + getLatestPostIdByMemberId("PostUser"), requestBodyJson, "PATCH", 200, 400);

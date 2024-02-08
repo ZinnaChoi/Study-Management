@@ -7,7 +7,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class ScheduleReq extends DTOReqCommon {
+public class ScheduleReq {
 
     @Schema(example = "AM1")
     private String scheduleName;

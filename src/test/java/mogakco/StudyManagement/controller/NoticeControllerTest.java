@@ -28,7 +28,6 @@ import mogakco.StudyManagement.scheduler.StartTimeMonitoringScheduler;
 import mogakco.StudyManagement.service.common.LoggingService;
 import mogakco.StudyManagement.service.external.SendEmailService;
 import mogakco.StudyManagement.service.notice.NoticeService;
-import mogakco.StudyManagement.util.DateUtil;
 import mogakco.StudyManagement.util.TestUtil;
 
 import static org.mockito.Mockito.times;
@@ -109,7 +108,7 @@ public class NoticeControllerTest {
         public void updateNoticeSuccess() throws Exception {
 
                 String requestBodyJson = objectMapper.writeValueAsString(
-                                new NoticeReq(DateUtil.getCurrentDateTime(), systemId, Boolean.TRUE.booleanValue(),
+                                new NoticeReq(Boolean.TRUE.booleanValue(),
                                                 Boolean.FALSE,
                                                 Boolean.FALSE, Boolean.TRUE.booleanValue()));
 
@@ -130,7 +129,7 @@ public class NoticeControllerTest {
         public void updateNoticeFailNoChanges() throws Exception {
 
                 String requestBodyJson = objectMapper.writeValueAsString(
-                                new NoticeReq(DateUtil.getCurrentDateTime(), systemId, Boolean.TRUE, Boolean.TRUE,
+                                new NoticeReq(Boolean.TRUE, Boolean.TRUE,
                                                 Boolean.TRUE, Boolean.TRUE));
 
                 TestUtil.performRequest(mockMvc,
