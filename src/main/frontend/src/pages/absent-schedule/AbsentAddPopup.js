@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { authClient } from "../../services/APIService";
-import { getCurrentDateTime, formatDateToYYYYMMDD } from "../../util/DateUtil";
+import { formatDateToYYYYMMDD } from "../../util/DateUtil";
 import Select from "react-select";
 
 const AbsentAddPopup = ({ onClose }) => {
@@ -14,12 +14,7 @@ const AbsentAddPopup = ({ onClose }) => {
 
   useEffect(() => {
     authClient
-      .get("/member", {
-        params: {
-          sendDate: getCurrentDateTime(),
-          systemId: "STUDY_0001",
-        },
-      })
+      .get("/member")
       .then((response) => {
         const scheduleOptions = response.data.scheduleName.map(
           (scheduleName) => ({
@@ -39,8 +34,6 @@ const AbsentAddPopup = ({ onClose }) => {
 
   const handleAddAbsent = () => {
     const newAbsentData = {
-      sendDate: getCurrentDateTime(),
-      systemId: "STUDY_0001",
       absentDate: formatDateToYYYYMMDD(absentDate),
       description: description,
       scheduleNameList: selectedSchedules.map((schedule) => schedule.value),
