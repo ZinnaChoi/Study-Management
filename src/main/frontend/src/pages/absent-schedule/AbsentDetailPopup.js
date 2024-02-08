@@ -16,19 +16,22 @@ const AbsentDetailPopup = ({ selectedDate, onClose, onRefresh }) => {
     authClient
       .get("/member")
       .then((response) => {
-        const scheduleOptions = {};
-        response.data.scheduleName.forEach((scheduleName) => {
-          scheduleOptions[scheduleName] = {
-            value: scheduleName,
-            label: scheduleName,
-          };
-        });
         setLoginMemberName(response.data.name);
+        const scheduleOptions = response.data.scheduleName.reduce(
+          (options, scheduleName) => {
+            options[scheduleName] = {
+              value: scheduleName,
+              label: scheduleName,
+            };
+            return options;
+          },
+          {}
+        );
         setSchedules(scheduleOptions);
       })
       .catch((error) => {
         alert(
-          "스케줄 목록 조회 실패: " +
+          "스터디원의 정보 조회 실패: " +
             (error.response?.data.retMsg || "Unknown error")
         );
       });
@@ -44,10 +47,13 @@ const AbsentDetailPopup = ({ selectedDate, onClose, onRefresh }) => {
         })
         .then((response) => {
           setAbsentDetail(response.data.content);
-          const initialEditingMembers = {};
-          response.data.content.forEach((detail) => {
-            initialEditingMembers[detail.memberName] = false;
-          });
+          const initialEditingMembers = response.data.content.reduce(
+            (acc, detail) => {
+              acc[detail.memberName] = false;
+              return acc;
+            },
+            {}
+          );
           setEditingMembers(initialEditingMembers);
         })
         .catch((error) => {
@@ -59,45 +65,31 @@ const AbsentDetailPopup = ({ selectedDate, onClose, onRefresh }) => {
     }
   }, [selectedDate]);
 
-  const handleEditClick = async (memberName) => {
+  const handleEditClick = (memberName) => {
     setEditingMembers((prevEditingMembers) => ({
       ...prevEditingMembers,
       [memberName]: true,
     }));
 
-    try {
-      const response = await authClient.get(`/absent/detail`, {
-        params: {
-          absentDate: formatDateToYYYYMMDD(selectedDate),
-        },
-      });
-      const memberDetail = response.data.content.find(
-        (detail) => detail.memberName === memberName
-      );
+    const memberDetail = absentDetail.find(
+      (detail) => detail.memberName === memberName
+    );
 
-      const allScheduleOptions = Object.values(schedules);
+    const selectedScheduleOptions = memberDetail.scheduleNameList.map(
+      (name) => ({
+        value: name,
+        label: name,
+      })
+    );
 
-      const selectedScheduleOptions = memberDetail.scheduleNameList.map(
-        (name) => ({
-          value: name,
-          label: name,
-        })
-      );
-
-      setEditFormData({
-        ...editFormData,
-        [memberName]: {
-          scheduleNameList: selectedScheduleOptions,
-          allSchedules: allScheduleOptions,
-          description: memberDetail.description,
-        },
-      });
-    } catch (error) {
-      alert(
-        "부재일정 상세 정보 조회 실패: " +
-          (error.response?.data.retMsg || "Unknown error")
-      );
-    }
+    setEditFormData((prevEditFormData) => ({
+      ...prevEditFormData,
+      [memberName]: {
+        scheduleNameList: selectedScheduleOptions,
+        allSchedules: Object.values(schedules),
+        description: memberDetail.description,
+      },
+    }));
   };
 
   const handleEditFormChange = (memberName, name, value) => {
