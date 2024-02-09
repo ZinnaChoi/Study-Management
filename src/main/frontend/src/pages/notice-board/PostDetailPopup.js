@@ -1,4 +1,3 @@
-// PostDetail 컴포넌트 수정
 import React, { useState, useEffect } from "react";
 import { parseDate } from "../../util/DateUtil";
 import { authClient } from "../../services/APIService";

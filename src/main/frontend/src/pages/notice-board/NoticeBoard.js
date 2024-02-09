@@ -6,7 +6,7 @@ import Pagination from "../../components/Pagination";
 import CommonDialog from "../../components/CommonDialog";
 import "../../styles/NoticeBoard.css";
 import "../../styles/Button.css";
-import PostDetail from "./PostDetail";
+import PostDetailPopup from "./PostDetailPopup";
 
 const NoticeBoard = () => {
   const [posts, setPosts] = useState([]);
@@ -150,7 +150,7 @@ const NoticeBoard = () => {
           showButton={false}
           onClose={handleCloseDetailPopup}
           extraComponents={
-            <PostDetail
+            <PostDetailPopup
               postId={selectedPostId}
               onClose={handleCloseDetailPopup}
             />
