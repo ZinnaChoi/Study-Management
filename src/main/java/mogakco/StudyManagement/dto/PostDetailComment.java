@@ -9,7 +9,7 @@ public class PostDetailComment {
 
     private Long commnetId;
 
-    private String memeberName;
+    private String memberName;
 
     private String content;
 
