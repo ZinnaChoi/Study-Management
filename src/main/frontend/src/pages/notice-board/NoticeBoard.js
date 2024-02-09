@@ -78,56 +78,6 @@ const NoticeBoard = () => {
     fetchPosts(newPage, size, searchType, searchKeyword);
   };
 
-  const containerStyle = {
-    padding: "30px",
-    minHeight: "100vh",
-    justifyContent: "center",
-  };
-
-  const selectAndInputBaseStyle = {
-    marginRight: "5px",
-    padding: "5px 10px",
-    borderRadius: "5px",
-  };
-
-  const searchAndTableContainerStyle = {
-    display: "flex",
-    justifyContent: "space-between",
-    width: "100%",
-    minHeight: "50px",
-    marginBottom: "10px",
-  };
-
-  const selectStyle = {
-    flex: "1",
-    ...selectAndInputBaseStyle,
-  };
-
-  const inputStyle = {
-    flex: "8",
-    ...selectAndInputBaseStyle,
-  };
-
-  const buttonStyle = {
-    margin: "0 5px",
-    padding: "5px 10px",
-    border: "none",
-    borderRadius: "5px",
-    backgroundColor: "#375582",
-    color: "white",
-    cursor: "pointer",
-  };
-
-  const searchButtonStyle = {
-    flex: "0.5",
-    ...buttonStyle,
-  };
-
-  const addButtonStyle = {
-    flex: "0.5",
-    ...buttonStyle,
-  };
-
   const columns = [
     {
       Header: "좋아요 수",
@@ -158,12 +108,12 @@ const NoticeBoard = () => {
   ];
 
   return (
-    <div style={containerStyle}>
-      <div style={searchAndTableContainerStyle}>
+    <div>
+      <div className="searchAndTableContainer">
         <select
           value={searchType}
           onChange={(e) => setSearchType(e.target.value)}
-          style={selectStyle}
+          className="selectAndInputBase select"
         >
           <option value="MEMBER">작성자</option>
           <option value="TITLE">제목</option>
@@ -173,12 +123,12 @@ const NoticeBoard = () => {
           value={searchKeyword}
           onChange={(e) => setSearchKeyword(e.target.value)}
           onKeyDown={handleKeyDown}
-          style={inputStyle}
+          className="selectAndInputBase input"
         />
-        <button onClick={handleSearch} style={searchButtonStyle}>
+        <button onClick={handleSearch} className="searchButton search-btn">
           검색
         </button>
-        <button style={addButtonStyle}>추가</button>
+        <button className="addButton accept-btn">추가</button>
       </div>
       <Table
         columns={columns}

@@ -16,6 +16,7 @@ export default function MembersInfo() {
     acceptStr: "확인",
     cancleStr: "취소",
     submitEvt: doSomeAction,
+    showButton: true,
   };
   return (
     <React.Fragment>
@@ -34,6 +35,7 @@ export default function MembersInfo() {
           acceptStr={dialogProps.acceptStr} // 확인 버튼 str
           cancleStr={dialogProps.cancleStr} // 취소 버튼 str
           submitEvt={dialogProps.submitEvt} // 확인 버튼 클릭 시 함수 실행
+          showButton={dialogProps.showButton}
           extraComponents={<ExtraComponents />} // 추가적인 컴포넌트 연결(테이블 등)
         ></CommonDialog>
       </div>

@@ -82,7 +82,14 @@ const AbsentCalendar = ({
       }}
       eventContent={(eventInfo) => (
         <>
-          <div style={{ color: "black" }}>{eventInfo.event.title}</div>
+          <div
+            style={{
+              color: "black",
+              overflow: "hidden",
+            }}
+          >
+            {eventInfo.event.title}
+          </div>
         </>
       )}
       dateClick={(event) => onDateClick(event.dateStr)}
