@@ -4,6 +4,7 @@
   color: white !important;
   font-weight: 600 !important;
   font-size: 12px !important;
+  border: none;
 }
 
 .cancel-btn {
@@ -11,6 +12,23 @@
   color: white !important;
   font-weight: 600 !important;
   font-size: 12px !important;
+  border: none;
+}
+
+.edit-btn {
+  background-color: #81abf4 !important;
+  color: white !important;
+  font-weight: 600 !important;
+  font-size: 12px !important;
+  border: none;
+}
+
+.delete-btn {
+  background-color: #c881f4 !important;
+  color: white !important;
+  font-weight: 600 !important;
+  font-size: 12px !important;
+  border: none;
 }
 
 .page-btn {

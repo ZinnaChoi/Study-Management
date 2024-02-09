@@ -4,6 +4,7 @@ import { authClient } from "../../services/APIService";
 import { formatDateToYYYYMMDD } from "../../util/DateUtil";
 import Table from "../../components/Table";
 import Select from "react-select";
+import "../../styles/Button.css";
 
 const AbsentDetailPopup = ({ selectedDate, onClose, onRefresh }) => {
   const [absentDetail, setAbsentDetail] = useState([]);
@@ -171,15 +172,25 @@ const AbsentDetailPopup = ({ selectedDate, onClose, onRefresh }) => {
           {isCurrentUser && (
             <>
               {isEditing ? (
-                <button onClick={() => handleSaveClick(detail.memberName)}>
+                <button
+                  className="accept-btn"
+                  onClick={() => handleSaveClick(detail.memberName)}
+                >
                   저장
                 </button>
               ) : (
                 <>
-                  <button onClick={() => handleEditClick(detail.memberName)}>
+                  <button
+                    className="edit-btn"
+                    style={{ marginRight: "5px" }}
+                    onClick={() => handleEditClick(detail.memberName)}
+                  >
                     수정
                   </button>
-                  <button onClick={() => handleDelete(detail.memberName)}>
+                  <button
+                    className="delete-btn"
+                    onClick={() => handleDelete(detail.memberName)}
+                  >
                     삭제
                   </button>
                 </>
