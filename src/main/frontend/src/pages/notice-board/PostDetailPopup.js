@@ -1,9 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { parseDate } from "../../util/DateUtil";
 import { authClient } from "../../services/APIService";
+import "../../styles/NoticeBoard.css";
+import "../../styles/Button.css";
 
 const PostDetailPopup = ({ postId }) => {
-  const [postDetail, setPostDetail] = useState({ comments: [] });
+  const [postDetail, setPostDetail] = useState({
+    comments: [],
+    isLiked: false,
+  });
   const [loginMemberName, setLoginMemberName] = useState("");
   const [newComment, setNewComment] = useState("");
 
@@ -49,20 +54,33 @@ const PostDetailPopup = ({ postId }) => {
 
   const handleDeleteComment = (commentId) => {};
 
+  const toggleLike = () => {
+    setPostDetail((prevState) => ({
+      ...prevState,
+      isLiked: !prevState.isLiked,
+    }));
+  };
+
   return (
     <div className="post-detail-fullscreen">
-      <div className="post-detail-header">
-        <div className="post-actions">
-          <button onClick={handleEditPost}>수정</button>
-          <button onClick={handleDeletePost}>삭제</button>
+      {isLoginMember(postDetail?.memberName) && (
+        <div className="post-detail-header">
+          <button className="edit-btn" onClick={handleEditPost}>
+            수정
+          </button>
+          <button className="delete-btn" onClick={handleDeletePost}>
+            삭제
+          </button>
         </div>
-      </div>
+      )}
       <div className="post-detail-container">
         <div className="post-detail-info">
           <h1>{postDetail?.title}</h1>
-          <p>
-            {" "}
-            <span className="like-icon">♥</span> 좋아요 수: {postDetail?.likes}
+          <p onClick={toggleLike}>
+            <span className={`like-icon ${postDetail.isLiked ? "liked" : ""}`}>
+              ♥
+            </span>
+            {postDetail?.likes}
           </p>
           <div className="post-author">
             <div>작성자: {postDetail?.memberName}</div>
@@ -83,31 +101,46 @@ const PostDetailPopup = ({ postId }) => {
         </div>
       </div>
       <div className="post-comments">
-        <h3>댓글</h3>
+        <h2> 댓글 </h2>
+        <div className="comment-button-group">
+          <button className="accept-btn" onClick={handlePostComment}>
+            작성
+          </button>
+          <button className="cancel-btn" onClick={() => setNewComment("")}>
+            취소
+          </button>
+        </div>
         <textarea
           value={newComment}
           onChange={handleNewCommentChange}
           placeholder="댓글을 입력하세요"
+          className="text-area"
         ></textarea>
-        <button onClick={handlePostComment}>작성</button>
-        <button onClick={() => setNewComment("")}>취소</button>
         {postDetail?.comments?.map((comment) => (
-          <div key={comment.commentId} className="comment">
-            <div className="comment-info">
-              <span>{comment.memberName} </span>
-              <span>{parseDate(comment.updatedAt).toLocaleString()}</span>
-            </div>
-            <p>{comment.content}</p>
-            {isLoginMember(comment.memberName) && (
-              <div className="comment-actions">
-                <button onClick={() => handleEditComment(comment.commentId)}>
-                  수정
-                </button>
-                <button onClick={() => handleDeleteComment(comment.commentId)}>
-                  삭제
-                </button>
+          <div>
+            <div key={comment.commentId} className="comment">
+              <div className="comment-info">
+                <span>{comment.memberName}</span>
+                <span>{parseDate(comment.updatedAt).toLocaleString()}</span>
               </div>
-            )}
+              {isLoginMember(comment.memberName) && (
+                <div className="comment-actions">
+                  <button
+                    className="edit-btn"
+                    onClick={() => handleEditComment(comment.commentId)}
+                  >
+                    수정
+                  </button>
+                  <button
+                    className="delete-btn"
+                    onClick={() => handleDeleteComment(comment.commentId)}
+                  >
+                    삭제
+                  </button>
+                </div>
+              )}
+            </div>
+            <div className="comment-content">{comment.content}</div>
           </div>
         ))}
       </div>

@@ -33,3 +33,93 @@
 .addButton {
   flex: 0.5;
 }
+
+.post-detail-fullscreen {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+.post-detail-header {
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.comment-actions {
+  display: flex;
+}
+
+.post-detail-container {
+  width: 100%;
+  border: 1px solid #ccc;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+.like-icon {
+  font-size: 30px;
+  cursor: pointer;
+  margin-right: 10px;
+}
+
+.liked {
+  color: red;
+}
+
+.post-author {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.post-comments {
+  width: 100%;
+  border-top: 1px solid #ccc;
+  padding-top: 20px;
+}
+
+.post-comments h3,
+.post-comments textarea,
+.post-comments .comment-button-group {
+  display: block;
+  width: 100%;
+}
+
+.post-comments .comment-button-group {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 10px;
+}
+
+.comment {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid #ccc;
+  padding-top: 10px;
+  margin-top: 10px;
+}
+
+.comment-info {
+  display: flex;
+  align-items: center;
+}
+
+.comment-info span:first-child {
+  font-weight: bold;
+  margin-right: 5px;
+}
+
+.comment-actions {
+  margin-left: auto;
+}
+
+.text-area {
+  height: 100px;
+  margin-top: 10px;
+}
