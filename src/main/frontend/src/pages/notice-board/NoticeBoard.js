@@ -3,6 +3,10 @@ import { parseDate } from "../../util/DateUtil";
 import { authClient } from "../../services/APIService";
 import Table from "../../components/Table";
 import Pagination from "../../components/Pagination";
+import CommonDialog from "../../components/CommonDialog";
+import "../../styles/NoticeBoard.css";
+import "../../styles/Button.css";
+import PostDetail from "./PostDetail";
 
 const NoticeBoard = () => {
   const [posts, setPosts] = useState([]);
@@ -11,6 +15,8 @@ const NoticeBoard = () => {
   const [totalPages, setTotalPages] = useState(0);
   const [searchType, setSearchType] = useState("MEMBER");
   const [searchKeyword, setSearchKeyword] = useState("");
+  const [selectedPostId, setSelectedPostId] = useState(null);
+  const [showDetailPopup, setShowDetailPopup] = useState(false);
 
   const fetchPosts = (
     currentPage = page,
@@ -47,6 +53,15 @@ const NoticeBoard = () => {
   useEffect(() => {
     fetchPosts();
   }, []);
+
+  const handlePostClick = (content) => {
+    setSelectedPostId(content.postId);
+    setShowDetailPopup(true);
+  };
+
+  const handleCloseDetailPopup = () => {
+    setShowDetailPopup(false);
+  };
 
   const handleSearch = () => {
     fetchPosts(page, size, searchType, searchKeyword);
@@ -165,12 +180,32 @@ const NoticeBoard = () => {
         </button>
         <button style={addButtonStyle}>추가</button>
       </div>
-      <Table columns={columns} contents={posts} />
+      <Table
+        columns={columns}
+        contents={posts}
+        onRowClick={handlePostClick}
+        clickable={true}
+      />
       <Pagination
         totalPages={totalPages}
         currentPage={page}
         onPageChange={handlePageChange}
       />
+      {showDetailPopup && (
+        <CommonDialog
+          open={showDetailPopup}
+          title="게시글 상세"
+          cancleStr="닫기"
+          showButton={false}
+          onClose={handleCloseDetailPopup}
+          extraComponents={
+            <PostDetail
+              postId={selectedPostId}
+              onClose={handleCloseDetailPopup}
+            />
+          }
+        />
+      )}
     </div>
   );
 };

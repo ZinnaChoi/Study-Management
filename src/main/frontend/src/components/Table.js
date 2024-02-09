@@ -1,6 +1,7 @@
+import React from "react";
 import "../styles/Table.css";
 
-const Table = ({ columns, contents }) => {
+const Table = ({ columns, contents, onRowClick, clickable = false }) => {
   return (
     <table
       style={{ width: "100%", borderCollapse: "collapse", marginTop: "20px" }}
@@ -16,7 +17,13 @@ const Table = ({ columns, contents }) => {
       </thead>
       <tbody>
         {contents.map((content, index) => (
-          <tr key={index}>
+          <tr
+            key={index}
+            onClick={() =>
+              clickable && onRowClick ? onRowClick(content) : null
+            }
+            style={{ cursor: clickable ? "pointer" : "default" }}
+          >
             {columns.map((column) => (
               <td key={column.accessor} className="td">
                 {column.Cell ? column.Cell(content) : content[column.accessor]}
@@ -28,5 +35,4 @@ const Table = ({ columns, contents }) => {
     </table>
   );
 };
-
 export default Table;
