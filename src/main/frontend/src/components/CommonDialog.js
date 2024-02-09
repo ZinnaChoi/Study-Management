@@ -9,11 +9,16 @@ import {
   DialogContent,
   DialogTitle,
 } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
+import useMediaQuery from "@mui/material/useMediaQuery";
 
 export default function CommonDialog(props) {
   const [internalOpen, setInternalOpen] = useState(false);
   const isControlled = props.open !== undefined;
   const open = isControlled ? props.open : internalOpen;
+  const theme = useTheme();
+  const fullScreen =
+    useMediaQuery(theme.breakpoints.down("sm")) || props.fullScreen;
 
   const handleOpen = () => {
     if (!isControlled) {
@@ -46,6 +51,7 @@ export default function CommonDialog(props) {
         </Button>
       )}
       <Dialog
+        fullScreen={fullScreen}
         open={open}
         onClose={handleClose}
         PaperProps={{

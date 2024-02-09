@@ -143,6 +143,7 @@ const NoticeBoard = () => {
       />
       {showDetailPopup && (
         <CommonDialog
+          fullScreen={true}
           open={showDetailPopup}
           title="게시글 상세"
           cancleStr="닫기"
