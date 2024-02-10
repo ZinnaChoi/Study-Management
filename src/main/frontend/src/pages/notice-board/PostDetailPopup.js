@@ -4,11 +4,14 @@ import { authClient } from "../../services/APIService";
 import "../../styles/NoticeBoard.css";
 import "../../styles/Button.css";
 
-const PostDetailPopup = ({ postId }) => {
+const PostDetailPopup = ({ postId, onRefresh }) => {
   const [postDetail, setPostDetail] = useState({
     comments: [],
     isLiked: false,
   });
+  const [editMode, setEditMode] = useState(false);
+  const [editedTitle, setEditedTitle] = useState("");
+  const [editedContent, setEditedContent] = useState("");
   const [loginMemberName, setLoginMemberName] = useState("");
   const [newComment, setNewComment] = useState("");
 
@@ -18,6 +21,8 @@ const PostDetailPopup = ({ postId }) => {
       .then((response) => {
         if (response.data) {
           setPostDetail(response.data.postDetail);
+          setEditedTitle(response.data.postDetail.title);
+          setEditedContent(response.data.postDetail.content);
         }
       })
       .catch((error) => {
@@ -34,7 +39,32 @@ const PostDetailPopup = ({ postId }) => {
       });
   }, [postId]);
 
-  const handleEditPost = () => {};
+  const handleEditPost = () => {
+    setEditMode(true);
+  };
+
+  const handleSavePost = () => {
+    const updatedPost = {
+      title: editedTitle,
+      content: editedContent,
+    };
+
+    authClient
+      .patch(`/posts/${postId}`, updatedPost)
+      .then((response) => {
+        alert(response.data.retMsg);
+        setEditMode(false);
+        setPostDetail((prev) => ({
+          ...prev,
+          title: editedTitle,
+          content: editedContent,
+        }));
+        onRefresh();
+      })
+      .catch((error) => {
+        console.error("게시글 수정 실패:", error);
+      });
+  };
 
   const handleDeletePost = () => {};
 
@@ -61,45 +91,77 @@ const PostDetailPopup = ({ postId }) => {
     }));
   };
 
+  const editUI = (
+    <>
+      <label htmlFor="post-title">제목:</label>
+      <input
+        id="post-title"
+        type="text"
+        className="post-edit"
+        value={editedTitle}
+        onChange={(e) => setEditedTitle(e.target.value)}
+      />
+      <label htmlFor="post-content">내용:</label>
+      <textarea
+        id="post-content"
+        className="post-edit"
+        value={editedContent}
+        onChange={(e) => setEditedContent(e.target.value)}
+      />
+      <div className="edit-actions">
+        <button className="accept-btn" onClick={handleSavePost}>
+          저장
+        </button>
+        <button className="cancel-btn" onClick={() => setEditMode(false)}>
+          취소
+        </button>
+      </div>
+    </>
+  );
+
+  const viewUI = (
+    <>
+      <h1>{postDetail?.title}</h1>
+      <div className="post-author">
+        <p onClick={toggleLike}>
+          <span className={`like-icon ${postDetail.isLiked ? "liked" : ""}`}>
+            ♥
+          </span>
+          {postDetail?.likes}
+        </p>
+        <span>작성자: {postDetail?.memberName}</span>
+        <span>
+          작성 일시:{" "}
+          {postDetail?.createdAt &&
+            parseDate(postDetail.createdAt).toLocaleString()}
+        </span>
+        <span>
+          수정 일시:{" "}
+          {postDetail?.updatedAt &&
+            parseDate(postDetail.updatedAt).toLocaleString()}
+        </span>
+      </div>
+      <div className="post-detail-content">
+        <p>{postDetail?.content}</p>
+      </div>
+    </>
+  );
+
   return (
     <div className="post-detail-fullscreen">
-      {isLoginMember(postDetail?.memberName) && (
-        <div className="post-detail-header">
+      <div className="post-detail-header">
+        {isLoginMember(postDetail?.memberName) && !editMode && (
           <button className="edit-btn" onClick={handleEditPost}>
             수정
           </button>
+        )}
+        {isLoginMember(postDetail?.memberName) && (
           <button className="delete-btn" onClick={handleDeletePost}>
             삭제
           </button>
-        </div>
-      )}
-      <div className="post-detail-container">
-        <div className="post-detail-info">
-          <h1>{postDetail?.title}</h1>
-          <p onClick={toggleLike}>
-            <span className={`like-icon ${postDetail.isLiked ? "liked" : ""}`}>
-              ♥
-            </span>
-            {postDetail?.likes}
-          </p>
-          <div className="post-author">
-            <div>작성자: {postDetail?.memberName}</div>
-            <div>
-              작성 일시:{" "}
-              {postDetail?.createdAt &&
-                parseDate(postDetail.createdAt).toLocaleString()}
-            </div>
-            <div>
-              수정 일시:{" "}
-              {postDetail?.createdAt &&
-                parseDate(postDetail.updatedAt).toLocaleString()}
-            </div>
-          </div>
-        </div>
-        <div className="post-detail-content">
-          <p>{postDetail?.content}</p>
-        </div>
+        )}
       </div>
+      <div className="post-detail-container">{editMode ? editUI : viewUI}</div>
       <div className="post-comments">
         <h2> 댓글 </h2>
         <div className="comment-button-group">
