@@ -74,9 +74,8 @@ const NoticeBoard = () => {
     setShowDetailPopup(true);
   };
 
-  const handleDetailPost = () => {
-    handleCloseDetailPopup();
-    fetchPosts();
+  const handleSavePost = () => {
+    refreshPosts();
   };
 
   const handleCloseDetailPopup = () => {
@@ -173,13 +172,14 @@ const NoticeBoard = () => {
       {showDetailPopup && (
         <CommonDialog
           fullScreen={true}
-          submitEvt={handleDetailPost}
+          submitEvt={handleSavePost}
           open={showDetailPopup}
           title="게시글 상세"
           cancleStr="닫기"
           showButton={false}
           onRefresh={refreshPosts}
           onClose={handleCloseDetailPopup}
+          closeDialog={false}
           extraComponents={
             <PostDetailPopup postId={selectedPostId} onRefresh={refreshPosts} />
           }

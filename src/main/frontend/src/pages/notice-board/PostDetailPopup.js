@@ -64,6 +64,7 @@ const PostDetailPopup = ({ postId, onRefresh }) => {
           title: editedTitle,
           content: formattedContent,
         }));
+        setEditMode(false);
         onRefresh();
       })
       .catch((error) => {
@@ -118,7 +119,7 @@ const PostDetailPopup = ({ postId, onRefresh }) => {
         onChange={(e) => setEditedContent(e.target.value)}
       />
       <div className="edit-actions">
-        <button className="accept-btn" onClick={handleSavePost}>
+        <button className="accept-btn" onClick={() => handleSavePost()}>
           저장
         </button>
         <button className="cancel-btn" onClick={() => setEditMode(false)}>

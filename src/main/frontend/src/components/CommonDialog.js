@@ -16,6 +16,7 @@ export default function CommonDialog(props) {
   const [internalOpen, setInternalOpen] = useState(false);
   const isControlled = props.open !== undefined;
   const open = isControlled ? props.open : internalOpen;
+  const closeAfterSubmit = props.closeDialog == false ? false : true;
   const theme = useTheme();
   const fullScreen =
     useMediaQuery(theme.breakpoints.down("sm")) || props.fullScreen;
@@ -61,7 +62,7 @@ export default function CommonDialog(props) {
             const formData = new FormData(event.currentTarget);
             const formJson = Object.fromEntries(formData.entries());
             props.submitEvt(formJson);
-            handleClose(event, reason);
+            closeAfterSubmit && handleClose(event, reason);
           },
         }}
       >
