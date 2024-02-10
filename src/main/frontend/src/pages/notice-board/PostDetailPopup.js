@@ -15,7 +15,7 @@ const PostDetailPopup = ({ postId, onRefresh, setShowDetailPopup }) => {
   const [loginMemberName, setLoginMemberName] = useState("");
   const [newComment, setNewComment] = useState("");
 
-  useEffect(() => {
+  const fetchPostDetail = () => {
     authClient
       .get(`/posts/${postId}`)
       .then((response) => {
@@ -30,17 +30,28 @@ const PostDetailPopup = ({ postId, onRefresh, setShowDetailPopup }) => {
         }
       })
       .catch((error) => {
-        console.error("게시글 상세 정보 조회 실패:", error);
+        alert(
+          `게시글 상세 정보 조회 실패: ${error.response?.data.retMsg || error}`
+        );
       });
+  };
 
+  const fetchMemberInfo = () => {
     authClient
       .get("/member")
       .then((response) => {
         setLoginMemberName(response.data.name);
       })
       .catch((error) => {
-        console.error("스터디원 정보 조회 실패:", error);
+        alert(
+          `스터디원정보 조회 실패: ${error.response?.data.retMsg || error}`
+        );
       });
+  };
+
+  useEffect(() => {
+    fetchPostDetail();
+    fetchMemberInfo();
   }, [postId]);
 
   const handleEditPost = () => {
@@ -68,7 +79,9 @@ const PostDetailPopup = ({ postId, onRefresh, setShowDetailPopup }) => {
         onRefresh();
       })
       .catch((error) => {
-        console.error("게시글 수정 실패:", error);
+        alert(
+          `게시글 수정에 실패했습니다: ${error.response?.data.retMsg || error}`
+        );
       });
   };
 
@@ -100,7 +113,27 @@ const PostDetailPopup = ({ postId, onRefresh, setShowDetailPopup }) => {
   };
 
   const handlePostComment = () => {
-    setNewComment("");
+    if (!newComment.trim()) {
+      alert("댓글 내용을 입력해주세요.");
+      return;
+    }
+
+    const commentData = {
+      content: newComment,
+    };
+
+    authClient
+      .post(`/posts/${postId}/comments`, commentData)
+      .then((response) => {
+        alert(response.data.retMsg);
+        setNewComment("");
+        fetchPostDetail();
+      })
+      .catch((error) => {
+        alert(
+          `댓글 등록에 실패했습니다: ${error.response?.data.retMsg || error}`
+        );
+      });
   };
 
   const handleEditComment = (commentId) => {};
@@ -194,7 +227,7 @@ const PostDetailPopup = ({ postId, onRefresh, setShowDetailPopup }) => {
         <h2> 댓글 </h2>
         <div className="comment-button-group">
           <button className="accept-btn" onClick={handlePostComment}>
-            작성
+            저장
           </button>
           <button className="cancel-btn" onClick={() => setNewComment("")}>
             취소
