@@ -8,6 +8,7 @@ import java.util.List;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.mock.web.MockPart;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.RequestBuilder;
@@ -50,13 +51,17 @@ public class TestUtil {
     }
 
     public static MvcResult performFileRequest(MockMvc mockMvc, String url, HttpMethod method,
-            List<MockMultipartFile> files, int expectedStatus, Integer expectedRetCode) throws Exception {
+            List<MockMultipartFile> files, List<MockPart> parts, int expectedStatus, Integer expectedRetCode)
+            throws Exception {
         ResultActions resultActions = null;
         MockMultipartHttpServletRequestBuilder requestBuilder = null;
 
         requestBuilder = (MockMultipartHttpServletRequestBuilder) MockMvcRequestBuilders.multipart(method, url)
                 .contentType(MediaType.MULTIPART_FORM_DATA);
 
+        for (int i = 0; i < parts.size(); i++) {
+            requestBuilder.part(parts.get(i));
+        }
         for (int i = 0; i < files.size(); i++) {
             requestBuilder.file(files.get(i));
         }
