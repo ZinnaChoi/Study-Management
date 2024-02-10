@@ -245,13 +245,13 @@ public class StudyControllerTest {
 
         private Long getStudyIdById() {
                 return jdbcTemplate.queryForObject(
-                                "SELECT study_id FROM study_info",
+                                "SELECT study_id FROM study_info LIMIT 1",
                                 Long.class);
         }
 
         private String getStudyName() {
                 return jdbcTemplate.queryForObject(
-                                "SELECT study_name FROM study_info",
+                                "SELECT study_name FROM study_info LIMIT 1",
                                 String.class);
         }
 
