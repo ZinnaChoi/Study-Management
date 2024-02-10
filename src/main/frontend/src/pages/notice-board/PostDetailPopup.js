@@ -20,9 +20,13 @@ const PostDetailPopup = ({ postId, onRefresh }) => {
       .get(`/posts/${postId}`)
       .then((response) => {
         if (response.data) {
-          setPostDetail(response.data.postDetail);
-          setEditedTitle(response.data.postDetail.title);
-          setEditedContent(response.data.postDetail.content);
+          const detailedPost = response.data.postDetail;
+          setPostDetail({
+            ...detailedPost,
+            content: detailedPost.content,
+          });
+          setEditedTitle(detailedPost.title);
+          setEditedContent(detailedPost.content.replace(/<br\s*\/?>/gi, "\n"));
         }
       })
       .catch((error) => {
@@ -44,9 +48,10 @@ const PostDetailPopup = ({ postId, onRefresh }) => {
   };
 
   const handleSavePost = () => {
+    const formattedContent = editedContent.replace(/\n/g, "<br>");
     const updatedPost = {
       title: editedTitle,
-      content: editedContent,
+      content: formattedContent,
     };
 
     authClient
@@ -57,13 +62,17 @@ const PostDetailPopup = ({ postId, onRefresh }) => {
         setPostDetail((prev) => ({
           ...prev,
           title: editedTitle,
-          content: editedContent,
+          content: formattedContent,
         }));
         onRefresh();
       })
       .catch((error) => {
         console.error("게시글 수정 실패:", error);
       });
+  };
+
+  const createMarkup = (htmlContent) => {
+    return { __html: htmlContent };
   };
 
   const handleDeletePost = () => {};
@@ -141,9 +150,10 @@ const PostDetailPopup = ({ postId, onRefresh }) => {
             parseDate(postDetail.updatedAt).toLocaleString()}
         </span>
       </div>
-      <div className="post-detail-content">
-        <p>{postDetail?.content}</p>
-      </div>
+      <div
+        className="post-detail-content"
+        dangerouslySetInnerHTML={createMarkup(postDetail?.content)}
+      />
     </>
   );
 
