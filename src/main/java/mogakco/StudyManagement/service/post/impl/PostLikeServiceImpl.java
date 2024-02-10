@@ -37,7 +37,7 @@ public class PostLikeServiceImpl extends PostCommonService implements PostLikeSe
             lo.setDBStart();
             Member member = getLoginMember();
             Post post = getPostById(postId);
-            long count = postLikeRepository.countByMember(member);
+            long count = postLikeRepository.countByMemberAndPost(member, post);
             lo.setDBEnd();
 
             if (count > 0) {

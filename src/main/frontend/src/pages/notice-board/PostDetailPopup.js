@@ -8,7 +8,6 @@ import "../../styles/Button.css";
 const PostDetailPopup = ({ postId, onRefresh, setShowDetailPopup }) => {
   const [postDetail, setPostDetail] = useState({
     comments: [],
-    isLiked: false,
   });
   const [editMode, setEditMode] = useState(false);
   const [editedTitle, setEditedTitle] = useState("");
@@ -26,9 +25,9 @@ const PostDetailPopup = ({ postId, onRefresh, setShowDetailPopup }) => {
           setPostDetail({
             ...detailedPost,
             content: detailedPost.content,
+            likes: detailedPost.likes,
           });
           setEditedTitle(detailedPost.title);
-
           setEditedContent(detailedPost.content.replace(/<br\s*\/?>/gi, "\n"));
         }
       })
@@ -172,10 +171,27 @@ const PostDetailPopup = ({ postId, onRefresh, setShowDetailPopup }) => {
   };
 
   const toggleLike = () => {
-    setPostDetail((prevState) => ({
-      ...prevState,
-      isLiked: !prevState.isLiked,
-    }));
+    authClient
+      .post(`/posts/${postId}/likes`)
+      .then((response) => {
+        if (response.data.retCode == 409) {
+          authClient
+            .delete(`/posts/${postId}/likes`)
+            .then((response) => {
+              alert(response.data.retMsg);
+              fetchPostDetail();
+            })
+            .catch((error) => {
+              alert(`좋아요 취소에 실패했습니다: ${error}`);
+            });
+        } else {
+          alert(response.data.retMsg);
+          fetchPostDetail();
+        }
+      })
+      .catch((error) => {
+        alert(`좋아요 등록에 실패했습니다: ${error}`);
+      });
   };
 
   const editUI = (
@@ -211,9 +227,7 @@ const PostDetailPopup = ({ postId, onRefresh, setShowDetailPopup }) => {
       <h1>{postDetail?.title}</h1>
       <div className="post-author">
         <p onClick={toggleLike}>
-          <span className={`like-icon ${postDetail.isLiked ? "liked" : ""}`}>
-            ♥
-          </span>
+          <span className={`like-icon`}>♥</span>
           {postDetail?.likes}
         </p>
         <span>작성자: {postDetail?.memberName}</span>
