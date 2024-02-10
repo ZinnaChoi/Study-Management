@@ -171,7 +171,8 @@ const PostDetailPopup = ({ postId, onRefresh, setShowDetailPopup }) => {
     const content = editedComments[commentId];
     authClient
       .patch(`/posts/${postId}/comments/${commentId}`, { content })
-      .then(() => {
+      .then((response) => {
+        alert(response.data.retMsg);
         setPostDetail({
           ...postDetail,
           comments: postDetail.comments.map((comment) =>
