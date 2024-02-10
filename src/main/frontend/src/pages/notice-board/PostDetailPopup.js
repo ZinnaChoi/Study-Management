@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { parseDate } from "../../util/DateUtil";
 import { authClient } from "../../services/APIService";
+import Comment from "./Comment";
 import "../../styles/NoticeBoard.css";
 import "../../styles/Button.css";
 
@@ -14,8 +15,6 @@ const PostDetailPopup = ({ postId, onRefresh, setShowDetailPopup }) => {
   const [editedContent, setEditedContent] = useState("");
   const [loginMemberName, setLoginMemberName] = useState("");
   const [newComment, setNewComment] = useState("");
-  const [editedComments, setEditedComments] = useState({});
-  const [editingCommentId, setEditingCommentId] = useState(null);
 
   const fetchPostDetail = () => {
     authClient
@@ -101,7 +100,7 @@ const PostDetailPopup = ({ postId, onRefresh, setShowDetailPopup }) => {
         .then((response) => {
           alert(response.data.retMsg);
           onRefresh();
-          setShowDetailPopup(true);
+          setShowDetailPopup(false);
         })
         .catch((error) => {
           alert(
@@ -141,65 +140,32 @@ const PostDetailPopup = ({ postId, onRefresh, setShowDetailPopup }) => {
       });
   };
 
-  const handleEditComment = (commentId) => {
-    setEditingCommentId(commentId);
-
-    const existingComment = postDetail.comments.find(
-      (c) => c.commentId === commentId
-    );
-    if (!existingComment) {
-      return;
-    }
-
-    setEditedComments((prevComments) => ({
-      ...prevComments,
-      [commentId]: existingComment.content,
-    }));
-  };
-  const handleCommentChange = (commentId, newContent) => {
-    setEditedComments({
-      ...editedComments,
-      [commentId]: newContent,
-    });
-  };
-
-  const handleSaveEditedComment = (commentId) => {
-    if (!editedComments[commentId]) {
-      alert("댓글 내용을 입력해주세요.");
-      return;
-    }
-    const content = editedComments[commentId];
+  const handleSaveEditedComment = (commentId, content) => {
     authClient
       .patch(`/posts/${postId}/comments/${commentId}`, { content })
       .then((response) => {
         alert(response.data.retMsg);
-        setPostDetail({
-          ...postDetail,
-          comments: postDetail.comments.map((comment) =>
-            comment.commentId === commentId ? { ...comment, content } : comment
-          ),
-        });
-        setEditingCommentId(null);
-        setEditedComments((prev) => {
-          const newEditedComments = { ...prev };
-          delete newEditedComments[commentId];
-          return newEditedComments;
-        });
+        fetchPostDetail();
       })
       .catch((error) => {
         alert(`댓글 수정에 실패했습니다: ${error}`);
       });
   };
 
-  const handleCancelEdit = (commentId) => {
-    setEditingCommentId(null);
-    setEditedComments((prev) => {
-      const newEditedComments = { ...prev };
-      delete newEditedComments[commentId];
-      return newEditedComments;
-    });
+  const handleDeleteComment = (commentId) => {
+    const confirmDelete = window.confirm("댓글을 삭제하시겠습니까?");
+    if (confirmDelete) {
+      authClient
+        .delete(`/posts/${postId}/comments/${commentId}`)
+        .then((response) => {
+          alert(response.data.retMsg);
+          fetchPostDetail();
+        })
+        .catch((error) => {
+          alert(`댓글 삭제에 실패했습니다: ${error}`);
+        });
+    }
   };
-  const handleDeleteComment = (commentId) => {};
 
   const isLoginMember = (authorName) => {
     return loginMemberName === authorName;
@@ -269,69 +235,6 @@ const PostDetailPopup = ({ postId, onRefresh, setShowDetailPopup }) => {
     </>
   );
 
-  const Comment = ({
-    comment,
-    isEditing,
-    onEdit,
-    onCancel,
-    onSave,
-    onDelete,
-    onChange,
-  }) => {
-    const isCurrentlyEditing = editingCommentId === comment.commentId;
-    return (
-      <div className="comment" key={comment.commentId}>
-        <span className="comment-author">{comment.memberName}</span>
-        <span className="comment-date">
-          {parseDate(comment.updatedAt).toLocaleString()}
-        </span>
-        {isCurrentlyEditing ? (
-          <input
-            type="text"
-            value={editedComments[comment.commentId]}
-            onChange={(e) => onChange(comment.commentId, e.target.value)}
-            className="comment-input"
-          />
-        ) : (
-          <span className="comment-content">{comment.content}</span>
-        )}
-        <div className="comment-actions">
-          {isCurrentlyEditing ? (
-            <>
-              <button
-                onClick={() => onSave(comment.commentId)}
-                className="comment-save-btn accept-btn"
-              >
-                저장
-              </button>
-              <button
-                onClick={() => onCancel(comment.commentId)}
-                className="comment-cancel-btn cancel-btn"
-              >
-                취소
-              </button>
-            </>
-          ) : (
-            <>
-              <button
-                onClick={() => onEdit(comment.commentId)}
-                className="comment-edit-btn edit-btn"
-              >
-                수정
-              </button>
-              <button
-                onClick={() => onDelete(comment.commentId)}
-                className="comment-delete-btn delete-btn"
-              >
-                삭제
-              </button>
-            </>
-          )}
-        </div>
-      </div>
-    );
-  };
-
   return (
     <div className="post-detail-fullscreen">
       <div className="post-detail-header">
@@ -348,7 +251,7 @@ const PostDetailPopup = ({ postId, onRefresh, setShowDetailPopup }) => {
       </div>
       <div className="post-detail-container">{editMode ? editUI : viewUI}</div>
       <div className="post-comments">
-        <h2> 댓글 </h2>
+        <h2>댓글</h2>
         <div className="comment-button-group">
           <button className="accept-btn" onClick={handlePostComment}>
             저장
@@ -367,12 +270,9 @@ const PostDetailPopup = ({ postId, onRefresh, setShowDetailPopup }) => {
           <Comment
             key={comment.commentId}
             comment={comment}
-            isEditing={editingCommentId === comment.commentId}
-            onEdit={() => handleEditComment(comment.commentId)}
-            onCancel={() => handleCancelEdit(comment.commentId)}
-            onSave={() => handleSaveEditedComment(comment.commentId)}
-            onDelete={() => handleDeleteComment(comment.commentId)}
-            onChange={handleCommentChange}
+            onSave={handleSaveEditedComment}
+            onDelete={handleDeleteComment}
+            loginMemberName={loginMemberName}
           />
         ))}
       </div>
