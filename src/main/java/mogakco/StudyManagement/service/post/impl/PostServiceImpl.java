@@ -131,7 +131,7 @@ public class PostServiceImpl extends PostCommonService implements PostService {
 
             List<PostDetailComment> postCommentList = commentEntities.stream().map(entity -> {
                 PostDetailComment dto = new PostDetailComment();
-                dto.setCommnetId(entity.getCommentId());
+                dto.setCommentId(entity.getCommentId());
                 dto.setMemberName(entity.getMember().getName());
                 dto.setContent(entity.getContent());
                 dto.setCreatedAt(entity.getCreatedAt());

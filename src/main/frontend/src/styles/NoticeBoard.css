@@ -139,13 +139,6 @@
   margin-top: 10px;
 }
 
-.post-edit-container {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  width: 100%;
-}
-
 .post-edit {
   width: 100%;
   margin-bottom: 1rem;

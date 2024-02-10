@@ -15,6 +15,7 @@ const PostDetailPopup = ({ postId, onRefresh, setShowDetailPopup }) => {
   const [loginMemberName, setLoginMemberName] = useState("");
   const [newComment, setNewComment] = useState("");
   const [editedComments, setEditedComments] = useState({});
+  const [editingCommentId, setEditingCommentId] = useState(null);
 
   const fetchPostDetail = () => {
     authClient
@@ -22,11 +23,13 @@ const PostDetailPopup = ({ postId, onRefresh, setShowDetailPopup }) => {
       .then((response) => {
         if (response.data) {
           const detailedPost = response.data.postDetail;
+          console.log("Comments:", detailedPost.comments);
           setPostDetail({
             ...detailedPost,
             content: detailedPost.content,
           });
           setEditedTitle(detailedPost.title);
+
           setEditedContent(detailedPost.content.replace(/<br\s*\/?>/gi, "\n"));
         }
       })
@@ -96,8 +99,9 @@ const PostDetailPopup = ({ postId, onRefresh, setShowDetailPopup }) => {
       authClient
         .delete(`/posts/${postId}`)
         .then((response) => {
+          alert(response.data.retMsg);
           onRefresh();
-          setShowDetailPopup(false);
+          setShowDetailPopup(true);
         })
         .catch((error) => {
           alert(
@@ -137,14 +141,21 @@ const PostDetailPopup = ({ postId, onRefresh, setShowDetailPopup }) => {
       });
   };
 
-  const handleEditComment = (comment) => {
-    setEditedComments({
-      ...editedComments,
-      [comment.commentId]: comment.content,
-    });
-  };
+  const handleEditComment = (commentId) => {
+    setEditingCommentId(commentId);
 
-  // Function to handle the change of comment content while editing
+    const existingComment = postDetail.comments.find(
+      (c) => c.commentId === commentId
+    );
+    if (!existingComment) {
+      return;
+    }
+
+    setEditedComments((prevComments) => ({
+      ...prevComments,
+      [commentId]: existingComment.content,
+    }));
+  };
   const handleCommentChange = (commentId, newContent) => {
     setEditedComments({
       ...editedComments,
@@ -153,6 +164,10 @@ const PostDetailPopup = ({ postId, onRefresh, setShowDetailPopup }) => {
   };
 
   const handleSaveEditedComment = (commentId) => {
+    if (!editedComments[commentId]) {
+      alert("댓글 내용을 입력해주세요.");
+      return;
+    }
     const content = editedComments[commentId];
     authClient
       .patch(`/posts/${postId}/comments/${commentId}`, { content })
@@ -163,9 +178,12 @@ const PostDetailPopup = ({ postId, onRefresh, setShowDetailPopup }) => {
             comment.commentId === commentId ? { ...comment, content } : comment
           ),
         });
-        const newEditedComments = { ...editedComments };
-        delete newEditedComments[commentId];
-        setEditedComments(newEditedComments);
+        setEditingCommentId(null);
+        setEditedComments((prev) => {
+          const newEditedComments = { ...prev };
+          delete newEditedComments[commentId];
+          return newEditedComments;
+        });
       })
       .catch((error) => {
         alert(`댓글 수정에 실패했습니다: ${error}`);
@@ -173,11 +191,13 @@ const PostDetailPopup = ({ postId, onRefresh, setShowDetailPopup }) => {
   };
 
   const handleCancelEdit = (commentId) => {
-    const newEditedComments = { ...editedComments };
-    delete newEditedComments[commentId];
-    setEditedComments(newEditedComments);
+    setEditingCommentId(null);
+    setEditedComments((prev) => {
+      const newEditedComments = { ...prev };
+      delete newEditedComments[commentId];
+      return newEditedComments;
+    });
   };
-
   const handleDeleteComment = (commentId) => {};
 
   const isLoginMember = (authorName) => {
@@ -257,16 +277,17 @@ const PostDetailPopup = ({ postId, onRefresh, setShowDetailPopup }) => {
     onDelete,
     onChange,
   }) => {
+    const isCurrentlyEditing = editingCommentId === comment.commentId;
     return (
       <div className="comment" key={comment.commentId}>
         <span className="comment-author">{comment.memberName}</span>
         <span className="comment-date">
           {parseDate(comment.updatedAt).toLocaleString()}
         </span>
-        {isEditing ? (
+        {isCurrentlyEditing ? (
           <input
             type="text"
-            value={comment.content}
+            value={editedComments[comment.commentId]}
             onChange={(e) => onChange(comment.commentId, e.target.value)}
             className="comment-input"
           />
@@ -274,7 +295,7 @@ const PostDetailPopup = ({ postId, onRefresh, setShowDetailPopup }) => {
           <span className="comment-content">{comment.content}</span>
         )}
         <div className="comment-actions">
-          {isEditing ? (
+          {isCurrentlyEditing ? (
             <>
               <button
                 onClick={() => onSave(comment.commentId)}
@@ -292,7 +313,7 @@ const PostDetailPopup = ({ postId, onRefresh, setShowDetailPopup }) => {
           ) : (
             <>
               <button
-                onClick={() => onEdit(comment)}
+                onClick={() => onEdit(comment.commentId)}
                 className="comment-edit-btn edit-btn"
               >
                 수정
@@ -343,12 +364,13 @@ const PostDetailPopup = ({ postId, onRefresh, setShowDetailPopup }) => {
         ></textarea>
         {postDetail.comments.map((comment) => (
           <Comment
+            key={comment.commentId}
             comment={comment}
-            isEditing={editedComments.hasOwnProperty(comment.commentId)}
-            onEdit={handleEditComment}
-            onCancel={handleCancelEdit}
-            onSave={handleSaveEditedComment}
-            onDelete={handleDeleteComment}
+            isEditing={editingCommentId === comment.commentId}
+            onEdit={() => handleEditComment(comment.commentId)}
+            onCancel={() => handleCancelEdit(comment.commentId)}
+            onSave={() => handleSaveEditedComment(comment.commentId)}
+            onDelete={() => handleDeleteComment(comment.commentId)}
             onChange={handleCommentChange}
           />
         ))}

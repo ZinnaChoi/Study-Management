@@ -7,7 +7,7 @@ import lombok.Setter;
 @Setter
 public class PostDetailComment {
 
-    private Long commnetId;
+    private Long commentId;
 
     private String memberName;
 
