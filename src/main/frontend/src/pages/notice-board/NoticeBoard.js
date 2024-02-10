@@ -181,7 +181,11 @@ const NoticeBoard = () => {
           onClose={handleCloseDetailPopup}
           closeDialog={false}
           extraComponents={
-            <PostDetailPopup postId={selectedPostId} onRefresh={refreshPosts} />
+            <PostDetailPopup
+              postId={selectedPostId}
+              onRefresh={refreshPosts}
+              setShowDetailPopup={setShowDetailPopup}
+            />
           }
         />
       )}

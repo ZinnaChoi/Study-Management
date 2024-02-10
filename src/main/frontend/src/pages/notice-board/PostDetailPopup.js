@@ -4,7 +4,7 @@ import { authClient } from "../../services/APIService";
 import "../../styles/NoticeBoard.css";
 import "../../styles/Button.css";
 
-const PostDetailPopup = ({ postId, onRefresh }) => {
+const PostDetailPopup = ({ postId, onRefresh, setShowDetailPopup }) => {
   const [postDetail, setPostDetail] = useState({
     comments: [],
     isLiked: false,
@@ -76,7 +76,24 @@ const PostDetailPopup = ({ postId, onRefresh }) => {
     return { __html: htmlContent };
   };
 
-  const handleDeletePost = () => {};
+  const handleDeletePost = () => {
+    const confirmDelete = window.confirm("게시글을 삭제하시겠습니까?");
+    if (confirmDelete) {
+      authClient
+        .delete(`/posts/${postId}`)
+        .then((response) => {
+          onRefresh();
+          setShowDetailPopup(false);
+        })
+        .catch((error) => {
+          alert(
+            `게시글 삭제에 실패했습니다: ${
+              error.response?.data.retMsg || error
+            }`
+          );
+        });
+    }
+  };
 
   const handleNewCommentChange = (e) => {
     setNewComment(e.target.value);
@@ -88,11 +105,11 @@ const PostDetailPopup = ({ postId, onRefresh }) => {
 
   const handleEditComment = (commentId) => {};
 
+  const handleDeleteComment = (commentId) => {};
+
   const isLoginMember = (authorName) => {
     return loginMemberName === authorName;
   };
-
-  const handleDeleteComment = (commentId) => {};
 
   const toggleLike = () => {
     setPostDetail((prevState) => ({
