@@ -97,27 +97,41 @@
 }
 
 .comment {
-  width: 100%;
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
+  padding: 10px;
   border-top: 1px solid #ccc;
-  padding-top: 10px;
   margin-top: 10px;
 }
 
-.comment-info {
-  display: flex;
-  align-items: center;
+.comment-author {
+  margin-right: 10px;
+  font-weight: bold;
 }
 
-.comment-info span:first-child {
-  font-weight: bold;
-  margin-right: 5px;
+.comment-date {
+  margin-right: 10px;
+}
+
+.comment-content {
+  flex-grow: 1;
+}
+
+.comment-input {
+  flex-grow: 1;
+  margin-right: 10px;
 }
 
 .comment-actions {
-  margin-left: auto;
+  display: flex;
+}
+
+.comment-edit-btn,
+.comment-delete-btn,
+.comment-save-btn,
+.comment-cancel-btn {
+  cursor: pointer;
 }
 
 .text-area {

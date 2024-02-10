@@ -14,6 +14,7 @@ const PostDetailPopup = ({ postId, onRefresh, setShowDetailPopup }) => {
   const [editedContent, setEditedContent] = useState("");
   const [loginMemberName, setLoginMemberName] = useState("");
   const [newComment, setNewComment] = useState("");
+  const [editedComments, setEditedComments] = useState({});
 
   const fetchPostDetail = () => {
     authClient
@@ -136,7 +137,46 @@ const PostDetailPopup = ({ postId, onRefresh, setShowDetailPopup }) => {
       });
   };
 
-  const handleEditComment = (commentId) => {};
+  const handleEditComment = (comment) => {
+    setEditedComments({
+      ...editedComments,
+      [comment.commentId]: comment.content,
+    });
+  };
+
+  // Function to handle the change of comment content while editing
+  const handleCommentChange = (commentId, newContent) => {
+    setEditedComments({
+      ...editedComments,
+      [commentId]: newContent,
+    });
+  };
+
+  const handleSaveEditedComment = (commentId) => {
+    const content = editedComments[commentId];
+    authClient
+      .patch(`/posts/${postId}/comments/${commentId}`, { content })
+      .then(() => {
+        setPostDetail({
+          ...postDetail,
+          comments: postDetail.comments.map((comment) =>
+            comment.commentId === commentId ? { ...comment, content } : comment
+          ),
+        });
+        const newEditedComments = { ...editedComments };
+        delete newEditedComments[commentId];
+        setEditedComments(newEditedComments);
+      })
+      .catch((error) => {
+        alert(`댓글 수정에 실패했습니다: ${error}`);
+      });
+  };
+
+  const handleCancelEdit = (commentId) => {
+    const newEditedComments = { ...editedComments };
+    delete newEditedComments[commentId];
+    setEditedComments(newEditedComments);
+  };
 
   const handleDeleteComment = (commentId) => {};
 
@@ -208,6 +248,68 @@ const PostDetailPopup = ({ postId, onRefresh, setShowDetailPopup }) => {
     </>
   );
 
+  const Comment = ({
+    comment,
+    isEditing,
+    onEdit,
+    onCancel,
+    onSave,
+    onDelete,
+    onChange,
+  }) => {
+    return (
+      <div className="comment" key={comment.commentId}>
+        <span className="comment-author">{comment.memberName}</span>
+        <span className="comment-date">
+          {parseDate(comment.updatedAt).toLocaleString()}
+        </span>
+        {isEditing ? (
+          <input
+            type="text"
+            value={comment.content}
+            onChange={(e) => onChange(comment.commentId, e.target.value)}
+            className="comment-input"
+          />
+        ) : (
+          <span className="comment-content">{comment.content}</span>
+        )}
+        <div className="comment-actions">
+          {isEditing ? (
+            <>
+              <button
+                onClick={() => onSave(comment.commentId)}
+                className="comment-save-btn accept-btn"
+              >
+                저장
+              </button>
+              <button
+                onClick={() => onCancel(comment.commentId)}
+                className="comment-cancel-btn cancel-btn"
+              >
+                취소
+              </button>
+            </>
+          ) : (
+            <>
+              <button
+                onClick={() => onEdit(comment)}
+                className="comment-edit-btn edit-btn"
+              >
+                수정
+              </button>
+              <button
+                onClick={() => onDelete(comment.commentId)}
+                className="comment-delete-btn delete-btn"
+              >
+                삭제
+              </button>
+            </>
+          )}
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="post-detail-fullscreen">
       <div className="post-detail-header">
@@ -239,32 +341,16 @@ const PostDetailPopup = ({ postId, onRefresh, setShowDetailPopup }) => {
           placeholder="댓글을 입력하세요"
           className="text-area"
         ></textarea>
-        {postDetail?.comments?.map((comment) => (
-          <div>
-            <div key={comment.commentId} className="comment">
-              <div className="comment-info">
-                <span>{comment.memberName}</span>
-                <span>{parseDate(comment.updatedAt).toLocaleString()}</span>
-              </div>
-              {isLoginMember(comment.memberName) && (
-                <div className="comment-actions">
-                  <button
-                    className="edit-btn"
-                    onClick={() => handleEditComment(comment.commentId)}
-                  >
-                    수정
-                  </button>
-                  <button
-                    className="delete-btn"
-                    onClick={() => handleDeleteComment(comment.commentId)}
-                  >
-                    삭제
-                  </button>
-                </div>
-              )}
-            </div>
-            <div className="comment-content">{comment.content}</div>
-          </div>
+        {postDetail.comments.map((comment) => (
+          <Comment
+            comment={comment}
+            isEditing={editedComments.hasOwnProperty(comment.commentId)}
+            onEdit={handleEditComment}
+            onCancel={handleCancelEdit}
+            onSave={handleSaveEditedComment}
+            onDelete={handleDeleteComment}
+            onChange={handleCommentChange}
+          />
         ))}
       </div>
     </div>
