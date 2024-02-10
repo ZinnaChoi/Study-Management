@@ -7,6 +7,7 @@ import CommonDialog from "../../components/CommonDialog";
 import "../../styles/NoticeBoard.css";
 import "../../styles/Button.css";
 import PostDetailPopup from "./PostDetailPopup";
+import PostAddPopup from "./PostAddPopup";
 
 const NoticeBoard = () => {
   const [posts, setPosts] = useState([]);
@@ -16,7 +17,21 @@ const NoticeBoard = () => {
   const [searchType, setSearchType] = useState("MEMBER");
   const [searchKeyword, setSearchKeyword] = useState("");
   const [selectedPostId, setSelectedPostId] = useState(null);
+
+  const [showAddPopup, setShowAddPopup] = useState(false);
   const [showDetailPopup, setShowDetailPopup] = useState(false);
+
+  const handleAddPost = () => {
+    setShowAddPopup(true);
+  };
+
+  const handleCloseAddPopup = () => {
+    setShowAddPopup(false);
+  };
+
+  const refreshPosts = () => {
+    fetchPosts();
+  };
 
   const fetchPosts = (
     currentPage = page,
@@ -128,7 +143,9 @@ const NoticeBoard = () => {
         <button onClick={handleSearch} className="searchButton search-btn">
           검색
         </button>
-        <button className="addButton accept-btn">추가</button>
+        <button onClick={handleAddPost} className="addButton accept-btn">
+          추가
+        </button>
       </div>
       <Table
         columns={columns}
@@ -141,6 +158,13 @@ const NoticeBoard = () => {
         currentPage={page}
         onPageChange={handlePageChange}
       />
+      {showAddPopup && (
+        <PostAddPopup
+          open={showAddPopup}
+          onClose={handleCloseAddPopup}
+          onRefresh={refreshPosts}
+        />
+      )}
       {showDetailPopup && (
         <CommonDialog
           fullScreen={true}
