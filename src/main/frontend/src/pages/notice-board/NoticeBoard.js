@@ -180,7 +180,9 @@ const NoticeBoard = () => {
           showButton={false}
           onRefresh={refreshPosts}
           onClose={handleCloseDetailPopup}
-          extraComponents={<PostDetailPopup postId={selectedPostId} />}
+          extraComponents={
+            <PostDetailPopup postId={selectedPostId} onRefresh={refreshPosts} />
+          }
         />
       )}
     </div>
