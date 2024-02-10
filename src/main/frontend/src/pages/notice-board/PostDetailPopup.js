@@ -180,6 +180,7 @@ const PostDetailPopup = ({ postId, onRefresh, setShowDetailPopup }) => {
             .then((response) => {
               alert(response.data.retMsg);
               fetchPostDetail();
+              onRefresh();
             })
             .catch((error) => {
               alert(`좋아요 취소에 실패했습니다: ${error}`);
@@ -187,6 +188,7 @@ const PostDetailPopup = ({ postId, onRefresh, setShowDetailPopup }) => {
         } else {
           alert(response.data.retMsg);
           fetchPostDetail();
+          onRefresh();
         }
       })
       .catch((error) => {
