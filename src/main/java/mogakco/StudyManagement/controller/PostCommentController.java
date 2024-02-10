@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -54,6 +55,7 @@ public class PostCommentController extends CommonController {
         return result;
     }
 
+    @Hidden
     @Operation(summary = "게시판 답글 등록", description = "새 답글 추가")
     @PostMapping("/{postId}/comments/{commentId}/replies")
     public CommonRes createPostCommentReply(HttpServletRequest request,
@@ -75,6 +77,7 @@ public class PostCommentController extends CommonController {
         return result;
     }
 
+    @Hidden
     @Operation(summary = "게시판 답글 조회", description = "답글 조회")
     @GetMapping("/{postId}/comments/{commentId}/replies")
     public PostCommentReplyRes getCommentReply(HttpServletRequest request,
@@ -95,7 +98,7 @@ public class PostCommentController extends CommonController {
         return result;
     }
 
-    @Operation(summary = "게시판 댓글(답글) 수정", description = "게시판의 댓글(답글) 수정")
+    @Operation(summary = "게시판 댓글 수정", description = "게시판의 댓글 수정")
     @PatchMapping("/{postId}/comments/{commentId}")
     public CommonRes updateComment(HttpServletRequest request,
             @PathVariable(name = "postId", required = true) Long postId,
@@ -116,7 +119,7 @@ public class PostCommentController extends CommonController {
         return result;
     }
 
-    @Operation(summary = "게시판 댓글(답글) 삭제", description = "특정 게시판 댓글(답글) 삭제")
+    @Operation(summary = "게시판 댓글 삭제", description = "특정 게시판 댓글 삭제")
     @DeleteMapping("/{postId}/comments/{commentId}")
     public CommonRes deleteComment(HttpServletRequest request,
             @PathVariable(name = "postId", required = true) Long postId,
