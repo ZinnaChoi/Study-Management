@@ -16,6 +16,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpMethod;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.mock.web.MockPart;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
@@ -104,11 +105,11 @@ public class StudyControllerTest {
 
                 String requestBodyJson = objectMapper.writeValueAsString(studyReq);
 
-                MockMultipartFile jsonFile = new MockMultipartFile("studyReq", "", "application/json",
-                                requestBodyJson.getBytes());
+                MockPart reqPart = new MockPart("req", requestBodyJson.getBytes());
 
-                List<MockMultipartFile> files = Lists.list(file, jsonFile);
-                TestUtil.performFileRequest(mockMvc, STUDY_API_URL, HttpMethod.POST, files, 200, 200);
+                List<MockMultipartFile> files = Lists.list(file);
+                List<MockPart> parts = Lists.list(reqPart);
+                TestUtil.performFileRequest(mockMvc, STUDY_API_URL, HttpMethod.POST, files, parts, 200, 200);
         }
 
         @Test
@@ -127,11 +128,11 @@ public class StudyControllerTest {
 
                 String requestBodyJson = objectMapper.writeValueAsString(studyReq);
 
-                MockMultipartFile jsonFile = new MockMultipartFile("studyReq", "", "application/json",
-                                requestBodyJson.getBytes());
+                MockPart reqPart = new MockPart("req", requestBodyJson.getBytes());
 
-                List<MockMultipartFile> files = Lists.list(file, jsonFile);
-                TestUtil.performFileRequest(mockMvc, STUDY_API_URL, HttpMethod.POST, files, 200, 400);
+                List<MockMultipartFile> files = Lists.list(file);
+                List<MockPart> parts = Lists.list(reqPart);
+                TestUtil.performFileRequest(mockMvc, STUDY_API_URL, HttpMethod.POST, files, parts, 200, 400);
         }
 
         @Test
@@ -150,11 +151,11 @@ public class StudyControllerTest {
 
                 String requestBodyJson = objectMapper.writeValueAsString(studyReq);
 
-                MockMultipartFile jsonFile = new MockMultipartFile("studyReq", "", "application/json",
-                                requestBodyJson.getBytes());
+                MockPart reqPart = new MockPart("req", requestBodyJson.getBytes());
 
-                List<MockMultipartFile> files = Lists.list(file, jsonFile);
-                TestUtil.performFileRequest(mockMvc, STUDY_API_URL, HttpMethod.POST, files, 200, 400);
+                List<MockMultipartFile> files = Lists.list(file);
+                List<MockPart> parts = Lists.list(reqPart);
+                TestUtil.performFileRequest(mockMvc, STUDY_API_URL, HttpMethod.POST, files, parts, 200, 400);
         }
 
         /////////////////////////////////////////////////////////////////
@@ -175,11 +176,11 @@ public class StudyControllerTest {
 
                 String requestBodyJson = objectMapper.writeValueAsString(studyReq);
 
-                MockMultipartFile jsonFile = new MockMultipartFile("studyReq", "", "application/json",
-                                requestBodyJson.getBytes());
+                MockPart reqPart = new MockPart("req", requestBodyJson.getBytes());
 
-                List<MockMultipartFile> files = Lists.list(file, jsonFile);
-                TestUtil.performFileRequest(mockMvc, STUDY_API_URL, HttpMethod.PUT, files, 200, 200);
+                List<MockMultipartFile> files = Lists.list(file);
+                List<MockPart> parts = Lists.list(reqPart);
+                TestUtil.performFileRequest(mockMvc, STUDY_API_URL, HttpMethod.PUT, files, parts, 200, 200);
         }
 
         @Test
@@ -197,11 +198,11 @@ public class StudyControllerTest {
 
                 String requestBodyJson = objectMapper.writeValueAsString(studyReq);
 
-                MockMultipartFile jsonFile = new MockMultipartFile("studyReq", "", "application/json",
-                                requestBodyJson.getBytes());
+                MockPart reqPart = new MockPart("req", requestBodyJson.getBytes());
 
-                List<MockMultipartFile> files = Lists.list(file, jsonFile);
-                TestUtil.performFileRequest(mockMvc, STUDY_API_URL, HttpMethod.PUT, files, 200, 404);
+                List<MockMultipartFile> files = Lists.list(file);
+                List<MockPart> parts = Lists.list(reqPart);
+                TestUtil.performFileRequest(mockMvc, STUDY_API_URL, HttpMethod.PUT, files, parts, 200, 404);
         }
 
         /////////////////////////////////////////////////////////////////
@@ -244,13 +245,13 @@ public class StudyControllerTest {
 
         private Long getStudyIdById() {
                 return jdbcTemplate.queryForObject(
-                                "SELECT study_id FROM study_info",
+                                "SELECT study_id FROM study_info LIMIT 1",
                                 Long.class);
         }
 
         private String getStudyName() {
                 return jdbcTemplate.queryForObject(
-                                "SELECT study_name FROM study_info",
+                                "SELECT study_name FROM study_info LIMIT 1",
                                 String.class);
         }
 
