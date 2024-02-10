@@ -62,12 +62,22 @@ public class StudyController extends CommonController {
     @PostMapping(value = "/study", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE })
     public CommonRes createStudy(HttpServletRequest request,
             @Schema(name = "req", description = """
-                        스터디 추가 Request Body(json)
-                        studyName*(String): 추가할 스터디 이름
-                        schedules*(Array): 스케줄 리스트(HTML)
-                        schedules.scheduleName(String): 스케줄 이름
-                        schedules.startTime(String): 스케줄 시작 시간
-                        schedules.endTime(String): 스케줄 종료 시간
+                        [예시]
+                        {
+                            "studyName": "모각코 스터디",
+                            "schedules": [
+                              {
+                                "scheduleName": "AM2",
+                                "startTime": "1300",
+                                "endTime": "1400"
+                              },
+                              {
+                                "scheduleName": "AM3",
+                                "startTime": "1500",
+                                "endTime": "1600"
+                              }
+                            ]
+                          }
                     """, required = true, example = """
                         {
                             "studyName": "모각코 스터디",
@@ -108,13 +118,23 @@ public class StudyController extends CommonController {
     @PutMapping(value = "/study", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE })
     public CommonRes updateStudy(HttpServletRequest request,
             @Schema(name = "req", description = """
-                        스터디 추가 Request Body(json)
-                        studyName*(String): 현재 스터디 이름
-                        updateStudyName*(String): 변경할 스터디 이름
-                        schedules*(Array): 스케줄 리스트(HTML)
-                        schedules.scheduleName(String): 스케줄 이름
-                        schedules.startTime(String): 스케줄 시작 시간
-                        schedules.endTime(String): 스케줄 종료 시간
+                        [예시]
+                        {
+                            "studyName": "현재 스터디 이름",
+                            "updateStudyName": "변경할 스터디 이름",
+                            "schedules": [
+                              {
+                                "scheduleName": "AM2",
+                                "startTime": "1300",
+                                "endTime": "1400"
+                              },
+                              {
+                                "scheduleName": "AM3",
+                                "startTime": "1500",
+                                "endTime": "1600"
+                              }
+                            ]
+                          }
                     """, required = true, example = """
                         {
                             "studyName": "현재 스터디 이름",
