@@ -19,7 +19,6 @@ import mogakco.StudyManagement.exception.UnauthorizedAccessException;
 import mogakco.StudyManagement.repository.MemberRepository;
 import mogakco.StudyManagement.repository.PostCommentRepository;
 import mogakco.StudyManagement.repository.PostRepository;
-import mogakco.StudyManagement.service.common.LoggingService;
 import mogakco.StudyManagement.service.post.PostCommentService;
 import mogakco.StudyManagement.service.post.PostCommonService;
 import mogakco.StudyManagement.util.DateUtil;
@@ -38,20 +37,15 @@ public class PostCommentServiceImpl extends PostCommonService implements PostCom
 
     @Override
     @Transactional
-    public CommonRes createPostComment(Long postId, PostCommentReq postCommentReq, LoggingService lo) {
+    public CommonRes createPostComment(Long postId, PostCommentReq postCommentReq) {
         try {
-            lo.setDBStart();
             Member member = getLoginMember();
             Post post = getPostById(postId);
-            lo.setDBEnd();
 
             PostComment comment = PostComment.builder().member(member).parentComment(null).post(post)
                     .content(postCommentReq.getContent()).createdAt(DateUtil.getCurrentDateTime())
                     .updatedAt(DateUtil.getCurrentDateTime()).build();
-
-            lo.setDBStart();
             postCommentRepository.save(comment);
-            lo.setDBEnd();
 
             return new CommonRes(null, ErrorCode.CREATED.getCode(), ErrorCode.CREATED.getMessage("게시판 댓글"));
 
@@ -62,27 +56,20 @@ public class PostCommentServiceImpl extends PostCommonService implements PostCom
 
     @Override
     @Transactional
-    public CommonRes createPostCommentReply(Long postId, Long commentId, PostCommentReq postCommentReq,
-            LoggingService lo) {
+    public CommonRes createPostCommentReply(Long postId, Long commentId, PostCommentReq postCommentReq) {
         try {
-            lo.setDBStart();
             Member member = getLoginMember();
             Post post = getPostById(postId);
             PostComment postComment = getCommentByPostIdAndCommentId(postId, commentId);
-            lo.setDBEnd();
 
             if (postComment.getParentComment() != null) {
                 throw new InvalidRequestException(ErrorCode.BAD_REQUEST.getMessage("답글에는 답글을 생성할 수 없습니다"));
             }
-
             PostComment reply = PostComment.builder().member(member).parentComment(postComment).post(post)
                     .content(postCommentReq.getContent()).createdAt(DateUtil.getCurrentDateTime())
                     .updatedAt(DateUtil.getCurrentDateTime()).build();
 
-            lo.setDBStart();
             postCommentRepository.save(reply);
-            lo.setDBEnd();
-
             return new CommonRes(null, ErrorCode.CREATED.getCode(), ErrorCode.CREATED.getMessage("게시판 답글"));
 
         } catch (NotFoundException | InvalidRequestException e) {
@@ -91,20 +78,15 @@ public class PostCommentServiceImpl extends PostCommonService implements PostCom
     }
 
     @Override
-    public PostCommentReplyRes getCommentReply(Long postId, Long commentId, LoggingService lo) {
+    public PostCommentReplyRes getCommentReply(Long postId, Long commentId) {
         try {
-            lo.setDBStart();
             isPostExistById(postId);
             PostComment postComment = getCommentByPostIdAndCommentId(postId, commentId);
-            lo.setDBEnd();
 
             if (postComment.getParentComment() != null)
                 throw new InvalidRequestException(ErrorCode.BAD_REQUEST.getMessage("답글에 대한 답글 조회는 지원하지 않습니다."));
 
-            lo.setDBStart();
             List<PostComment> replies = postCommentRepository.findByParentCommentCommentId(commentId);
-            lo.setDBEnd();
-
             List<PostCommentReply> postCommentReplies = replies.stream()
                     .map(PostCommentReply::new)
                     .collect(Collectors.toList());
@@ -120,15 +102,12 @@ public class PostCommentServiceImpl extends PostCommonService implements PostCom
 
     @Override
     @Transactional
-    public CommonRes updatePostComment(Long postId, Long commentId, PostCommentReq postCommentReq,
-            LoggingService lo) {
+    public CommonRes updatePostComment(Long postId, Long commentId, PostCommentReq postCommentReq) {
         CommonRes result = new CommonRes();
         try {
-            lo.setDBStart();
             isPostExistById(postId);
             Member loginMember = getLoginMember();
             PostComment postComment = getCommentByPostIdAndCommentId(postId, commentId);
-            lo.setDBEnd();
 
             if (!postComment.getMember().equals(loginMember)) {
                 throw new UnauthorizedAccessException(
@@ -136,9 +115,7 @@ public class PostCommentServiceImpl extends PostCommonService implements PostCom
             }
             if (postComment.isPostCommentChanged(postCommentReq)) {
                 postComment.updatePostComment(postCommentReq);
-                lo.setDBStart();
                 postCommentRepository.save(postComment);
-                lo.setDBEnd();
                 result.setRetCode(ErrorCode.OK.getCode());
                 result.setRetMsg(ErrorCode.OK.getMessage("게시판 댓글"));
             } else {
@@ -155,21 +132,18 @@ public class PostCommentServiceImpl extends PostCommonService implements PostCom
 
     @Override
     @Transactional
-    public CommonRes deletePostComment(Long postId, Long commentId, LoggingService lo) {
+    public CommonRes deletePostComment(Long postId, Long commentId) {
         try {
-            lo.setDBStart();
             isPostExistById(postId);
             Member loginMember = getLoginMember();
             PostComment postComment = getCommentByPostIdAndCommentId(postId, commentId);
-            lo.setDBEnd();
 
             if (!postComment.getMember().equals(loginMember)) {
                 throw new UnauthorizedAccessException(
                         ErrorCode.BAD_REQUEST.getMessage("작성하지 않은 댓글(답글)은 삭제할 수 없습니다."));
             }
-            lo.setDBStart();
+
             postCommentRepository.delete(postComment);
-            lo.setDBEnd();
 
             return new CommonRes(null, ErrorCode.DELETED.getCode(),
                     ErrorCode.DELETED.getMessage("게시판 댓글(답글)"));

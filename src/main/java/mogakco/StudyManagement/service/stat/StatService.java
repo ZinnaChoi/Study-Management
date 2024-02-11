@@ -5,12 +5,11 @@ import org.springframework.data.domain.Pageable;
 import mogakco.StudyManagement.dto.CommonRes;
 import mogakco.StudyManagement.dto.StatGetRes;
 import mogakco.StudyManagement.enums.LogType;
-import mogakco.StudyManagement.service.common.LoggingService;
 
 public interface StatService {
-    StatGetRes getStat(LogType type, LoggingService lo, Pageable pageable);
+    StatGetRes getStat(LogType type, Pageable pageable);
 
-    CommonRes createAbsentLog(LoggingService lo);
+    CommonRes createAbsentLog();
 
-    CommonRes createWakeUpLog(LoggingService lo);
+    CommonRes createWakeUpLog();
 }

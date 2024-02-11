@@ -30,7 +30,6 @@ import mogakco.StudyManagement.dto.RegistedScheduleRes;
 import mogakco.StudyManagement.dto.RegistedWakeupRes;
 import mogakco.StudyManagement.dto.StudyMembersRes;
 import mogakco.StudyManagement.enums.ErrorCode;
-import mogakco.StudyManagement.service.common.LoggingService;
 import mogakco.StudyManagement.service.member.MemberService;
 
 @Tag(name = "계정 및 권한", description = "계정 및 권한 관련 API 분류")
@@ -40,8 +39,7 @@ public class MemberController extends CommonController {
 
     private final MemberService memberService;
 
-    public MemberController(MemberService memberService, LoggingService lo) {
-        super(lo);
+    public MemberController(MemberService memberService) {
         this.memberService = memberService;
     }
 
@@ -51,14 +49,11 @@ public class MemberController extends CommonController {
         MemberLoginRes result = new MemberLoginRes();
 
         try {
-            startAPI(lo, loginInfo);
-            result = memberService.login(loginInfo, lo);
+            result = memberService.login(loginInfo);
             result.setSystemId(systemId);
         } catch (Exception e) {
             result = new MemberLoginRes(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
                     ErrorCode.INTERNAL_ERROR.getMessage(), "");
-        } finally {
-            endAPI(request, findErrorCodeByCode(result.getRetCode()), lo, result);
         }
         return result;
     }
@@ -70,13 +65,10 @@ public class MemberController extends CommonController {
         CommonRes result = new CommonRes();
 
         try {
-            startAPI(lo, null);
-            result = memberService.logout(lo);
+            result = memberService.logout();
         } catch (Exception e) {
             result = new MemberLoginRes(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
                     ErrorCode.INTERNAL_ERROR.getMessage(), "");
-        } finally {
-            endAPI(request, findErrorCodeByCode(result.getRetCode()), lo, result);
         }
         return result;
     }
@@ -87,14 +79,11 @@ public class MemberController extends CommonController {
         CommonRes result = new CommonRes();
 
         try {
-            startAPI(lo, joinInfo);
-            result = memberService.join(joinInfo, lo);
+            result = memberService.join(joinInfo);
         } catch (Exception e) {
             e.printStackTrace();
             result = new CommonRes(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
                     ErrorCode.INTERNAL_ERROR.getMessage());
-        } finally {
-            endAPI(request, findErrorCodeByCode(result.getRetCode()), lo, result);
         }
         return result;
     }
@@ -105,15 +94,12 @@ public class MemberController extends CommonController {
         MemberIdDuplRes result = new MemberIdDuplRes();
 
         try {
-            startAPI(lo, idInfo);
-            boolean isDuplicated = memberService.isIdDuplicated(idInfo, lo);
+            boolean isDuplicated = memberService.isIdDuplicated(idInfo);
             result = new MemberIdDuplRes(systemId, ErrorCode.OK.getCode(), ErrorCode.OK.getMessage());
             result.setDuplicated(isDuplicated);
         } catch (Exception e) {
             result = new MemberIdDuplRes(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
                     ErrorCode.INTERNAL_ERROR.getMessage());
-        } finally {
-            endAPI(request, findErrorCodeByCode(result.getRetCode()), lo, result);
         }
         return result;
 
@@ -126,13 +112,10 @@ public class MemberController extends CommonController {
         MemberInfoRes result = new MemberInfoRes();
 
         try {
-            startAPI(lo, null);
-            result = memberService.getMemberInfo(lo);
+            result = memberService.getMemberInfo();
         } catch (Exception e) {
             result = new MemberInfoRes(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
                     ErrorCode.INTERNAL_ERROR.getMessage(), null, null, null, null, null, null, null);
-        } finally {
-            endAPI(request, findErrorCodeByCode(result.getRetCode()), lo, result);
         }
         return result;
 
@@ -144,13 +127,10 @@ public class MemberController extends CommonController {
     public MemberListRes getMemberList(HttpServletRequest request) {
         MemberListRes result = new MemberListRes();
         try {
-            startAPI(lo, null);
-            result = memberService.getMemberList(lo);
+            result = memberService.getMemberList();
         } catch (Exception e) {
             result = new MemberListRes(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
                     ErrorCode.INTERNAL_ERROR.getMessage(), null);
-        } finally {
-            endAPI(request, findErrorCodeByCode(result.getRetCode()), lo, result);
         }
         return result;
     }
@@ -162,14 +142,11 @@ public class MemberController extends CommonController {
         CommonRes result = new CommonRes();
 
         try {
-            startAPI(lo, updateInfo);
-            result = memberService.setMemberInfo(updateInfo, lo);
+            result = memberService.setMemberInfo(updateInfo);
         } catch (Exception e) {
             e.printStackTrace();
             result = new CommonRes(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
                     ErrorCode.INTERNAL_ERROR.getMessage());
-        } finally {
-            endAPI(request, findErrorCodeByCode(result.getRetCode()), lo, result);
         }
         return result;
     }
@@ -184,15 +161,12 @@ public class MemberController extends CommonController {
 
         StudyMembersRes result = new StudyMembersRes();
         try {
-            startAPI(lo, null);
-            result = memberService.getMembersBySchedule(lo, schedule, pageable);
+            result = memberService.getMembersBySchedule(schedule, pageable);
             result.setSystemId(systemId);
         } catch (Exception e) {
             e.printStackTrace();
             result = new StudyMembersRes(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
                     ErrorCode.INTERNAL_ERROR.getMessage(), null, null);
-        } finally {
-            endAPI(request, findErrorCodeByCode(result.getRetCode()), lo, result);
         }
         return result;
     }
@@ -207,15 +181,12 @@ public class MemberController extends CommonController {
 
         StudyMembersRes result = new StudyMembersRes();
         try {
-            startAPI(lo, null);
-            result = memberService.getMembersByWakeupTime(lo, time, pageable);
+            result = memberService.getMembersByWakeupTime(time, pageable);
             result.setSystemId(systemId);
         } catch (Exception e) {
             e.printStackTrace();
             result = new StudyMembersRes(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
                     ErrorCode.INTERNAL_ERROR.getMessage(), null, null);
-        } finally {
-            endAPI(request, findErrorCodeByCode(result.getRetCode()), lo, result);
         }
         return result;
     }
@@ -228,15 +199,12 @@ public class MemberController extends CommonController {
 
         RegistedScheduleRes result = new RegistedScheduleRes();
         try {
-            startAPI(lo, null);
-            result = memberService.getRegistedSchedule(lo);
+            result = memberService.getRegistedSchedule();
             result.setSystemId(systemId);
         } catch (Exception e) {
             e.printStackTrace();
             result = new RegistedScheduleRes(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
                     ErrorCode.INTERNAL_ERROR.getMessage(), null);
-        } finally {
-            endAPI(request, findErrorCodeByCode(result.getRetCode()), lo, result);
         }
         return result;
     }
@@ -249,15 +217,12 @@ public class MemberController extends CommonController {
 
         RegistedWakeupRes result = new RegistedWakeupRes();
         try {
-            startAPI(lo, null);
-            result = memberService.getRegistedWakeup(lo);
+            result = memberService.getRegistedWakeup();
             result.setSystemId(systemId);
         } catch (Exception e) {
             e.printStackTrace();
             result = new RegistedWakeupRes(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
                     ErrorCode.INTERNAL_ERROR.getMessage(), null);
-        } finally {
-            endAPI(request, findErrorCodeByCode(result.getRetCode()), lo, result);
         }
         return result;
     }

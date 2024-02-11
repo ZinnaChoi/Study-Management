@@ -18,7 +18,6 @@ import mogakco.StudyManagement.dto.CommonRes;
 import mogakco.StudyManagement.dto.PostCommentReplyRes;
 import mogakco.StudyManagement.dto.PostCommentReq;
 import mogakco.StudyManagement.enums.ErrorCode;
-import mogakco.StudyManagement.service.common.LoggingService;
 import mogakco.StudyManagement.service.post.PostCommentService;
 
 @Tag(name = "게시판 댓글", description = "게시판 댓글 관련 API 분류")
@@ -29,8 +28,7 @@ public class PostCommentController extends CommonController {
 
     private final PostCommentService postCommentService;
 
-    public PostCommentController(PostCommentService postCommentService, LoggingService lo) {
-        super(lo);
+    public PostCommentController(PostCommentService postCommentService) {
         this.postCommentService = postCommentService;
     }
 
@@ -42,14 +40,11 @@ public class PostCommentController extends CommonController {
 
         CommonRes result = new CommonRes();
         try {
-            startAPI(lo, postCommentReq);
-            result = postCommentService.createPostComment(postId, postCommentReq, lo);
+            result = postCommentService.createPostComment(postId, postCommentReq);
             result.setSystemId(systemId);
         } catch (Exception e) {
             result = new CommonRes(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
                     ErrorCode.INTERNAL_ERROR.getMessage());
-        } finally {
-            endAPI(request, findErrorCodeByCode(result.getRetCode()), lo, result);
         }
         return result;
     }
@@ -63,14 +58,11 @@ public class PostCommentController extends CommonController {
 
         CommonRes result = new CommonRes();
         try {
-            startAPI(lo, postCommentReq);
-            result = postCommentService.createPostCommentReply(postId, commentId, postCommentReq, lo);
+            result = postCommentService.createPostCommentReply(postId, commentId, postCommentReq);
             result.setSystemId(systemId);
         } catch (Exception e) {
             result = new CommonRes(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
                     ErrorCode.INTERNAL_ERROR.getMessage());
-        } finally {
-            endAPI(request, findErrorCodeByCode(result.getRetCode()), lo, result);
         }
         return result;
     }
@@ -83,14 +75,11 @@ public class PostCommentController extends CommonController {
 
         PostCommentReplyRes result = new PostCommentReplyRes();
         try {
-            startAPI(lo, null);
-            result = postCommentService.getCommentReply(postId, commentId, lo);
+            result = postCommentService.getCommentReply(postId, commentId);
             result.setSystemId(systemId);
         } catch (Exception e) {
             result = new PostCommentReplyRes(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
                     ErrorCode.INTERNAL_ERROR.getMessage(), null);
-        } finally {
-            endAPI(request, findErrorCodeByCode(result.getRetCode()), lo, result);
         }
         return result;
     }
@@ -104,14 +93,11 @@ public class PostCommentController extends CommonController {
         CommonRes result = new CommonRes();
 
         try {
-            startAPI(lo, postCommentReq);
-            result = postCommentService.updatePostComment(postId, commentId, postCommentReq, lo);
+            result = postCommentService.updatePostComment(postId, commentId, postCommentReq);
             result.setSystemId(systemId);
         } catch (Exception e) {
             result = new CommonRes(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
                     ErrorCode.INTERNAL_ERROR.getMessage());
-        } finally {
-            endAPI(request, findErrorCodeByCode(result.getRetCode()), lo, result);
         }
         return result;
     }
@@ -123,14 +109,11 @@ public class PostCommentController extends CommonController {
             @PathVariable(name = "commentId", required = true) Long commentId) {
         CommonRes result = new CommonRes();
         try {
-            startAPI(lo, null);
-            result = postCommentService.deletePostComment(postId, commentId, lo);
+            result = postCommentService.deletePostComment(postId, commentId);
             result.setSystemId(systemId);
         } catch (Exception e) {
             result = new CommonRes(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
                     ErrorCode.INTERNAL_ERROR.getMessage());
-        } finally {
-            endAPI(request, findErrorCodeByCode(result.getRetCode()), lo, result);
         }
         return result;
     }

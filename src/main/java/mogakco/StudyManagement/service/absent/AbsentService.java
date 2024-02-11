@@ -6,18 +6,17 @@ import mogakco.StudyManagement.dto.AbsentDetailReq;
 import mogakco.StudyManagement.dto.AbsentDetailRes;
 import mogakco.StudyManagement.dto.AbsentReq;
 import mogakco.StudyManagement.dto.CommonRes;
-import mogakco.StudyManagement.service.common.LoggingService;
 
 public interface AbsentService {
 
-    CommonRes registerAbsentSchedule(AbsentReq absentReq, LoggingService lo);
+    CommonRes registerAbsentSchedule(AbsentReq absentReq);
 
-    AbsentCalendarRes getAbsentScheduleByMonth(AbsentCalendarReq absentCalendarReq, LoggingService lo);
+    AbsentCalendarRes getAbsentScheduleByMonth(AbsentCalendarReq absentCalendarReq);
 
-    AbsentDetailRes getAbsentScheduleDetail(AbsentDetailReq absentDetailReq, LoggingService lo);
+    AbsentDetailRes getAbsentScheduleDetail(AbsentDetailReq absentDetailReq);
 
-    CommonRes updateAbsentSchedule(AbsentReq absentReq, LoggingService lo);
+    CommonRes updateAbsentSchedule(AbsentReq absentReq);
 
-    CommonRes deleteAbsentSchedule(String absentDate, LoggingService lo);
+    CommonRes deleteAbsentSchedule(String absentDate);
 
 }

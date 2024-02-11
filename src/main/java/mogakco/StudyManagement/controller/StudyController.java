@@ -22,7 +22,6 @@ import mogakco.StudyManagement.dto.CommonRes;
 import mogakco.StudyManagement.dto.StudyInfoRes;
 import mogakco.StudyManagement.dto.StudyReq;
 import mogakco.StudyManagement.enums.ErrorCode;
-import mogakco.StudyManagement.service.common.LoggingService;
 import mogakco.StudyManagement.service.study.StudyService;
 
 @Tag(name = "관리자", description = "스터디 등록 및 일정 등록")
@@ -31,164 +30,150 @@ import mogakco.StudyManagement.service.study.StudyService;
 @RestController
 public class StudyController extends CommonController {
 
-    private final StudyService studyService;
+  private final StudyService studyService;
 
-    public StudyController(StudyService studyService, LoggingService lo) {
-        super(lo);
-        this.studyService = studyService;
+  public StudyController(StudyService studyService) {
+    this.studyService = studyService;
+  }
+
+  @Operation(summary = "스터디 정보 조회", description = "등록 스터디 정보 조회")
+  @SecurityRequirement(name = "bearer-key")
+  @GetMapping(value = "/study")
+  public StudyInfoRes getStudy(HttpServletRequest request) {
+    StudyInfoRes result = new StudyInfoRes();
+
+    try {
+      result = studyService.getStudy();
+    } catch (Exception e) {
+      result = new StudyInfoRes(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
+          ErrorCode.INTERNAL_ERROR.getMessage(), null, null, null, null);
     }
 
-    @Operation(summary = "스터디 정보 조회", description = "등록 스터디 정보 조회")
-    @SecurityRequirement(name = "bearer-key")
-    @GetMapping(value = "/study")
-    public StudyInfoRes getStudy(HttpServletRequest request) {
-        StudyInfoRes result = new StudyInfoRes();
+    return result;
+  }
 
-        try {
-            startAPI(lo, null);
-            result = studyService.getStudy(lo);
-        } catch (Exception e) {
-            result = new StudyInfoRes(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
-                    ErrorCode.INTERNAL_ERROR.getMessage(), null, null, null, null);
-        } finally {
-            endAPI(request, findErrorCodeByCode(result.getRetCode()), lo, result);
-        }
+  @Operation(summary = "스터디 등록", description = "새 스터디 추가")
+  @SecurityRequirement(name = "bearer-key")
+  @PostMapping(value = "/study", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE })
+  public CommonRes createStudy(HttpServletRequest request,
+      @Schema(name = "req", description = """
+              [예시]
+              {
+                  "studyName": "모각코 스터디",
+                  "schedules": [
+                    {
+                      "scheduleName": "AM2",
+                      "startTime": "1300",
+                      "endTime": "1400"
+                    },
+                    {
+                      "scheduleName": "AM3",
+                      "startTime": "1500",
+                      "endTime": "1600"
+                    }
+                  ]
+                }
+          """, required = true, example = """
+              {
+                  "studyName": "모각코 스터디",
+                  "schedules": [
+                    {
+                      "scheduleName": "AM2",
+                      "startTime": "1300",
+                      "endTime": "1400"
+                    },
+                    {
+                      "scheduleName": "AM3",
+                      "startTime": "1500",
+                      "endTime": "1600"
+                    }
+                  ]
+                }
 
-        return result;
+          """) @RequestPart(name = "req") String req,
+      @Parameter(description = "이미지 파일") @RequestParam(name = "logo file", required = false) MultipartFile imageFile) {
+    CommonRes result = new CommonRes();
+
+    try {
+      StudyReq studyReq = mapper.readValue(req, StudyReq.class);
+      result = studyService.createStudy(studyReq, imageFile);
+    } catch (Exception e) {
+      result = new CommonRes(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
+          ErrorCode.INTERNAL_ERROR.getMessage());
     }
 
-    @Operation(summary = "스터디 등록", description = "새 스터디 추가")
-    @SecurityRequirement(name = "bearer-key")
-    @PostMapping(value = "/study", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE })
-    public CommonRes createStudy(HttpServletRequest request,
-            @Schema(name = "req", description = """
-                        [예시]
-                        {
-                            "studyName": "모각코 스터디",
-                            "schedules": [
-                              {
-                                "scheduleName": "AM2",
-                                "startTime": "1300",
-                                "endTime": "1400"
-                              },
-                              {
-                                "scheduleName": "AM3",
-                                "startTime": "1500",
-                                "endTime": "1600"
-                              }
-                            ]
-                          }
-                    """, required = true, example = """
-                        {
-                            "studyName": "모각코 스터디",
-                            "schedules": [
-                              {
-                                "scheduleName": "AM2",
-                                "startTime": "1300",
-                                "endTime": "1400"
-                              },
-                              {
-                                "scheduleName": "AM3",
-                                "startTime": "1500",
-                                "endTime": "1600"
-                              }
-                            ]
-                          }
+    return result;
+  }
 
-                    """) @RequestPart(name = "req") String req,
-            @Parameter(description = "이미지 파일") @RequestParam(name = "logo file", required = false) MultipartFile imageFile) {
-        CommonRes result = new CommonRes();
+  @Operation(summary = "스터디 정보 수정", description = "스터디 정보(스터디 이름, 로고, 스케줄) 수정")
+  @SecurityRequirement(name = "bearer-key")
+  @PutMapping(value = "/study", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE })
+  public CommonRes updateStudy(HttpServletRequest request,
+      @Schema(name = "req", description = """
+              [예시]
+              {
+                  "studyName": "현재 스터디 이름",
+                  "updateStudyName": "변경할 스터디 이름",
+                  "schedules": [
+                    {
+                      "scheduleName": "AM2",
+                      "startTime": "1300",
+                      "endTime": "1400"
+                    },
+                    {
+                      "scheduleName": "AM3",
+                      "startTime": "1500",
+                      "endTime": "1600"
+                    }
+                  ]
+                }
+          """, required = true, example = """
+              {
+                  "studyName": "현재 스터디 이름",
+                  "updateStudyName": "변경할 스터디 이름",
+                  "schedules": [
+                    {
+                      "scheduleName": "AM2",
+                      "startTime": "1300",
+                      "endTime": "1400"
+                    },
+                    {
+                      "scheduleName": "AM3",
+                      "startTime": "1500",
+                      "endTime": "1600"
+                    }
+                  ]
+                }
 
-        try {
-            StudyReq studyReq = mapper.readValue(req, StudyReq.class);
-            startAPI(lo, studyReq);
-            result = studyService.createStudy(studyReq, imageFile, lo);
-        } catch (Exception e) {
-            result = new CommonRes(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
-                    ErrorCode.INTERNAL_ERROR.getMessage());
-        } finally {
-            endAPI(request, findErrorCodeByCode(result.getRetCode()), lo, result);
-        }
+          """) @RequestPart(name = "req") String req,
+      @Parameter(description = "이미지 파일") @RequestParam(name = "logo file", required = false) MultipartFile imageFile) {
+    CommonRes result = new CommonRes();
 
-        return result;
+    try {
+      StudyReq studyReq = mapper.readValue(req, StudyReq.class);
+      result = studyService.updateStudy(studyReq, imageFile);
+    } catch (Exception e) {
+      result = new CommonRes(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
+          ErrorCode.INTERNAL_ERROR.getMessage());
+    }
+    return result;
+  }
+
+  @Operation(summary = "스터디 정보 삭제", description = "스터디 정보(스터디 이름, 로고, 스케줄) 삭제")
+  @SecurityRequirement(name = "bearer-key")
+  @DeleteMapping(value = "/study/{studyid}")
+  public CommonRes deleteStudy(HttpServletRequest request,
+      @PathVariable(name = "studyid", required = true) Long studyId) {
+    CommonRes result = new CommonRes();
+
+    try {
+      result = studyService.deleteStudy(studyId);
+    } catch (Exception e) {
+      result = new CommonRes(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
+          ErrorCode.INTERNAL_ERROR.getMessage());
     }
 
-    @Operation(summary = "스터디 정보 수정", description = "스터디 정보(스터디 이름, 로고, 스케줄) 수정")
-    @SecurityRequirement(name = "bearer-key")
-    @PutMapping(value = "/study", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE })
-    public CommonRes updateStudy(HttpServletRequest request,
-            @Schema(name = "req", description = """
-                        [예시]
-                        {
-                            "studyName": "현재 스터디 이름",
-                            "updateStudyName": "변경할 스터디 이름",
-                            "schedules": [
-                              {
-                                "scheduleName": "AM2",
-                                "startTime": "1300",
-                                "endTime": "1400"
-                              },
-                              {
-                                "scheduleName": "AM3",
-                                "startTime": "1500",
-                                "endTime": "1600"
-                              }
-                            ]
-                          }
-                    """, required = true, example = """
-                        {
-                            "studyName": "현재 스터디 이름",
-                            "updateStudyName": "변경할 스터디 이름",
-                            "schedules": [
-                              {
-                                "scheduleName": "AM2",
-                                "startTime": "1300",
-                                "endTime": "1400"
-                              },
-                              {
-                                "scheduleName": "AM3",
-                                "startTime": "1500",
-                                "endTime": "1600"
-                              }
-                            ]
-                          }
-
-                    """) @RequestPart(name = "req") String req,
-            @Parameter(description = "이미지 파일") @RequestParam(name = "logo file", required = false) MultipartFile imageFile) {
-        CommonRes result = new CommonRes();
-
-        try {
-            StudyReq studyReq = mapper.readValue(req, StudyReq.class);
-            startAPI(lo, studyReq);
-            result = studyService.updateStudy(studyReq, imageFile, lo);
-        } catch (Exception e) {
-            result = new CommonRes(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
-                    ErrorCode.INTERNAL_ERROR.getMessage());
-        } finally {
-            endAPI(request, findErrorCodeByCode(result.getRetCode()), lo, result);
-        }
-
-        return result;
-    }
-
-    @Operation(summary = "스터디 정보 삭제", description = "스터디 정보(스터디 이름, 로고, 스케줄) 삭제")
-    @SecurityRequirement(name = "bearer-key")
-    @DeleteMapping(value = "/study/{studyid}")
-    public CommonRes deleteStudy(HttpServletRequest request,
-            @PathVariable(name = "studyid", required = true) Long studyId) {
-        CommonRes result = new CommonRes();
-
-        try {
-            startAPI(lo, null);
-            result = studyService.deleteStudy(studyId, lo);
-        } catch (Exception e) {
-            result = new CommonRes(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
-                    ErrorCode.INTERNAL_ERROR.getMessage());
-        } finally {
-            endAPI(request, findErrorCodeByCode(result.getRetCode()), lo, result);
-        }
-
-        return result;
-    }
+    return result;
+  }
 
 }
