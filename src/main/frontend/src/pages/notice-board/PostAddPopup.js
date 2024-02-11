@@ -1,12 +1,22 @@
 import React, { useState } from "react";
 import { authClient } from "../../services/APIService";
 import CommonDialog from "../../components/CommonDialog";
+import { TextField } from "@mui/material";
 
 const PostAddPopup = ({ open, onClose, onRefresh }) => {
-  const handleCreatePost = (formJson) => {
-    console.log(formJson);
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
+
+  const handleCreatePost = () => {
+    const formattedContent = content.replace(/\n/g, "<br>");
+
+    const postPayload = {
+      title: title,
+      content: formattedContent,
+    };
+
     authClient
-      .post("/posts", formJson)
+      .post("/posts", postPayload)
       .then((response) => {
         alert(response.data.retMsg);
         onClose();
@@ -20,6 +30,35 @@ const PostAddPopup = ({ open, onClose, onRefresh }) => {
       });
   };
 
+  const extraComponents = (
+    <>
+      <TextField
+        required
+        margin="dense"
+        id="title"
+        name="title"
+        label="제목을 입력하세요"
+        type="text"
+        fullWidth
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
+      />
+      <TextField
+        required
+        margin="dense"
+        id="content"
+        name="content"
+        label="내용을 입력하세요"
+        type="text"
+        fullWidth
+        multiline
+        rows={4}
+        value={content}
+        onChange={(e) => setContent(e.target.value)}
+      />
+    </>
+  );
+
   return (
     <CommonDialog
       open={open}
@@ -27,13 +66,11 @@ const PostAddPopup = ({ open, onClose, onRefresh }) => {
       onClose={onClose}
       acceptStr="생성"
       cancleStr="취소"
-      names={["title", "content"]}
-      isRequireds={[true, true]}
-      descriptions={["제목을 입력하세요", "내용을 입력하세요"]}
-      inputTypes={["text", "text"]}
+      isRequireds={true}
       showButton={false}
       submitEvt={handleCreatePost}
-    ></CommonDialog>
+      extraComponents={extraComponents}
+    />
   );
 };
 
