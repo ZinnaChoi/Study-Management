@@ -33,8 +33,6 @@ import mogakco.StudyManagement.repository.PostCommentRepository;
 import mogakco.StudyManagement.repository.PostLikeRepository;
 import mogakco.StudyManagement.repository.PostRepository;
 import mogakco.StudyManagement.repository.spec.PostSpecification;
-import mogakco.StudyManagement.service.common.LoggingService;
-
 import mogakco.StudyManagement.service.notice.NoticeService;
 import mogakco.StudyManagement.service.post.PostCommonService;
 import mogakco.StudyManagement.service.post.PostService;
@@ -60,53 +58,39 @@ public class PostServiceImpl extends PostCommonService implements PostService {
 
     @Override
     @Transactional
-    public void createPost(PostReq postCreateReq, LoggingService lo) {
-        lo.setDBStart();
+    public void createPost(PostReq postCreateReq) {
         Member member = getLoginMember();
-        lo.setDBEnd();
-
         Post post = Post.builder().member(member).title(postCreateReq.getTitle()).content(postCreateReq.getContent())
                 .createdAt(DateUtil.getCurrentDateTime()).updatedAt(DateUtil.getCurrentDateTime())
                 .build();
 
-        lo.setDBStart();
         postRepository.save(post);
-        lo.setDBEnd();
-
-        noticeService.createSpecificNotice(member, MessageType.NEW_POST, lo);
+        noticeService.createSpecificNotice(member, MessageType.NEW_POST);
     }
 
     @Override
-    public PostListRes getPostList(PostListReq postListReq, LoggingService lo, Pageable pageable) {
+    public PostListRes getPostList(PostListReq postListReq, Pageable pageable) {
 
         String searchKeyWord = postListReq.getSearchKeyWord().trim();
         Specification<Post> spec;
         Page<Post> posts;
 
         if (searchKeyWord.length() == 0) {
-            lo.setDBStart();
             posts = postRepository.findAll(pageable);
-            lo.setDBEnd();
         } else {
             if (postListReq.getSearchType() == PostSearchType.TITLE) {
                 spec = PostSpecification.withTitleContaining(searchKeyWord);
             } else {
-                lo.setDBStart();
                 List<Member> members = memberRepository.findByNameContaining(searchKeyWord);
-                lo.setDBEnd();
                 spec = PostSpecification.withMemberIn(members);
             }
-            lo.setDBStart();
             posts = postRepository.findAll(spec, pageable);
-            lo.setDBEnd();
         }
 
         List<PostList> postLists = posts.getContent().stream()
                 .map(post -> {
-                    lo.setDBStart();
                     Integer commentCount = postCommentRepository.countByPostPostId(post.getPostId());
                     Integer likeCount = postLikeRepository.countByPostPostId(post.getPostId());
-                    lo.setDBEnd();
                     return new PostList(post, likeCount, commentCount);
                 })
                 .collect(Collectors.toList());
@@ -115,14 +99,12 @@ public class PostServiceImpl extends PostCommonService implements PostService {
     }
 
     @Override
-    public PostDetailRes getPostDetail(Long postId, LoggingService lo) {
+    public PostDetailRes getPostDetail(Long postId) {
         try {
-            lo.setDBStart();
             Post post = getPostById(postId);
             Integer likeCount = postLikeRepository.countByPostPostId(postId);
             List<PostComment> commentEntities = postCommentRepository.findByPostPostIdAndParentCommentIsNull(postId);
             List<Object[]> replyCntByPostId = postCommentRepository.countRepliesByPostId(postId);
-            lo.setDBEnd();
 
             Map<Long, Integer> replyCountMap = replyCntByPostId.stream()
                     .collect(Collectors.toMap(
@@ -150,22 +132,20 @@ public class PostServiceImpl extends PostCommonService implements PostService {
 
     @Override
     @Transactional
-    public CommonRes updatePost(Long postId, PostReq postUpdateReq, LoggingService lo) {
+    public CommonRes updatePost(Long postId, PostReq postUpdateReq) {
         try {
             CommonRes result = new CommonRes();
-            lo.setDBStart();
+
             Post post = getPostById(postId);
             Member loginMember = getLoginMember();
-            lo.setDBEnd();
+
             if (!post.getMember().equals(loginMember)) {
                 throw new UnauthorizedAccessException(
                         ErrorCode.BAD_REQUEST.getMessage("작성하지 않은 게시글은 수정할 수 없습니다."));
             }
             if (post.isPostChanged(postUpdateReq)) {
                 post.updatePost(postUpdateReq);
-                lo.setDBStart();
                 postRepository.save(post);
-                lo.setDBEnd();
                 result.setRetCode(ErrorCode.OK.getCode());
                 result.setRetMsg(ErrorCode.OK.getMessage("게시글"));
             } else {
@@ -181,20 +161,16 @@ public class PostServiceImpl extends PostCommonService implements PostService {
 
     @Override
     @Transactional
-    public CommonRes deletePost(Long postId, LoggingService lo) {
+    public CommonRes deletePost(Long postId) {
         try {
-            lo.setDBStart();
             Post post = getPostById(postId);
             Member loginMember = getLoginMember();
-            lo.setDBEnd();
 
             if (!post.getMember().equals(loginMember)) {
                 throw new UnauthorizedAccessException(
                         ErrorCode.BAD_REQUEST.getMessage("작성하지 않은 게시글은 삭제할 수 없습니다."));
             }
-            lo.setDBStart();
             postRepository.delete(post);
-            lo.setDBEnd();
 
             return new CommonRes(null, ErrorCode.DELETED.getCode(),
                     ErrorCode.DELETED.getMessage("게시글"));

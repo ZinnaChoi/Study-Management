@@ -25,7 +25,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import mogakco.StudyManagement.dto.NoticeReq;
 import mogakco.StudyManagement.scheduler.StartTimeMonitoringScheduler;
-import mogakco.StudyManagement.service.common.LoggingService;
 import mogakco.StudyManagement.service.external.SendEmailService;
 import mogakco.StudyManagement.service.notice.NoticeService;
 import mogakco.StudyManagement.util.TestUtil;
@@ -41,9 +40,6 @@ public class NoticeControllerTest {
 
         @Mock
         private NoticeService noticeService;
-
-        @Mock
-        private LoggingService loggingService;
 
         @Mock
         private SendEmailService sendEmailService;
@@ -144,14 +140,12 @@ public class NoticeControllerTest {
         @DisplayName("구글 링크 생성 알림 모니터링 작업 성공")
         public void excuteGeneralNoti() {
                 NoticeService noticeServiceMock = Mockito.mock(NoticeService.class);
-                LoggingService loggingServiceMock = Mockito.mock(LoggingService.class);
-
                 StartTimeMonitoringScheduler startTimeMonitoringScheduler = new StartTimeMonitoringScheduler(
-                                noticeServiceMock, loggingServiceMock);
+                                noticeServiceMock);
 
                 startTimeMonitoringScheduler.executeGeneralNotice();
 
-                verify(noticeServiceMock, times(1)).createGeneralNotice(loggingServiceMock);
+                verify(noticeServiceMock, times(1)).createGeneralNotice();
         }
 
 }

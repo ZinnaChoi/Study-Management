@@ -7,16 +7,15 @@ import mogakco.StudyManagement.dto.CommonRes;
 import mogakco.StudyManagement.dto.PostDetailRes;
 import mogakco.StudyManagement.dto.PostListReq;
 import mogakco.StudyManagement.dto.PostListRes;
-import mogakco.StudyManagement.service.common.LoggingService;
 
 public interface PostService {
-    void createPost(PostReq postCreateReq, LoggingService lo);
+    void createPost(PostReq postCreateReq);
 
-    PostListRes getPostList(PostListReq postListReq, LoggingService lo, Pageable pageable);
+    PostListRes getPostList(PostListReq postListReq, Pageable pageable);
 
-    PostDetailRes getPostDetail(Long postId, LoggingService lo);
+    PostDetailRes getPostDetail(Long postId);
 
-    CommonRes updatePost(Long postId, PostReq postUpdateReq, LoggingService lo);
+    CommonRes updatePost(Long postId, PostReq postUpdateReq);
 
-    CommonRes deletePost(Long postId, LoggingService lo);
+    CommonRes deletePost(Long postId);
 }

@@ -18,7 +18,6 @@ import mogakco.StudyManagement.dto.CommonRes;
 import mogakco.StudyManagement.dto.StatGetRes;
 import mogakco.StudyManagement.enums.ErrorCode;
 import mogakco.StudyManagement.enums.LogType;
-import mogakco.StudyManagement.service.common.LoggingService;
 import mogakco.StudyManagement.service.stat.StatService;
 
 @Tag(name = "통계", description = "통계 관련 API 분류")
@@ -29,10 +28,8 @@ public class StatController extends CommonController {
 
     private final StatService statService;
 
-    public StatController(LoggingService lo, StatService statService) {
-        super(lo);
+    public StatController(StatService statService) {
         this.statService = statService;
-
     }
 
     @Operation(summary = "통계 조회", description = "출석률 통계 조회, 기상률 조회")
@@ -42,11 +39,8 @@ public class StatController extends CommonController {
             @PageableDefault(size = 10, page = 0, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
 
         StatGetRes result = new StatGetRes();
-
         try {
-            startAPI(lo, type);
-            result = statService.getStat(type, lo, pageable);
-
+            result = statService.getStat(type, pageable);
             if (result == null || result.getContent() == null || result.getContent().isEmpty()) {
                 result = new StatGetRes(systemId, ErrorCode.NOT_FOUND.getCode(),
                         ErrorCode.NOT_FOUND.getMessage("content"), null, null);
@@ -54,8 +48,6 @@ public class StatController extends CommonController {
         } catch (Exception e) {
             result = new StatGetRes(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
                     ErrorCode.INTERNAL_ERROR.getMessage(), null, null);
-        } finally {
-            endAPI(request, findErrorCodeByCode(result.getRetCode()), lo, result);
         }
 
         return result;
@@ -69,13 +61,10 @@ public class StatController extends CommonController {
 
         CommonRes result = new CommonRes();
         try {
-            startAPI(lo, null);
-            result = statService.createAbsentLog(lo);
+            result = statService.createAbsentLog();
         } catch (Exception e) {
             result = new CommonRes(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
                     ErrorCode.INTERNAL_ERROR.getMessage());
-        } finally {
-            endAPI(request, findErrorCodeByCode(result.getRetCode()), lo, result);
         }
         return result;
     }
@@ -86,13 +75,10 @@ public class StatController extends CommonController {
 
         CommonRes result = new CommonRes();
         try {
-            startAPI(lo, null);
-            result = statService.createWakeUpLog(lo);
+            result = statService.createWakeUpLog();
         } catch (Exception e) {
             result = new CommonRes(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
                     ErrorCode.INTERNAL_ERROR.getMessage());
-        } finally {
-            endAPI(request, findErrorCodeByCode(result.getRetCode()), lo, result);
         }
         return result;
     }

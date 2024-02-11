@@ -24,7 +24,6 @@ import mogakco.StudyManagement.exception.InvalidRequestException;
 import mogakco.StudyManagement.exception.NotFoundException;
 import mogakco.StudyManagement.repository.ScheduleRepository;
 import mogakco.StudyManagement.repository.StudyInfoRepository;
-import mogakco.StudyManagement.service.common.LoggingService;
 import mogakco.StudyManagement.service.study.StudyService;
 import mogakco.StudyManagement.util.ExceptionUtil;
 
@@ -56,13 +55,11 @@ public class StudyServiceImpl implements StudyService {
 
         @Override
         @Transactional(readOnly = true)
-        public StudyInfoRes getStudy(LoggingService lo) {
-
+        public StudyInfoRes getStudy() {
                 // study_info 테이블에서 스터디 조회
-                lo.setDBStart();
                 // TODO: 중앙 - 스터디 DB 분리 시 알맞은 study_info 가져올 것
                 StudyInfo studyInfo = studyInfoRepository.findTopBy();
-                lo.setDBEnd();
+
                 if (studyInfo == null) {
                         CommonRes res = ExceptionUtil.handleException(
                                         new NotFoundException("등록된 스터디가 없습니다."));
@@ -75,9 +72,7 @@ public class StudyServiceImpl implements StudyService {
                 byte[] logo = studyInfo.getStudyLogo();
 
                 // schedule 테이블에서 전체 스케줄 조회
-                lo.setDBStart();
                 List<Schedule> schedules = scheduleRepository.findAll();
-                lo.setDBEnd();
                 List<ScheduleRes> scheduleResList = schedules.stream().map(s -> new ScheduleRes(s.getScheduleId(),
                                 s.getScheduleName(), s.getStartTime(), s.getEndTime())).collect(Collectors.toList());
 
@@ -87,7 +82,7 @@ public class StudyServiceImpl implements StudyService {
 
         @Override
         @Transactional
-        public CommonRes createStudy(StudyReq studyReq, MultipartFile imageFile, LoggingService lo)
+        public CommonRes createStudy(StudyReq studyReq, MultipartFile imageFile)
                         throws IOException {
                 CommonRes result = new CommonRes(systemId, ErrorCode.OK.getCode(), ErrorCode.OK.getMessage());
                 if (studyInfoRepository.existsByStudyName(studyReq.getStudyName())) {
@@ -114,26 +109,22 @@ public class StudyServiceImpl implements StudyService {
                                 .studyLogo(studyLogoBytes)
                                 .db_url(dbUrl).db_user(dbUser).db_password(bCryptPasswordEncoder.encode(dbPassword))
                                 .build();
-                lo.setDBStart();
-                studyInfoRepository.save(studyInfo);
-                lo.setDBEnd();
 
+                studyInfoRepository.save(studyInfo);
                 for (ScheduleReq scheduleCreateReq : studyReq.getSchedules()) {
                         Schedule schedule = Schedule.builder().scheduleName(scheduleCreateReq.getScheduleName())
                                         .startTime(scheduleCreateReq.getStartTime())
                                         .endTime(scheduleCreateReq.getEndTime())
                                         .build();
 
-                        lo.setDBStart();
                         scheduleRepository.save(schedule);
-                        lo.setDBEnd();
                 }
                 return result;
         }
 
         @Override
         @Transactional
-        public CommonRes updateStudy(StudyReq studyReq, MultipartFile imageFile, LoggingService lo) {
+        public CommonRes updateStudy(StudyReq studyReq, MultipartFile imageFile) {
 
                 List<Schedule> allSchedules = scheduleRepository.findAll();
                 List<Schedule> reqSchedules = studyReq.getSchedules().stream()
@@ -174,10 +165,9 @@ public class StudyServiceImpl implements StudyService {
                         }
                 }
 
-                lo.setDBStart();
                 List<StudyInfo> sInfos = studyInfoRepository.findAll();
                 StudyInfo sInfo = studyInfoRepository.findByStudyName(studyReq.getStudyName());
-                lo.setDBEnd();
+
                 try {
                         if (sInfos.isEmpty()) {
                                 throw new NullPointerException("등록된 스터디가 없어 수정할 수 없습니다");
@@ -206,33 +196,28 @@ public class StudyServiceImpl implements StudyService {
                         return ExceptionUtil.handleException(new InvalidRequestException(ie.getMessage()));
                 }
                 // do query
-                lo.setDBStart();
                 studyInfoRepository.save(sInfo);
                 scheduleRepository.deleteAll(schedulesToDelete);
                 scheduleRepository.saveAll(schedulesToUpdate);
                 scheduleRepository.saveAll(schedulesToInsert);
-                lo.setDBEnd();
 
                 return new CommonRes(systemId, ErrorCode.OK.getCode(), ErrorCode.OK.getMessage());
         }
 
         @Override
         @Transactional
-        public CommonRes deleteStudy(Long studyId, LoggingService lo) {
+        public CommonRes deleteStudy(Long studyId) {
 
-                lo.setDBStart();
                 StudyInfo studyInfo = studyInfoRepository.findByStudyId(studyId);
-                lo.setDBEnd();
+
                 if (studyInfo == null) {
                         return ExceptionUtil.handleException(
                                         new NotFoundException(studyId + " 아이디로 등록된 스터디가 존재하지 않아 삭제할 수 없습니다."));
                 }
 
                 // study_info 및 schedule 삭제(member_schedule, absent_schedule 테이블도 cascade 삭제됨)
-                lo.setDBStart();
                 studyInfoRepository.delete(studyInfo);
                 scheduleRepository.deleteAll();
-                lo.setDBEnd();
 
                 return new CommonRes(systemId, ErrorCode.OK.getCode(), ErrorCode.OK.getMessage());
         }

@@ -29,7 +29,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import mogakco.StudyManagement.dto.ScheduleReq;
 import mogakco.StudyManagement.dto.StudyReq;
-import mogakco.StudyManagement.service.common.LoggingService;
 import mogakco.StudyManagement.service.external.SendEmailService;
 import mogakco.StudyManagement.service.study.StudyService;
 import mogakco.StudyManagement.util.TestUtil;
@@ -42,9 +41,6 @@ public class StudyControllerTest {
 
         @Mock
         private StudyService studyService;
-
-        @Mock
-        private LoggingService loggingService;
 
         @Mock
         private SendEmailService sendEmailService;

@@ -22,7 +22,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import mogakco.StudyManagement.dto.PostReq;
 import mogakco.StudyManagement.enums.PostSearchType;
-import mogakco.StudyManagement.service.common.LoggingService;
 import mogakco.StudyManagement.service.external.SendEmailService;
 import mogakco.StudyManagement.service.post.PostService;
 import mogakco.StudyManagement.util.TestUtil;
@@ -39,9 +38,6 @@ public class PostControllerTest {
 
     @Mock
     private PostService postService;
-
-    @Mock
-    private LoggingService loggingService;
 
     @Mock
     private SendEmailService sendEmailService;
