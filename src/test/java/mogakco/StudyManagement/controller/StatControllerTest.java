@@ -22,7 +22,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import mogakco.StudyManagement.enums.LogType;
 import mogakco.StudyManagement.scheduler.DailyAbsentScheduler;
-import mogakco.StudyManagement.service.common.LoggingService;
 import mogakco.StudyManagement.service.external.SendEmailService;
 import mogakco.StudyManagement.service.stat.StatService;
 
@@ -44,9 +43,6 @@ public class StatControllerTest {
 
     @Mock
     private StatService statService;
-
-    @Mock
-    private LoggingService loggingService;
 
     @Mock
     private SendEmailService sendEmailService;
@@ -154,13 +150,12 @@ public class StatControllerTest {
     @DisplayName("부재 로그 배치 작업 성공")
     public void executeDailyLog() {
         StatService statServiceMock = Mockito.mock(StatService.class);
-        LoggingService loggingServiceMock = Mockito.mock(LoggingService.class);
 
-        DailyAbsentScheduler dailyAbsentScheduler = new DailyAbsentScheduler(statServiceMock, loggingServiceMock);
+        DailyAbsentScheduler dailyAbsentScheduler = new DailyAbsentScheduler(statServiceMock);
 
         dailyAbsentScheduler.executeDailyLog();
 
-        verify(statServiceMock, times(1)).createAbsentLog(loggingServiceMock);
+        verify(statServiceMock, times(1)).createAbsentLog();
     }
 
     ////////////////////////////////////////////////////////

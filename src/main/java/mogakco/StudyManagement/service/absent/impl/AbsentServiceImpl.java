@@ -37,7 +37,6 @@ import mogakco.StudyManagement.exception.ConflictException;
 import mogakco.StudyManagement.exception.InvalidRequestException;
 import mogakco.StudyManagement.exception.NotFoundException;
 import mogakco.StudyManagement.service.absent.AbsentService;
-import mogakco.StudyManagement.service.common.LoggingService;
 import mogakco.StudyManagement.service.notice.NoticeService;
 import mogakco.StudyManagement.util.DateUtil;
 
@@ -66,13 +65,11 @@ public class AbsentServiceImpl implements AbsentService {
 
     @Override
     @Transactional
-    public CommonRes registerAbsentSchedule(AbsentReq absentReq, LoggingService lo) {
+    public CommonRes registerAbsentSchedule(AbsentReq absentReq) {
         try {
-            lo.setDBStart();
             Member member = memberRepository.findById(SecurityUtil.getLoginUserId());
             List<Schedule> scheduleList = scheduleRepository.findAllByScheduleNameIn(absentReq.getScheduleNameList());
             List<MemberSchedule> memeberScheduleList = memberScheduleRepository.findAllByMember(member);
-            lo.setDBEnd();
 
             // Check if the Schedule Name List is Empty
             if (absentReq.getScheduleNameList().isEmpty()) {
@@ -94,10 +91,9 @@ public class AbsentServiceImpl implements AbsentService {
 
             // Check if the absent schedule already exists
             for (Schedule schedule : scheduleList) {
-                lo.setDBStart();
                 long absentScheduleCnt = absentScheduleRepository
                         .countByAbsentDateAndScheduleAndMember(absentReq.getAbsentDate(), schedule, member);
-                lo.setDBEnd();
+
                 if (absentScheduleCnt > 0) {
                     throw new ConflictException(ErrorCode.CONFLICT.getMessage("부재 일정: " +
                             absentReq.getAbsentDate() + " " + schedule.getScheduleName()));
@@ -109,12 +105,10 @@ public class AbsentServiceImpl implements AbsentService {
                 AbsentSchedule absentSchedule = AbsentSchedule.builder().absentDate(absentReq.getAbsentDate())
                         .schedule(schedule).member(member).description(absentReq.getDescription())
                         .createdAt(DateUtil.getCurrentDateTime()).updatedAt(DateUtil.getCurrentDateTime()).build();
-
-                lo.setDBStart();
                 absentScheduleRepository.save(absentSchedule);
-                lo.setDBEnd();
+
             }
-            noticeService.createSpecificNotice(member, MessageType.ABSENT, lo);
+            noticeService.createSpecificNotice(member, MessageType.ABSENT);
 
             return new CommonRes(null, ErrorCode.CREATED.getCode(), ErrorCode.CREATED.getMessage("부재 일정"));
         } catch (NotFoundException | InvalidRequestException | ConflictException e) {
@@ -124,21 +118,17 @@ public class AbsentServiceImpl implements AbsentService {
     }
 
     @Override
-    public AbsentCalendarRes getAbsentScheduleByMonth(AbsentCalendarReq absentCalendarReq, LoggingService lo) {
+    public AbsentCalendarRes getAbsentScheduleByMonth(AbsentCalendarReq absentCalendarReq) {
         try {
             Specification<AbsentSchedule> spec = AbsentScheduleSpecification
                     .withYearMonth(absentCalendarReq.getYearMonth());
 
             List<Member> members = new ArrayList<>();
             if (absentCalendarReq.getMemberNameList() == null || absentCalendarReq.getMemberNameList().isEmpty()) {
-                lo.setDBStart();
                 members = memberRepository.findAll();
-                lo.setDBEnd();
             } else {
                 for (String name : absentCalendarReq.getMemberNameList()) {
-                    lo.setDBStart();
                     Member member = memberRepository.findByName(name);
-                    lo.setDBEnd();
                     if (member == null)
                         throw new NotFoundException(ErrorCode.NOT_FOUND.getMessage("스터디원 " + name));
                     members.add(member);
@@ -146,16 +136,13 @@ public class AbsentServiceImpl implements AbsentService {
             }
             spec = spec.and(AbsentScheduleSpecification.withMemberIn(members));
 
-            lo.setDBStart();
             // Get AbsentSchedules By YearMonth and MemberNameList
             List<AbsentSchedule> absentSchedules = absentScheduleRepository.findAll(spec);
-            lo.setDBEnd();
 
             Map<String, AbsentCalendar> groupedSchedules = new HashMap<>();
             for (AbsentSchedule schedule : absentSchedules) {
                 // Group By AbsentDate & ScheduleName
                 String key = schedule.getAbsentDate() + "-" + schedule.getSchedule().getScheduleName();
-
                 AbsentCalendar calendarList = groupedSchedules.getOrDefault(key,
                         new AbsentCalendar(schedule));
                 calendarList.addMemberName(schedule.getMember().getName());
@@ -183,12 +170,9 @@ public class AbsentServiceImpl implements AbsentService {
     }
 
     @Override
-    public AbsentDetailRes getAbsentScheduleDetail(AbsentDetailReq absentDetailReq, LoggingService lo) {
-
-        lo.setDBStart();
+    public AbsentDetailRes getAbsentScheduleDetail(AbsentDetailReq absentDetailReq) {
         List<AbsentSchedule> absentSchedules = absentScheduleRepository
                 .findByAbsentDate(absentDetailReq.getAbsentDate());
-        lo.setDBEnd();
 
         Map<String, AbsentDetail> groupedSchedules = new HashMap<>();
         for (AbsentSchedule schedule : absentSchedules) {
@@ -207,20 +191,17 @@ public class AbsentServiceImpl implements AbsentService {
 
     @Override
     @Transactional
-    public CommonRes updateAbsentSchedule(AbsentReq absentReq, LoggingService lo) {
+    public CommonRes updateAbsentSchedule(AbsentReq absentReq) {
 
         CommonRes result = new CommonRes();
         try {
             if (absentReq.getScheduleNameList().isEmpty()) {
                 throw new InvalidRequestException("하나 이상의 스터디 시간을 선택해야 합니다");
             }
-
-            lo.setDBStart();
             Member loginMember = memberRepository.findById(SecurityUtil.getLoginUserId());
             List<Schedule> scheduleList = scheduleRepository.findAllByScheduleNameIn(absentReq.getScheduleNameList());
             List<AbsentSchedule> absentScheduleList = absentScheduleRepository
                     .findByAbsentDateAndMember(absentReq.getAbsentDate(), loginMember);
-            lo.setDBEnd();
 
             validateScheduleNames(scheduleList, absentReq.getScheduleNameList());
 
@@ -236,43 +217,32 @@ public class AbsentServiceImpl implements AbsentService {
 
                 Set<String> removedScheduleNames = new HashSet<>(existScheduleNames);
                 removedScheduleNames.removeAll(reqScheduleNames);
-
                 Set<String> addedScheduleNames = new HashSet<>(reqScheduleNames);
                 addedScheduleNames.removeAll(existScheduleNames);
 
                 for (AbsentSchedule schedule : absentScheduleList) {
                     if (isDescriptionChanged) {
                         schedule.updateAbsentSchedule(absentReq);
-                        lo.setDBStart();
                         absentScheduleRepository.save(schedule);
-                        lo.setDBEnd();
                     }
                     // ScheduleNames to be Removed
                     if (removedScheduleNames.contains(schedule.getSchedule().getScheduleName())) {
-                        lo.setDBStart();
                         absentScheduleRepository.delete(schedule);
-                        lo.setDBEnd();
                     }
                 }
 
                 // Add new ScheduleName
                 for (String addedScheduleName : addedScheduleNames) {
-                    lo.setDBStart();
                     Schedule addedSchedule = scheduleRepository.findByScheduleName(addedScheduleName);
-                    lo.setDBEnd();
 
                     AbsentSchedule newSchedule = AbsentSchedule.builder().absentDate(absentReq.getAbsentDate())
                             .schedule(addedSchedule).member(loginMember).description(absentReq.getDescription())
                             .createdAt(DateUtil.getCurrentDateTime()).updatedAt(DateUtil.getCurrentDateTime()).build();
 
-                    lo.setDBStart();
                     absentScheduleRepository.save(newSchedule);
-                    lo.setDBEnd();
                 }
-
                 result.setRetCode(ErrorCode.OK.getCode());
                 result.setRetMsg(ErrorCode.OK.getMessage());
-
             } else {
                 result.setRetCode(ErrorCode.UNCHANGED.getCode());
                 result.setRetMsg(ErrorCode.UNCHANGED.getMessage("부재 일정"));
@@ -286,25 +256,19 @@ public class AbsentServiceImpl implements AbsentService {
 
     @Override
     @Transactional
-    public CommonRes deleteAbsentSchedule(String absentDate, LoggingService lo) {
+    public CommonRes deleteAbsentSchedule(String absentDate) {
 
         try {
-            lo.setDBStart();
             Member loginMember = memberRepository.findById(SecurityUtil.getLoginUserId());
             List<AbsentSchedule> absentScheduleList = absentScheduleRepository.findByAbsentDateAndMember(absentDate,
                     loginMember);
-            lo.setDBEnd();
-
             if (absentScheduleList.isEmpty()) {
                 throw new NotFoundException(
                         ErrorCode.NOT_FOUND.getMessage(absentDate + " " + loginMember.getName() + "의 부재일정"));
             }
             for (AbsentSchedule schedule : absentScheduleList) {
-                lo.setDBStart();
                 absentScheduleRepository.delete(schedule);
-                lo.setDBEnd();
             }
-
             return new CommonRes(null, ErrorCode.DELETED.getCode(),
                     ErrorCode.DELETED.getMessage("부재일정"));
         } catch (NotFoundException e) {

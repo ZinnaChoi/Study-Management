@@ -8,7 +8,6 @@ import org.springframework.batch.core.configuration.annotation.EnableBatchProces
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import mogakco.StudyManagement.service.common.LoggingService;
 import mogakco.StudyManagement.service.notice.NoticeService;
 
 @Configuration
@@ -17,20 +16,18 @@ import mogakco.StudyManagement.service.notice.NoticeService;
 public class StartTimeMonitoringScheduler {
 
     private final NoticeService noticeService;
-    private final LoggingService lo;
 
     @Value("${scheduling.interval}")
     private long schedulingInterval;
 
-    public StartTimeMonitoringScheduler(NoticeService noticeService, LoggingService lo) {
+    public StartTimeMonitoringScheduler(NoticeService noticeService) {
         this.noticeService = noticeService;
-        this.lo = lo;
     }
 
     @Scheduled(fixedRateString = "${scheduling.interval}")
     public void executeGeneralNotice() {
         try {
-            noticeService.createGeneralNotice(lo);
+            noticeService.createGeneralNotice();
         } catch (Exception e) {
             System.err.println("구글 링크 생성을 위한 스케줄 모니터링 작업 도중 오류가 발생했습니다: " + e.getMessage());
         }

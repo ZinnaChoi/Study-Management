@@ -12,7 +12,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import mogakco.StudyManagement.dto.CommonRes;
 import mogakco.StudyManagement.enums.ErrorCode;
-import mogakco.StudyManagement.service.common.LoggingService;
 import mogakco.StudyManagement.service.post.PostLikeService;
 
 @Tag(name = "게시글 좋아요", description = "게시글 좋아요 관련 API 분류")
@@ -23,8 +22,7 @@ public class PostLikeController extends CommonController {
 
     private final PostLikeService postLikeService;
 
-    public PostLikeController(PostLikeService postLikeService, LoggingService lo) {
-        super(lo);
+    public PostLikeController(PostLikeService postLikeService) {
         this.postLikeService = postLikeService;
     }
 
@@ -35,14 +33,11 @@ public class PostLikeController extends CommonController {
 
         CommonRes result = new CommonRes();
         try {
-            startAPI(lo, null);
-            result = postLikeService.createPostLike(postId, lo);
+            result = postLikeService.createPostLike(postId);
             result.setSystemId(systemId);
         } catch (Exception e) {
             result = new CommonRes(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
                     ErrorCode.INTERNAL_ERROR.getMessage());
-        } finally {
-            endAPI(request, findErrorCodeByCode(result.getRetCode()), lo, result);
         }
         return result;
     }
@@ -53,16 +48,12 @@ public class PostLikeController extends CommonController {
             @PathVariable(name = "postId", required = true) Long postId) {
         CommonRes result = new CommonRes();
         try {
-            startAPI(lo, null);
-            result = postLikeService.deletePostLike(postId, lo);
+            result = postLikeService.deletePostLike(postId);
             result.setSystemId(systemId);
         } catch (Exception e) {
             result = new CommonRes(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
                     ErrorCode.INTERNAL_ERROR.getMessage());
-        } finally {
-            endAPI(request, findErrorCodeByCode(result.getRetCode()), lo, result);
         }
-
         return result;
     }
 

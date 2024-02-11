@@ -24,7 +24,6 @@ import mogakco.StudyManagement.dto.AbsentReq;
 import mogakco.StudyManagement.dto.CommonRes;
 import mogakco.StudyManagement.enums.ErrorCode;
 import mogakco.StudyManagement.service.absent.AbsentService;
-import mogakco.StudyManagement.service.common.LoggingService;
 
 @Tag(name = "부재 일정", description = "부재일정 관련 API 분류")
 @SecurityRequirement(name = "bearer-key")
@@ -34,8 +33,7 @@ public class AbsentController extends CommonController {
 
     private final AbsentService absentService;
 
-    public AbsentController(AbsentService absentService, LoggingService lo) {
-        super(lo);
+    public AbsentController(AbsentService absentService) {
         this.absentService = absentService;
     }
 
@@ -46,14 +44,11 @@ public class AbsentController extends CommonController {
 
         CommonRes result = new CommonRes();
         try {
-            startAPI(lo, absentReq);
-            result = absentService.registerAbsentSchedule(absentReq, lo);
+            result = absentService.registerAbsentSchedule(absentReq);
             result.setSystemId(systemId);
         } catch (Exception e) {
             result = new CommonRes(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
                     ErrorCode.INTERNAL_ERROR.getMessage());
-        } finally {
-            endAPI(request, findErrorCodeByCode(result.getRetCode()), lo, result);
         }
         return result;
     }
@@ -65,14 +60,11 @@ public class AbsentController extends CommonController {
 
         AbsentCalendarRes result = new AbsentCalendarRes();
         try {
-            startAPI(lo, absentCalendarReq);
-            result = absentService.getAbsentScheduleByMonth(absentCalendarReq, lo);
+            result = absentService.getAbsentScheduleByMonth(absentCalendarReq);
             result.setSystemId(systemId);
         } catch (Exception e) {
             result = new AbsentCalendarRes(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
                     ErrorCode.INTERNAL_ERROR.getMessage(), null);
-        } finally {
-            endAPI(request, findErrorCodeByCode(result.getRetCode()), lo, result);
         }
         return result;
     }
@@ -84,14 +76,11 @@ public class AbsentController extends CommonController {
 
         AbsentDetailRes result = new AbsentDetailRes();
         try {
-            startAPI(lo, absentDetailReq);
-            result = absentService.getAbsentScheduleDetail(absentDetailReq, lo);
+            result = absentService.getAbsentScheduleDetail(absentDetailReq);
             result.setSystemId(systemId);
         } catch (Exception e) {
             result = new AbsentDetailRes(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
                     ErrorCode.INTERNAL_ERROR.getMessage(), null);
-        } finally {
-            endAPI(request, findErrorCodeByCode(result.getRetCode()), lo, result);
         }
         return result;
     }
@@ -103,14 +92,11 @@ public class AbsentController extends CommonController {
 
         CommonRes result = new CommonRes();
         try {
-            startAPI(lo, absentReq);
-            result = absentService.updateAbsentSchedule(absentReq, lo);
+            result = absentService.updateAbsentSchedule(absentReq);
             result.setSystemId(systemId);
         } catch (Exception e) {
             result = new CommonRes(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
                     ErrorCode.INTERNAL_ERROR.getMessage());
-        } finally {
-            endAPI(request, findErrorCodeByCode(result.getRetCode()), lo, result);
         }
         return result;
 
@@ -123,14 +109,11 @@ public class AbsentController extends CommonController {
         CommonRes result = new CommonRes();
 
         try {
-            startAPI(lo, null);
-            result = absentService.deleteAbsentSchedule(absentDate, lo);
+            result = absentService.deleteAbsentSchedule(absentDate);
             result.setSystemId(systemId);
         } catch (Exception e) {
             result = new CommonRes(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
                     ErrorCode.INTERNAL_ERROR.getMessage());
-        } finally {
-            endAPI(request, findErrorCodeByCode(result.getRetCode()), lo, result);
         }
         return result;
     }

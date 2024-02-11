@@ -15,30 +15,29 @@ import mogakco.StudyManagement.dto.MemberLoginRes;
 import mogakco.StudyManagement.dto.RegistedScheduleRes;
 import mogakco.StudyManagement.dto.RegistedWakeupRes;
 import mogakco.StudyManagement.dto.StudyMembersRes;
-import mogakco.StudyManagement.service.common.LoggingService;
 
 public interface MemberService {
     UserDetails loadUserByUsername(String username) throws UsernameNotFoundException;
 
-    MemberLoginRes login(MemberLoginReq loginInfo, LoggingService lo);
+    MemberLoginRes login(MemberLoginReq loginInfo);
 
-    CommonRes logout(LoggingService lo);
+    CommonRes logout();
 
-    CommonRes join(MemberJoinReq joinInfo, LoggingService lo);
+    CommonRes join(MemberJoinReq joinInfo);
 
-    boolean isIdDuplicated(MemberIdDuplReq idInfo, LoggingService lo);
+    boolean isIdDuplicated(MemberIdDuplReq idInfo);
 
-    MemberInfoRes getMemberInfo(LoggingService lo);
+    MemberInfoRes getMemberInfo();
 
-    MemberListRes getMemberList(LoggingService lo);
+    MemberListRes getMemberList();
 
-    CommonRes setMemberInfo(MemberInfoUpdateReq updateInfo, LoggingService lo);
+    CommonRes setMemberInfo(MemberInfoUpdateReq updateInfo);
 
-    StudyMembersRes getMembersBySchedule(LoggingService lo, String schedule, Pageable pageable);
+    StudyMembersRes getMembersBySchedule(String schedule, Pageable pageable);
 
-    StudyMembersRes getMembersByWakeupTime(LoggingService lo, String time, Pageable pageable);
+    StudyMembersRes getMembersByWakeupTime(String time, Pageable pageable);
 
-    RegistedScheduleRes getRegistedSchedule(LoggingService lo);
+    RegistedScheduleRes getRegistedSchedule();
 
-    RegistedWakeupRes getRegistedWakeup(LoggingService lo);
+    RegistedWakeupRes getRegistedWakeup();
 }

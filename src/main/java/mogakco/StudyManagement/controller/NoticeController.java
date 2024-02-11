@@ -18,7 +18,6 @@ import mogakco.StudyManagement.dto.CommonRes;
 import mogakco.StudyManagement.dto.NoticeGetRes;
 import mogakco.StudyManagement.dto.NoticeReq;
 import mogakco.StudyManagement.enums.ErrorCode;
-import mogakco.StudyManagement.service.common.LoggingService;
 import mogakco.StudyManagement.service.notice.NoticeService;
 
 @Tag(name = "알림", description = "알림 관련 API 분류")
@@ -29,8 +28,7 @@ public class NoticeController extends CommonController {
 
     private final NoticeService noticeService;
 
-    public NoticeController(NoticeService noticeService, LoggingService lo) {
-        super(lo);
+    public NoticeController(NoticeService noticeService) {
         this.noticeService = noticeService;
     }
 
@@ -42,14 +40,10 @@ public class NoticeController extends CommonController {
         NoticeGetRes result = new NoticeGetRes();
 
         try {
-            startAPI(lo, null);
-            result = noticeService.getNotice(memberId, lo);
-
+            result = noticeService.getNotice(memberId);
         } catch (Exception e) {
             result = new NoticeGetRes(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
                     ErrorCode.INTERNAL_ERROR.getMessage(), null);
-        } finally {
-            endAPI(request, findErrorCodeByCode(result.getRetCode()), lo, result);
         }
 
         return result;
@@ -64,17 +58,13 @@ public class NoticeController extends CommonController {
         CommonRes result = new CommonRes();
 
         try {
-            startAPI(lo, null);
-            result = noticeService.updateNotice(memberId, noticeReq, lo);
+            result = noticeService.updateNotice(memberId, noticeReq);
             result.setSystemId(systemId);
         } catch (Exception e) {
             e.printStackTrace();
             result = new CommonRes(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
                     ErrorCode.INTERNAL_ERROR.getMessage());
-        } finally {
-            endAPI(request, ErrorCode.OK, lo, result);
         }
-
         return result;
     }
 
@@ -86,13 +76,10 @@ public class NoticeController extends CommonController {
 
         CommonRes result = new CommonRes();
         try {
-            startAPI(lo, null);
-            result = noticeService.createGeneralNotice(lo);
+            result = noticeService.createGeneralNotice();
         } catch (Exception e) {
             result = new CommonRes(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
                     ErrorCode.INTERNAL_ERROR.getMessage());
-        } finally {
-            endAPI(request, findErrorCodeByCode(result.getRetCode()), lo, result);
         }
         return result;
     }

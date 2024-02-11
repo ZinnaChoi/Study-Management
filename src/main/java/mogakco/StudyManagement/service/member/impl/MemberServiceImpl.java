@@ -10,8 +10,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.domain.Page;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -48,7 +46,6 @@ import mogakco.StudyManagement.repository.MemberScheduleRepository;
 import mogakco.StudyManagement.repository.ScheduleRepository;
 import mogakco.StudyManagement.repository.StudyInfoRepository;
 import mogakco.StudyManagement.repository.WakeUpRepository;
-import mogakco.StudyManagement.service.common.LoggingService;
 import mogakco.StudyManagement.service.member.MemberService;
 import mogakco.StudyManagement.util.DateUtil;
 import mogakco.StudyManagement.util.ExceptionUtil;
@@ -102,11 +99,10 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
     }
 
     @Override
-    public MemberLoginRes login(MemberLoginReq loginInfo, LoggingService lo) {
+    public MemberLoginRes login(MemberLoginReq loginInfo) {
         MemberLoginRes response = new MemberLoginRes();
-        lo.setDBStart();
+
         Member member = memberRepository.findById(loginInfo.getId());
-        lo.setDBEnd();
 
         if (member == null) {
             response.setRetMsg(ErrorCode.NOT_FOUND.getMessage("Member"));
@@ -141,22 +137,20 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
     }
 
     @Override
-    public CommonRes logout(LoggingService lo) {
+    public CommonRes logout() {
         String loginUserId = SecurityUtil.getLoginUserId();
 
-        lo.setDBStart();
         // redis에 접속한 아이디 정보가 있다면 삭제(정보가 있다는 것은 아직 로그아웃 하지 않은 것)
         if (redisTemplate.opsForValue().get("JWT:" + loginUserId) != null) {
             redisTemplate.delete("JWT:" + loginUserId); // redis 내 Token 삭제
         }
-        lo.setDBEnd();
 
         return new CommonRes(systemId, ErrorCode.OK.getCode(), ErrorCode.OK.getMessage());
     }
 
     @Override
     @Transactional
-    public CommonRes join(MemberJoinReq joinInfo, LoggingService lo) {
+    public CommonRes join(MemberJoinReq joinInfo) {
         CommonRes result = new CommonRes(systemId, ErrorCode.OK.getCode(), ErrorCode.OK.getMessage());
         Member member = Member.builder()
                 .id(joinInfo.getId())
@@ -173,9 +167,9 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
                 .build();
 
         List<MemberSchedule> mSchedules = new ArrayList<>();
-        lo.setDBStart();
+
         List<Schedule> schedules = scheduleRepository.findAllByScheduleNameIn(joinInfo.getScheduleNames());
-        lo.setDBEnd();
+
         if (schedules.size() != 0) {
             for (Schedule s : schedules) {
                 mSchedules.add(MemberSchedule.builder()
@@ -185,11 +179,11 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
                         .updatedAt(DateUtil.getCurrentDateTime())
                         .build());
             }
-            lo.setDBStart();
+
             memberRepository.save(member);
             wakeUpRepository.save(wakeUp);
             memberScheduleRepository.saveAll(mSchedules);
-            lo.setDBEnd();
+
         } else {
             result = new CommonRes(systemId, ErrorCode.BAD_REQUEST.getCode(),
                     ErrorCode.BAD_REQUEST.getMessage(joinInfo.getScheduleNames() + " Schedule is Not Regist"));
@@ -199,17 +193,15 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
     }
 
     @Override
-    public boolean isIdDuplicated(MemberIdDuplReq idInfo, LoggingService lo) {
-        lo.setDBStart();
-        boolean isExist = memberRepository.existsById(idInfo.getId());
-        lo.setDBEnd();
+    public boolean isIdDuplicated(MemberIdDuplReq idInfo) {
 
+        boolean isExist = memberRepository.existsById(idInfo.getId());
         return isExist;
     }
 
     @Override
     @Transactional(readOnly = true)
-    public MemberInfoRes getMemberInfo(LoggingService lo) {
+    public MemberInfoRes getMemberInfo() {
         MemberInfoRes result = new MemberInfoRes();
 
         result.setSystemId(systemId);
@@ -243,18 +235,14 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
 
     @Override
     @Transactional(readOnly = true)
-    public MemberListRes getMemberList(LoggingService lo) {
-
-        lo.setDBStart();
+    public MemberListRes getMemberList() {
         List<Member> content = memberRepository.findAll();
-        lo.setDBEnd();
-
         return new MemberListRes(systemId, ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), content);
     }
 
     @Override
     @Transactional
-    public CommonRes setMemberInfo(MemberInfoUpdateReq updateInfo, LoggingService lo) {
+    public CommonRes setMemberInfo(MemberInfoUpdateReq updateInfo) {
         CommonRes result = new CommonRes(systemId, ErrorCode.OK.getCode(), ErrorCode.OK.getMessage());
 
         Member member = memberRepository.findById(SecurityUtil.getLoginUserId());
@@ -266,9 +254,9 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
                     return ExceptionUtil.handleException(new InvalidRequestException("변경할 이름을 입력해주세요"));
                 }
                 member.updateName(changedName);
-                lo.setDBStart();
+
                 memberRepository.save(member);
-                lo.setDBEnd();
+
                 break;
             case SCHEDULE_NAMES:
                 // member_schedule 테이블 업데이트
@@ -276,10 +264,9 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
                 if (userScheduleNames == null || userScheduleNames.size() == 0) {
                     return ExceptionUtil.handleException(new InvalidRequestException("참여 스터디 스케줄을 선택해주세요"));
                 }
-                lo.setDBStart();
+
                 List<MemberSchedule> mSchedules = memberScheduleRepository.findAllByMember(member);
                 List<Schedule> userSchedules = scheduleRepository.findAllByScheduleNameIn(userScheduleNames);
-                lo.setDBEnd();
 
                 List<String> dbScheduleNames = mSchedules.stream().map(m -> m.getSchedule().getScheduleName())
                         .collect(Collectors.toList());
@@ -287,11 +274,11 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
                 List<MemberSchedule> toInsert = calculateInserts(userSchedules, dbScheduleNames, member);
                 List<MemberSchedule> toUpdate = calculateUpdates(userSchedules, dbScheduleNames, mSchedules);
                 List<MemberSchedule> toDelete = calculateDeletes(userScheduleNames, mSchedules);
-                lo.setDBStart();
+
                 memberScheduleRepository.deleteAll(toDelete);
                 memberScheduleRepository.saveAll(toInsert);
                 memberScheduleRepository.saveAll(toUpdate);
-                lo.setDBEnd();
+
                 break;
             case WAKEUP:
                 // wakeup 테이블 업데이트
@@ -301,18 +288,18 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
                 }
                 WakeUp wakeUp = wakeUpRepository.findByMember(member);
                 wakeUp.updateWakeupTime(changedWakeupTime);
-                lo.setDBStart();
+
                 wakeUpRepository.save(wakeUp);
-                lo.setDBEnd();
+
                 break;
 
             case CONTACT:
                 // member 테이블 업데이트
                 String changedContact = updateInfo.getContact();
                 member.updateContact(changedContact);
-                lo.setDBStart();
+
                 memberRepository.save(member);
-                lo.setDBEnd();
+
                 break;
             case PASSWORD:
                 // member 테이블 업데이트
@@ -324,9 +311,9 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
                 }
                 // 비밀번호 암호화
                 member.updatePassword(bCryptPasswordEncoder.encode(changedPassword));
-                lo.setDBStart();
+
                 memberRepository.save(member);
-                lo.setDBEnd();
+
                 break;
             default:
                 break;
@@ -337,32 +324,32 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
     }
 
     @Override
-    public StudyMembersRes getMembersBySchedule(LoggingService lo, String sName, Pageable pageable) {
+    public StudyMembersRes getMembersBySchedule(String sName, Pageable pageable) {
 
         List<MemberInfo> memberInfos = new ArrayList<>();
         List<Member> members = new ArrayList<>();
         SimplePageable simplePageable;
 
         if (sName == null) { // 전체 조회
-            lo.setDBStart();
+
             // admin 계정은 조회 X
             Page<Member> pMembers = memberRepository.findAllByRoleNot(MemberRole.ADMIN,
                     pageable);
-            lo.setDBEnd();
+
             members = pMembers.getContent();
             simplePageable = PageUtil.createSimplePageable(pMembers);
         } else {
             // 멤버 스케줄에서 스케줄 이름으로 조건 걸어서 가져온 member_id로 member에서 id, name 조회
-            lo.setDBStart();
+
             Schedule schedule = scheduleRepository.findByScheduleName(sName);
             Page<MemberSchedule> pSchedules = memberScheduleRepository.findAllBySchedule(schedule, pageable);
-            lo.setDBEnd();
+
             List<Member> mSchedules = pSchedules.getContent().stream().map(MemberSchedule::getMember)
                     .collect(Collectors.toList());
             Set<Long> ids = mSchedules.stream().map(Member::getMemberId).collect(Collectors.toSet());
-            lo.setDBStart();
+
             members = memberRepository.findAllById(ids);
-            lo.setDBEnd();
+
             simplePageable = PageUtil.createSimplePageable(pSchedules);
         }
 
@@ -376,20 +363,20 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
     }
 
     @Override
-    public StudyMembersRes getMembersByWakeupTime(LoggingService lo, String time, Pageable pageable) {
+    public StudyMembersRes getMembersByWakeupTime(String time, Pageable pageable) {
 
         Page<WakeUp> pWakeUp;
         List<MemberInfo> memberInfos = new ArrayList<>();
-        lo.setDBStart();
+
         pWakeUp = time == null ? wakeUpRepository.findAll(pageable)
                 : wakeUpRepository.findAllByWakeupTime(time, pageable);
-        lo.setDBEnd();
+
         List<Member> mWakeUp = pWakeUp.getContent().stream().map(WakeUp::getMember)
                 .collect(Collectors.toList());
         List<Long> ids = mWakeUp.stream().map(Member::getMemberId).collect(Collectors.toList());
-        lo.setDBStart();
+
         List<Member> members = memberRepository.findAllById(ids);
-        lo.setDBEnd();
+
         members.stream().map(m -> {
             memberInfos.add(new MemberInfo(m.getId(), m.getName()));
             return m;
@@ -401,12 +388,11 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
     }
 
     @Override
-    public RegistedScheduleRes getRegistedSchedule(LoggingService lo) {
+    public RegistedScheduleRes getRegistedSchedule() {
 
         // 스케줄 테이블에서 전체 조회 후 set
-        lo.setDBStart();
+
         List<Schedule> schedules = scheduleRepository.findAll();
-        lo.setDBEnd();
 
         List<RegistedSchedule> result = new ArrayList<>();
         for (Schedule sch : schedules) {
@@ -423,11 +409,10 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
     }
 
     @Override
-    public RegistedWakeupRes getRegistedWakeup(LoggingService lo) {
+    public RegistedWakeupRes getRegistedWakeup() {
         // 기상 시간 테이블에서 전체 조회 후 set
-        lo.setDBStart();
+
         List<WakeUp> wakeUps = wakeUpRepository.findAll();
-        lo.setDBEnd();
 
         Set<String> result = wakeUps.stream().map(WakeUp::getWakeupTime).collect(Collectors.toSet());
 

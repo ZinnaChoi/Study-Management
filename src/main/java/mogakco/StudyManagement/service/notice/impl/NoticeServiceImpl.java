@@ -27,7 +27,6 @@ import mogakco.StudyManagement.repository.MemberRepository;
 import mogakco.StudyManagement.repository.MemberScheduleRepository;
 import mogakco.StudyManagement.repository.NoticeRepository;
 import mogakco.StudyManagement.repository.ScheduleRepository;
-import mogakco.StudyManagement.service.common.LoggingService;
 import mogakco.StudyManagement.service.external.SendEmailService;
 import mogakco.StudyManagement.service.notice.NoticeService;
 import mogakco.StudyManagement.util.DateUtil;
@@ -63,12 +62,9 @@ public class NoticeServiceImpl implements NoticeService {
     SendEmailService sendEmailService;
 
     @Override
-    public NoticeGetRes getNotice(Long memberId, LoggingService lo) {
+    public NoticeGetRes getNotice(Long memberId) {
 
-        lo.setDBStart();
         Optional<Notice> noticeOptional = noticeRepository.findByMember_MemberId(memberId);
-        lo.setDBEnd();
-
         if (noticeOptional.isPresent()) {
             Notice notice = noticeOptional.get();
             NoticeList noticeList = new NoticeList(notice);
@@ -81,20 +77,16 @@ public class NoticeServiceImpl implements NoticeService {
 
     @Override
     @Transactional
-    public CommonRes updateNotice(Long memberId, NoticeReq noticeReq, LoggingService lo) {
+    public CommonRes updateNotice(Long memberId, NoticeReq noticeReq) {
 
         try {
             CommonRes result = new CommonRes();
-            lo.setDBStart();
             Optional<Notice> noticeOptional = noticeRepository.findByMember_MemberId(memberId);
 
             if (noticeOptional.isPresent()) {
                 Notice notice = noticeOptional.get();
-
                 if (notice.isNoticeChanged(noticeReq)) {
-                    lo.setDBStart();
                     noticeRepository.save(notice.updateNotice(noticeReq));
-                    lo.setDBEnd();
                     result.setRetCode(ErrorCode.OK.getCode());
                     result.setRetMsg(ErrorCode.OK.getMessage("알림 상태"));
                 } else {
@@ -113,62 +105,43 @@ public class NoticeServiceImpl implements NoticeService {
 
     @Override
     @Transactional
-    public CommonRes createGeneralNotice(LoggingService lo) {
+    public CommonRes createGeneralNotice() {
         try {
             CommonRes result = new CommonRes();
 
             String formattedTime = LocalDateTime.now().plusMinutes(10).format(DateTimeFormatter.ofPattern("HH:mm"));
 
-            lo.setDBStart();
             Schedule upcomingSchedulesId = scheduleRepository.findScheduleIdMatchingStartTime(formattedTime);
-            lo.setDBEnd();
 
             if (upcomingSchedulesId != null) {
-
-                lo.setDBStart();
                 List<Member> scheduleParticipants = memberScheduleRepository
                         .findMembersByScheduleId(upcomingSchedulesId.getScheduleId());
-                lo.setDBEnd();
-
                 List<Member> participants = new ArrayList<>(scheduleParticipants);
 
                 for (Member participant : scheduleParticipants) {
-
-                    lo.setDBStart();
                     List<Member> absentParticipants = absentScheduleRepository
                             .findAbsentParticipants(participant, DateUtil.getCurrentDateTime().substring(0, 8),
                                     upcomingSchedulesId);
-                    lo.setDBEnd();
-
                     participants.removeAll(absentParticipants);
                 }
 
                 Long notifier = findNotifier(participants);
-
-                lo.setDBStart();
                 Optional<Member> notifierMember = memberRepository.findById(notifier);
-                lo.setDBEnd();
 
                 try {
-
                     Boolean linkShareValue = noticeRepository.findByMember_MemberId(notifier).get().getLinkShare();
                     if (linkShareValue != null && linkShareValue) {
                         sendEmailService.sendEmail(notifierMember.get().getName(), MessageType.GENERAL,
                                 notifierMember.get().getContact());
-                        lo.setDBStart();
                     }
-
-                    lo.setDBStart();
                     noticeRepository.updateLastShareDateByMemberId(DateUtil.getCurrentDateTime().substring(0, 12),
                             notifier);
-                    lo.setDBEnd();
 
                     result.setRetCode(ErrorCode.OK.getCode());
                 } catch (NotFoundException | UnauthorizedAccessException e) {
                     return ExceptionUtil.handleException(e);
                 }
             }
-
             return result;
         } catch (NotFoundException | UnauthorizedAccessException e) {
             return ExceptionUtil.handleException(e);
@@ -189,11 +162,10 @@ public class NoticeServiceImpl implements NoticeService {
         return null;
     }
 
-    public void createSpecificNotice(Member member, MessageType type, LoggingService lo) {
+    public void createSpecificNotice(Member member, MessageType type) {
 
         List<Long> targetedMembers = new ArrayList<>();
         try {
-
             switch (type) {
                 case ABSENT:
                     targetedMembers = noticeRepository.findMemberIdByAbsentIsTrue();
@@ -212,7 +184,6 @@ public class NoticeServiceImpl implements NoticeService {
         }
 
         for (Long targetedMemberId : targetedMembers) {
-
             Optional<Member> mmember = memberRepository.findById(targetedMemberId);
             sendEmailService.sendEmail(member.getName(), type, mmember.get().getContact());
         }

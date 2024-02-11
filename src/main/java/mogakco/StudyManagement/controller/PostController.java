@@ -24,7 +24,6 @@ import mogakco.StudyManagement.dto.PostListReq;
 import mogakco.StudyManagement.dto.PostListRes;
 import mogakco.StudyManagement.dto.PostReq;
 import mogakco.StudyManagement.enums.ErrorCode;
-import mogakco.StudyManagement.service.common.LoggingService;
 import mogakco.StudyManagement.service.post.PostService;
 
 @Tag(name = "게시판", description = "게시판 관련 API 분류")
@@ -35,26 +34,21 @@ public class PostController extends CommonController {
 
     private final PostService postService;
 
-    public PostController(PostService postService, LoggingService lo) {
-        super(lo);
+    public PostController(PostService postService) {
         this.postService = postService;
     }
 
     @Operation(summary = "게시글 등록", description = "새 게시글 추가")
     @PostMapping("/posts")
     public CommonRes createPost(HttpServletRequest request, @RequestBody @Valid PostReq postCreateReq) {
-
         CommonRes result = new CommonRes();
         try {
-            startAPI(lo, postCreateReq);
-            postService.createPost(postCreateReq, lo);
+            postService.createPost(postCreateReq);
             result = new CommonRes(systemId, ErrorCode.CREATED.getCode(),
                     ErrorCode.CREATED.getMessage("게시글"));
         } catch (Exception e) {
             result = new CommonRes(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
                     ErrorCode.INTERNAL_ERROR.getMessage());
-        } finally {
-            endAPI(request, findErrorCodeByCode(result.getRetCode()), lo, result);
         }
         return result;
     }
@@ -64,17 +58,13 @@ public class PostController extends CommonController {
     public PostListRes getPostList(
             HttpServletRequest request, @ModelAttribute @Valid PostListReq postListReq,
             @PageableDefault(size = 10, page = 0, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
-
         PostListRes result = new PostListRes();
         try {
-            startAPI(lo, postListReq);
-            result = postService.getPostList(postListReq, lo, pageable);
+            result = postService.getPostList(postListReq, pageable);
             result.setSystemId(systemId);
         } catch (Exception e) {
             result = new PostListRes(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
                     ErrorCode.INTERNAL_ERROR.getMessage(), null, null);
-        } finally {
-            endAPI(request, findErrorCodeByCode(result.getRetCode()), lo, result);
         }
         return result;
     }
@@ -83,18 +73,14 @@ public class PostController extends CommonController {
     @GetMapping("/posts/{postId}")
     public PostDetailRes getPostDetail(HttpServletRequest request,
             @PathVariable(name = "postId", required = true) Long postId) {
-
         PostDetailRes result = new PostDetailRes();
 
         try {
-            startAPI(lo, null);
-            result = postService.getPostDetail(postId, lo);
+            result = postService.getPostDetail(postId);
             result.setSystemId(systemId);
         } catch (Exception e) {
             result = new PostDetailRes(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
                     ErrorCode.INTERNAL_ERROR.getMessage(), null);
-        } finally {
-            endAPI(request, findErrorCodeByCode(result.getRetCode()), lo, result);
         }
         return result;
 
@@ -107,14 +93,11 @@ public class PostController extends CommonController {
             @RequestBody @Valid PostReq postUpdateReq) {
         CommonRes result = new CommonRes();
         try {
-            startAPI(lo, postUpdateReq);
-            result = postService.updatePost(postId, postUpdateReq, lo);
+            result = postService.updatePost(postId, postUpdateReq);
             result.setSystemId(systemId);
         } catch (Exception e) {
             result = new CommonRes(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
                     ErrorCode.INTERNAL_ERROR.getMessage());
-        } finally {
-            endAPI(request, findErrorCodeByCode(result.getRetCode()), lo, result);
         }
         return result;
 
@@ -126,16 +109,12 @@ public class PostController extends CommonController {
             @PathVariable(name = "postId", required = true) Long postId) {
         CommonRes result = new CommonRes();
         try {
-            startAPI(lo, null);
-            result = postService.deletePost(postId, lo);
+            result = postService.deletePost(postId);
             result.setSystemId(systemId);
         } catch (Exception e) {
             result = new CommonRes(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
                     ErrorCode.INTERNAL_ERROR.getMessage());
-        } finally {
-            endAPI(request, findErrorCodeByCode(result.getRetCode()), lo, result);
         }
-
         return result;
     }
 

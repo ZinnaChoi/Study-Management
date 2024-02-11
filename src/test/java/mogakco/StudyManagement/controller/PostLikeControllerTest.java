@@ -15,7 +15,6 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
-import mogakco.StudyManagement.service.common.LoggingService;
 import mogakco.StudyManagement.service.external.SendEmailService;
 import mogakco.StudyManagement.service.post.PostLikeService;
 import mogakco.StudyManagement.util.TestUtil;
@@ -29,9 +28,6 @@ public class PostLikeControllerTest {
 
     @Mock
     private PostLikeService postLikeService;
-
-    @Mock
-    private LoggingService loggignService;
 
     @Mock
     private SendEmailService sendEmailService;

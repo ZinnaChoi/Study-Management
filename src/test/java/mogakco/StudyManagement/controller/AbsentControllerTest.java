@@ -22,7 +22,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import mogakco.StudyManagement.dto.AbsentReq;
 import mogakco.StudyManagement.service.absent.AbsentService;
-import mogakco.StudyManagement.service.common.LoggingService;
 import mogakco.StudyManagement.service.external.SendEmailService;
 
 import mogakco.StudyManagement.util.TestUtil;
@@ -39,9 +38,6 @@ public class AbsentControllerTest {
 
     @Mock
     private AbsentService absentService;
-
-    @Mock
-    private LoggingService loggingService;
 
     @Mock
     private SendEmailService sendEmailService;
