@@ -122,7 +122,7 @@ const PostDetailPopup = ({ postId, onRefresh, setShowDetailPopup }) => {
     }
 
     const commentData = {
-      content: newComment,
+      content: newComment.replace(/\n/g, "<br>"),
     };
 
     authClient

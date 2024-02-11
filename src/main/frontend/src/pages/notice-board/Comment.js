@@ -4,12 +4,15 @@ import "../../styles/Button.css";
 
 const Comment = ({ comment, onSave, onDelete, loginMemberName }) => {
   const [isEditing, setIsEditing] = useState(false);
-  const [editedContent, setEditedContent] = useState(comment.content);
+  const [editedContent, setEditedContent] = useState(
+    comment.content.replace(/<br\s*\/?>/gi, "\n")
+  );
 
   const handleEdit = () => setIsEditing(true);
 
   const handleSave = () => {
-    onSave(comment.commentId, editedContent);
+    const formattedContent = editedContent.replace(/\n/g, "<br>");
+    onSave(comment.commentId, formattedContent);
     setIsEditing(false);
   };
 
@@ -17,7 +20,7 @@ const Comment = ({ comment, onSave, onDelete, loginMemberName }) => {
 
   const handleCancel = () => {
     setIsEditing(false);
-    setEditedContent(comment.content);
+    setEditedContent(comment.content.replace(/<br\s*\/?>/gi, "\n"));
   };
 
   const isLoginMember = comment.memberName === loginMemberName;
@@ -30,11 +33,11 @@ const Comment = ({ comment, onSave, onDelete, loginMemberName }) => {
       </span>
       {isEditing ? (
         <>
-          <input
-            type="text"
+          <textarea
+            className="comment-input"
             value={editedContent}
             onChange={handleChange}
-            className="comment-input"
+            rows={4} // Adjust the number of rows as needed
           />
           {isLoginMember && (
             <>
@@ -54,24 +57,22 @@ const Comment = ({ comment, onSave, onDelete, loginMemberName }) => {
           )}
         </>
       ) : (
+        <div
+          className="comment-content"
+          dangerouslySetInnerHTML={{ __html: comment.content }}
+        />
+      )}
+      {isLoginMember && !isEditing && (
         <>
-          <span className="comment-content">{comment.content}</span>
-          {isLoginMember && (
-            <>
-              <button
-                onClick={handleEdit}
-                className="comment-edit-btn edit-btn"
-              >
-                수정
-              </button>
-              <button
-                onClick={() => onDelete(comment.commentId)}
-                className="comment-delete-btn delete-btn"
-              >
-                삭제
-              </button>
-            </>
-          )}
+          <button onClick={handleEdit} className="comment-edit-btn edit-btn">
+            수정
+          </button>
+          <button
+            onClick={() => onDelete(comment.commentId)}
+            className="comment-delete-btn delete-btn"
+          >
+            삭제
+          </button>
         </>
       )}
     </div>
