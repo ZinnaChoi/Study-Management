@@ -269,7 +269,7 @@ public class PostControllerTest {
                 new PostReq("Updated Title", "Updated Content"));
 
         TestUtil.performRequest(mockMvc,
-                POST_API_URL + "/" + getLatestPostIdByMemberId("PostUser"), requestBodyJson, "PATCH", 200, 400);
+                POST_API_URL + "/" + getLatestPostIdByMemberId("PostUser"), requestBodyJson, "PATCH", 200, 401);
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -299,7 +299,7 @@ public class PostControllerTest {
     @DisplayName("게시글 삭제 실패 - 잘못된 사용자")
     public void deletePostFailDiffMember() throws Exception {
         TestUtil.performRequest(mockMvc,
-                POST_API_URL + "/" + getLatestPostIdByMemberId("PostUser"), null, "DELETE", 200, 400);
+                POST_API_URL + "/" + getLatestPostIdByMemberId("PostUser"), null, "DELETE", 200, 401);
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
