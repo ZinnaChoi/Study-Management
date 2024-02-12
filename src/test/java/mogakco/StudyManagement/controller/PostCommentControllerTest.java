@@ -263,7 +263,7 @@ public class PostCommentControllerTest {
                                 .replace("{commentId}", getLatestCommentIdByContentAndMemberId("comment1", "PostUser")
                                                 .toString());
 
-                TestUtil.performRequest(mockMvc, url, requestBodyJson, "PATCH", 200, 400);
+                TestUtil.performRequest(mockMvc, url, requestBodyJson, "PATCH", 200, 401);
 
         }
 
@@ -319,7 +319,7 @@ public class PostCommentControllerTest {
                                 .replace("{postId}", getLatestPostIdByMemberId("PostUser").toString())
                                 .replace("{commentId}", getLatestCommentIdByContentAndMemberId("comment1", "PostUser")
                                                 .toString());
-                TestUtil.performRequest(mockMvc, url, null, "DELETE", 200, 400);
+                TestUtil.performRequest(mockMvc, url, null, "DELETE", 200, 401);
 
         }
 
