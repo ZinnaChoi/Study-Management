@@ -141,7 +141,7 @@ public class PostServiceImpl extends PostCommonService implements PostService {
 
             if (!post.getMember().equals(loginMember)) {
                 throw new UnauthorizedAccessException(
-                        ErrorCode.BAD_REQUEST.getMessage("작성하지 않은 게시글은 수정할 수 없습니다."));
+                        ErrorCode.UNAUTHORIZED.getMessage("작성하지 않은 게시글은 수정할 수 없습니다."));
             }
             if (post.isPostChanged(postUpdateReq)) {
                 post.updatePost(postUpdateReq);
@@ -168,7 +168,7 @@ public class PostServiceImpl extends PostCommonService implements PostService {
 
             if (!post.getMember().equals(loginMember)) {
                 throw new UnauthorizedAccessException(
-                        ErrorCode.BAD_REQUEST.getMessage("작성하지 않은 게시글은 삭제할 수 없습니다."));
+                        ErrorCode.UNAUTHORIZED.getMessage("작성하지 않은 게시글은 삭제할 수 없습니다."));
             }
             postRepository.delete(post);
 

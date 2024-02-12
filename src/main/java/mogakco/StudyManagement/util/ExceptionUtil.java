@@ -16,8 +16,10 @@ public class ExceptionUtil {
         ErrorCode errorCode;
         if (e instanceof NotFoundException) {
             errorCode = ErrorCode.NOT_FOUND;
-        } else if (e instanceof InvalidRequestException || e instanceof UnauthorizedAccessException) {
+        } else if (e instanceof InvalidRequestException) {
             errorCode = ErrorCode.BAD_REQUEST;
+        } else if (e instanceof UnauthorizedAccessException) {
+            errorCode = ErrorCode.UNAUTHORIZED;
         } else if (e instanceof ConflictException) {
             errorCode = ErrorCode.CONFLICT;
         } else {
