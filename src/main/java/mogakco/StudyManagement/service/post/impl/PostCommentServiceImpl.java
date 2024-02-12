@@ -111,7 +111,7 @@ public class PostCommentServiceImpl extends PostCommonService implements PostCom
 
             if (!postComment.getMember().equals(loginMember)) {
                 throw new UnauthorizedAccessException(
-                        ErrorCode.BAD_REQUEST.getMessage("작성하지 않은 댓글은 수정할 수 없습니다."));
+                        ErrorCode.UNAUTHORIZED.getMessage("작성하지 않은 댓글은 수정할 수 없습니다."));
             }
             if (postComment.isPostCommentChanged(postCommentReq)) {
                 postComment.updatePostComment(postCommentReq);
@@ -140,7 +140,7 @@ public class PostCommentServiceImpl extends PostCommonService implements PostCom
 
             if (!postComment.getMember().equals(loginMember)) {
                 throw new UnauthorizedAccessException(
-                        ErrorCode.BAD_REQUEST.getMessage("작성하지 않은 댓글(답글)은 삭제할 수 없습니다."));
+                        ErrorCode.UNAUTHORIZED.getMessage("작성하지 않은 댓글(답글)은 삭제할 수 없습니다."));
             }
 
             postCommentRepository.delete(postComment);
