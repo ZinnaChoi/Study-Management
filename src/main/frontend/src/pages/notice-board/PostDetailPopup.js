@@ -28,7 +28,9 @@ const PostDetailPopup = ({ postId, onRefresh, setShowDetailPopup }) => {
             likes: detailedPost.likes,
           });
           setEditedTitle(detailedPost.title);
-          setEditedContent(detailedPost.content.replace(/<br\s*\/?>/gi, "\n"));
+          setEditedContent(
+            (detailedPost.content || "").replace(/<br\s*\/?>/gi, "\n")
+          );
         }
       })
       .catch((error) => {
