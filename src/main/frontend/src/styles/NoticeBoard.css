@@ -33,3 +33,119 @@
 .addButton {
   flex: 0.5;
 }
+
+.post-detail-fullscreen {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+.post-detail-header {
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.comment-actions {
+  display: flex;
+}
+
+.post-detail-container {
+  width: 100%;
+  border: 1px solid #ccc;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  padding: 20px;
+}
+
+.like-icon {
+  font-size: 30px;
+  cursor: pointer;
+  margin-right: 10px;
+}
+
+.liked {
+  color: red;
+}
+
+.post-author {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.post-comments {
+  width: 100%;
+  border-top: 1px solid #ccc;
+  padding-top: 20px;
+}
+
+.post-comments h3,
+.post-comments textarea,
+.post-comments .comment-button-group {
+  display: block;
+  width: 100%;
+}
+
+.post-comments .comment-button-group {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 10px;
+}
+
+.comment {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px;
+  border-top: 1px solid #ccc;
+  margin-top: 10px;
+}
+
+.comment-author {
+  margin-right: 10px;
+  font-weight: bold;
+}
+
+.comment-date {
+  margin-right: 10px;
+}
+
+.comment-content {
+  flex-grow: 1;
+}
+
+.comment-input {
+  flex-grow: 1;
+  margin-right: 10px;
+}
+
+.comment-actions {
+  display: flex;
+}
+
+.comment-edit-btn,
+.comment-delete-btn,
+.comment-save-btn,
+.comment-cancel-btn {
+  cursor: pointer;
+}
+
+.text-area {
+  height: 100px;
+  margin-top: 10px;
+}
+
+.post-edit {
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
+.edit-actions {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1rem;
+}

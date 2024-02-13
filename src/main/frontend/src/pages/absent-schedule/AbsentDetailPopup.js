@@ -32,7 +32,7 @@ const AbsentDetailPopup = ({ selectedDate, onClose, onRefresh }) => {
       })
       .catch((error) => {
         alert(
-          "스터디원의 정보 조회 실패: " +
+          "스터디원 정보 조회 실패: " +
             (error.response?.data.retMsg || "Unknown error")
         );
       });

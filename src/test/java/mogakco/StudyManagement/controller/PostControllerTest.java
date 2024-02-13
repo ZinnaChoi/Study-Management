@@ -213,6 +213,7 @@ public class PostControllerTest {
 
         assertEquals("comment1", comments.path("content").asText());
         assertEquals(1, comments.path("replyCnt").asInt());
+        assertEquals(1, getViewCntByPostId(getLatestPostIdByMemberId("PostUser")));
     }
 
     @Test
@@ -309,6 +310,13 @@ public class PostControllerTest {
                 "SELECT post_id FROM post WHERE member_id = (SELECT member_id FROM member WHERE id = ?) AND title = 'post2'",
                 Long.class,
                 memberId);
+    }
+
+    public Long getViewCntByPostId(Long postId) {
+        return jdbcTemplate.queryForObject(
+                "SELECT view_cnt FROM post WHERE post_id = (SELECT post_id FROM post WHERE post_id = ?)",
+                Long.class,
+                postId);
     }
 
 }

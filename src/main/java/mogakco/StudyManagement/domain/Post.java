@@ -40,6 +40,10 @@ public class Post {
     @Column(length = 20000, nullable = false)
     private String content;
 
+    @Builder.Default
+    @Column(nullable = false)
+    private Integer viewCnt = 0;
+
     @Column(nullable = false)
     private String createdAt;
 

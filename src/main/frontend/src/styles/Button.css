@@ -20,7 +20,7 @@
 }
 
 .edit-btn {
-  background-color: #81abf4 !important;
+  background-color: #8cb1f0 !important;
   color: white !important;
   border: none;
   border-radius: 5px;
@@ -30,7 +30,7 @@
 }
 
 .delete-btn {
-  background-color: #c881f4 !important;
+  background-color: #f1949f !important;
   color: white !important;
   border: none;
   border-radius: 5px;
@@ -54,7 +54,7 @@
   padding: 5px 10px;
   border: none;
   border-radius: 5px;
-  background-color: #f4a0d2;
+  background-color: #d8aef3;
   color: white;
   cursor: pointer;
 }
