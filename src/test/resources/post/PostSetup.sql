@@ -5,11 +5,12 @@ VALUES
 ('010-1111-1111', '20240112222007395', '20240112222007395', 'PostUser2', 'PostUser2', '$2a$10$LFyW8UyygbwOdyVODxN/lOMVo.Euubxgx9F7c7tX49bqHOgOXE/Z6', 'USER');
 
 
-INSERT INTO study.post (member_id, title, content, created_at, updated_at)
+INSERT INTO study.post (member_id, title, content, view_cnt, created_at, updated_at)
 SELECT
     (SELECT member_id FROM member WHERE id = 'PostUser'),
     title,
     content,
+    0,
     DATE_FORMAT(NOW(6), '%Y%m%d24%H%i%s%f'),
     DATE_FORMAT(NOW(6), '%Y%m%d24%H%i%s%f')
 FROM (
