@@ -9,6 +9,9 @@ import mogakco.StudyManagement.domain.Post;
 @Getter
 @Setter
 public class PostDetail {
+
+    private Long postId;
+
     private String memberName;
 
     private Integer likes;
@@ -17,6 +20,8 @@ public class PostDetail {
 
     private String content;
 
+    private Integer viewCnt;
+
     private String createdAt;
 
     private String updatedAt;
@@ -24,9 +29,11 @@ public class PostDetail {
     private List<PostDetailComment> comments;
 
     public PostDetail(Post post, Integer likes, List<PostDetailComment> comments) {
+        this.postId = post.getPostId();
         this.memberName = post.getMember().getName();
         this.title = post.getTitle();
         this.content = post.getContent();
+        this.viewCnt = post.getViewCnt();
         this.createdAt = post.getCreatedAt();
         this.updatedAt = post.getUpdatedAt();
         this.likes = likes;

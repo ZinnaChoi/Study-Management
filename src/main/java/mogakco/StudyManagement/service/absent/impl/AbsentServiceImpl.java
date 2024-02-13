@@ -50,18 +50,18 @@ public class AbsentServiceImpl implements AbsentService {
     private final ScheduleRepository scheduleRepository;
     private final MemberScheduleRepository memberScheduleRepository;
     private final AbsentScheduleRepository absentScheduleRepository;
+    private final NoticeService noticeService;
 
     public AbsentServiceImpl(MemberRepository memberRepository, ScheduleRepository scheduleRepository,
             MemberScheduleRepository memberScheduleRepository,
-            AbsentScheduleRepository absentScheduleRepository) {
+            AbsentScheduleRepository absentScheduleRepository,
+            NoticeService noticeService) {
         this.memberRepository = memberRepository;
         this.scheduleRepository = scheduleRepository;
         this.memberScheduleRepository = memberScheduleRepository;
         this.absentScheduleRepository = absentScheduleRepository;
+        this.noticeService = noticeService;
     }
-
-    @Autowired
-    NoticeService noticeService;
 
     @Override
     @Transactional

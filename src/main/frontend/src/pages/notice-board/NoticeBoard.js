@@ -3,8 +3,11 @@ import { parseDate } from "../../util/DateUtil";
 import { authClient } from "../../services/APIService";
 import Table from "../../components/Table";
 import Pagination from "../../components/Pagination";
+import CommonDialog from "../../components/CommonDialog";
 import "../../styles/NoticeBoard.css";
 import "../../styles/Button.css";
+import PostDetailPopup from "./PostDetailPopup";
+import PostAddPopup from "./PostAddPopup";
 
 const NoticeBoard = () => {
   const [posts, setPosts] = useState([]);
@@ -13,6 +16,22 @@ const NoticeBoard = () => {
   const [totalPages, setTotalPages] = useState(0);
   const [searchType, setSearchType] = useState("MEMBER");
   const [searchKeyword, setSearchKeyword] = useState("");
+  const [selectedPostId, setSelectedPostId] = useState(null);
+
+  const [showAddPopup, setShowAddPopup] = useState(false);
+  const [showDetailPopup, setShowDetailPopup] = useState(false);
+
+  const handleAddPost = () => {
+    setShowAddPopup(true);
+  };
+
+  const handleCloseAddPopup = () => {
+    setShowAddPopup(false);
+  };
+
+  const refreshPosts = () => {
+    fetchPosts();
+  };
 
   const fetchPosts = (
     currentPage = page,
@@ -50,6 +69,19 @@ const NoticeBoard = () => {
     fetchPosts();
   }, []);
 
+  const handlePostClick = (content) => {
+    setSelectedPostId(content.postId);
+    setShowDetailPopup(true);
+  };
+
+  const handleSavePost = () => {
+    refreshPosts();
+  };
+
+  const handleCloseDetailPopup = () => {
+    setShowDetailPopup(false);
+  };
+
   const handleSearch = () => {
     fetchPosts(page, size, searchType, searchKeyword);
   };
@@ -69,6 +101,10 @@ const NoticeBoard = () => {
     {
       Header: "좋아요 수",
       accessor: "likes",
+    },
+    {
+      Header: "조회 수",
+      accessor: "viewCnt",
     },
     {
       Header: "제목",
@@ -115,14 +151,48 @@ const NoticeBoard = () => {
         <button onClick={handleSearch} className="searchButton search-btn">
           검색
         </button>
-        <button className="addButton accept-btn">추가</button>
+        <button onClick={handleAddPost} className="addButton accept-btn">
+          추가
+        </button>
       </div>
-      <Table columns={columns} contents={posts} />
+      <Table
+        columns={columns}
+        contents={posts}
+        onRowClick={handlePostClick}
+        clickable={true}
+      />
       <Pagination
         totalPages={totalPages}
         currentPage={page}
         onPageChange={handlePageChange}
       />
+      {showAddPopup && (
+        <PostAddPopup
+          open={showAddPopup}
+          onClose={handleCloseAddPopup}
+          onRefresh={refreshPosts}
+        />
+      )}
+      {showDetailPopup && (
+        <CommonDialog
+          fullScreen={true}
+          submitEvt={handleSavePost}
+          open={showDetailPopup}
+          title="게시글 상세"
+          cancleStr="닫기"
+          showButton={false}
+          onRefresh={refreshPosts}
+          onClose={handleCloseDetailPopup}
+          closeDialog={false}
+          extraComponents={
+            <PostDetailPopup
+              postId={selectedPostId}
+              onRefresh={refreshPosts}
+              setShowDetailPopup={setShowDetailPopup}
+            />
+          }
+        />
+      )}
     </div>
   );
 };

@@ -4,10 +4,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -45,16 +45,18 @@ public class PostServiceImpl extends PostCommonService implements PostService {
 
     private final PostCommentRepository postCommentRepository;
     private final PostLikeRepository postLikeRepository;
+    private final StringRedisTemplate redisTemplate;
+    private final NoticeService noticeService;
 
     public PostServiceImpl(MemberRepository memberRepository, PostRepository postRepository,
-            PostCommentRepository postCommentRepository, PostLikeRepository postLikeRepository) {
+            PostCommentRepository postCommentRepository, PostLikeRepository postLikeRepository,
+            StringRedisTemplate redisTemplate, NoticeService noticeService) {
         super(memberRepository, postRepository);
         this.postCommentRepository = postCommentRepository;
         this.postLikeRepository = postLikeRepository;
+        this.redisTemplate = redisTemplate;
+        this.noticeService = noticeService;
     }
-
-    @Autowired
-    NoticeService noticeService;
 
     @Override
     @Transactional
@@ -102,6 +104,7 @@ public class PostServiceImpl extends PostCommonService implements PostService {
     public PostDetailRes getPostDetail(Long postId) {
         try {
             Post post = getPostById(postId);
+            incrementViewCntIfNotViewed(post);
             Integer likeCount = postLikeRepository.countByPostPostId(postId);
             List<PostComment> commentEntities = postCommentRepository.findByPostPostIdAndParentCommentIsNull(postId);
             List<Object[]> replyCntByPostId = postCommentRepository.countRepliesByPostId(postId);
@@ -113,8 +116,8 @@ public class PostServiceImpl extends PostCommonService implements PostService {
 
             List<PostDetailComment> postCommentList = commentEntities.stream().map(entity -> {
                 PostDetailComment dto = new PostDetailComment();
-                dto.setCommnetId(entity.getCommentId());
-                dto.setMemeberName(entity.getMember().getName());
+                dto.setCommentId(entity.getCommentId());
+                dto.setMemberName(entity.getMember().getName());
                 dto.setContent(entity.getContent());
                 dto.setCreatedAt(entity.getCreatedAt());
                 dto.setUpdatedAt(entity.getUpdatedAt());
@@ -176,6 +179,16 @@ public class PostServiceImpl extends PostCommonService implements PostService {
                     ErrorCode.DELETED.getMessage("게시글"));
         } catch (NotFoundException | UnauthorizedAccessException e) {
             return ExceptionUtil.handleException(e);
+        }
+    }
+
+    public void incrementViewCntIfNotViewed(Post post) {
+        String key = "post:viewCount:" + post.getPostId();
+        Boolean alreadyViewed = redisTemplate.opsForSet().isMember(key, post.getMember().getId());
+
+        if (Boolean.FALSE.equals(alreadyViewed)) {
+            redisTemplate.opsForSet().add(key, post.getMember().getId());
+            postRepository.incrementViewCount(post.getPostId());
         }
     }
 

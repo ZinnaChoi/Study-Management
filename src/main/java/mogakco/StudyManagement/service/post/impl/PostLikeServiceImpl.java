@@ -36,7 +36,7 @@ public class PostLikeServiceImpl extends PostCommonService implements PostLikeSe
 
             Member member = getLoginMember();
             Post post = getPostById(postId);
-            long count = postLikeRepository.countByMember(member);
+            long count = postLikeRepository.countByMemberAndPost(member, post);
 
             if (count > 0) {
                 throw new ConflictException(ErrorCode.CONFLICT.getMessage(member.getName() + "의 좋아요"));

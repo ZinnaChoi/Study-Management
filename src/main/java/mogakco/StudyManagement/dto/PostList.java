@@ -16,6 +16,8 @@ public class PostList {
 
     private String memberName;
 
+    private Integer viewCnt;
+
     private Integer commentCnt;
 
     private String createdAt;
@@ -26,6 +28,7 @@ public class PostList {
         this.postId = post.getPostId();
         this.title = post.getTitle();
         this.memberName = post.getMember().getName();
+        this.viewCnt = post.getViewCnt();
         this.createdAt = post.getCreatedAt();
         this.updatedAt = post.getUpdatedAt();
         this.likes = likes;
