@@ -20,6 +20,8 @@ public class PostDetail {
 
     private String content;
 
+    private Integer viewCnt;
+
     private String createdAt;
 
     private String updatedAt;
@@ -31,6 +33,7 @@ public class PostDetail {
         this.memberName = post.getMember().getName();
         this.title = post.getTitle();
         this.content = post.getContent();
+        this.viewCnt = post.getViewCnt();
         this.createdAt = post.getCreatedAt();
         this.updatedAt = post.getUpdatedAt();
         this.likes = likes;
