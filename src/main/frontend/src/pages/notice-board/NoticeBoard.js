@@ -103,6 +103,10 @@ const NoticeBoard = () => {
       accessor: "likes",
     },
     {
+      Header: "조회 수",
+      accessor: "viewCnt",
+    },
+    {
       Header: "제목",
       accessor: "title",
     },

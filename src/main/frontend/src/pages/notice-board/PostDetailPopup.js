@@ -232,6 +232,7 @@ const PostDetailPopup = ({ postId, onRefresh, setShowDetailPopup }) => {
           <span className={`like-icon`}>♥</span>
           {postDetail?.likes}
         </p>
+        <span>조회수: {postDetail?.viewCnt}</span>
         <span>작성자: {postDetail?.memberName}</span>
         <span>
           작성 일시:{" "}
