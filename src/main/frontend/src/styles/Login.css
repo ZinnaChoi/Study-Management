@@ -1,0 +1,28 @@
+/* css 적용시 주의사항 -> Material-UI에서 제공하는 컴포넌트에 적용할 경우 !important 필수 */
+.root-layout {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+.paper-size {
+  padding: 20px !important;
+  min-width: 300px !important;
+  max-width: 400px !important;
+}
+
+.login-title {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.login-icon {
+  background-color: red !important;
+}
+
+.row-space {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
