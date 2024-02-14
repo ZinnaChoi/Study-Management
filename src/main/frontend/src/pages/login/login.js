@@ -49,6 +49,7 @@ export default function Login() {
         if (response.data?.retCode === 200) {
           localStorage.setItem("token", "Bearer " + response?.data?.token);
           navigate(menuTree.main.path);
+          window.location.reload();
         } else {
           alert(response.data?.retMsg);
         }
