@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import mogakco.StudyManagement.domain.Post;
 
@@ -19,6 +20,7 @@ public interface PostRepository extends JpaRepository<Post, Long>, JpaSpecificat
     boolean existsById(Long postId);
 
     @Modifying
+    @Transactional
     @Query("UPDATE Post p SET p.viewCnt = p.viewCnt + 1 WHERE p.postId = :postId")
     void incrementViewCount(@Param("postId") Long postId);
 }

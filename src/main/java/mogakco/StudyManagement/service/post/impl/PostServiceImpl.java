@@ -183,11 +183,13 @@ public class PostServiceImpl extends PostCommonService implements PostService {
     }
 
     public void incrementViewCntIfNotViewed(Post post) {
-        String key = "post:viewCount:" + post.getPostId();
-        Boolean alreadyViewed = redisTemplate.opsForSet().isMember(key, post.getMember().getId());
+        Long loginMemberId = getLoginMember().getMemberId();
+
+        String key = "post:viewCount:" + post.getPostId() + ":" + loginMemberId;
+        Boolean alreadyViewed = redisTemplate.opsForSet().isMember(key, String.valueOf(loginMemberId));
 
         if (Boolean.FALSE.equals(alreadyViewed)) {
-            redisTemplate.opsForSet().add(key, post.getMember().getId());
+            redisTemplate.opsForSet().add(key, String.valueOf(loginMemberId));
             postRepository.incrementViewCount(post.getPostId());
         }
     }
