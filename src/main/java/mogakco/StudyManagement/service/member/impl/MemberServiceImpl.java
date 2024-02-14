@@ -3,6 +3,7 @@ package mogakco.StudyManagement.service.member.impl;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -414,7 +415,8 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
 
         List<WakeUp> wakeUps = wakeUpRepository.findAll();
 
-        Set<String> result = wakeUps.stream().map(WakeUp::getWakeupTime).collect(Collectors.toSet());
+        Set<String> result = wakeUps.stream().map(WakeUp::getWakeupTime).sorted()
+                .collect(Collectors.toCollection(TreeSet::new));
 
         return new RegistedWakeupRes(systemId, ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), result);
     }
