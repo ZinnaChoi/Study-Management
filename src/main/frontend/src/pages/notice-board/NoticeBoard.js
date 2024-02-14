@@ -80,6 +80,7 @@ const NoticeBoard = () => {
 
   const handleCloseDetailPopup = () => {
     setShowDetailPopup(false);
+    refreshPosts();
   };
 
   const handleSearch = () => {

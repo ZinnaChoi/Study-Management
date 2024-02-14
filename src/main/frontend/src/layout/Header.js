@@ -13,13 +13,13 @@ import {
   Tooltip,
   MenuItem,
 } from "@mui/material";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { menuTree } from "../constants/constants";
-import axios from "axios";
 import { authClient } from "../services/APIService";
 import HomeIcon from "@mui/icons-material/Home";
 
 function Header() {
+  const navigate = useNavigate();
   const [anchorElStudy, setAnchorElStudy] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
   const [logo, setLogo] = React.useState(null);
@@ -38,6 +38,12 @@ function Header() {
 
   const handleCloseUserMenu = () => {
     setAnchorElUser(null);
+  };
+
+  const doLogout = () => {
+    navigate(menuTree.login.path);
+    localStorage.removeItem("token");
+    alert("로그아웃 되었습니다.");
   };
 
   // 통계 내 서브메뉴
@@ -67,23 +73,7 @@ function Header() {
       });
   }
 
-  // JWT 세션 스토리지에 초기 세팅(로그인 화면 구현 후 변경 예정)
-  function setAdminToken() {
-    axios
-      .post("api/v1/login", {
-        id: "admin",
-        password: "password",
-      })
-      .then(function (response) {
-        localStorage.setItem("token", "Bearer " + response?.data?.token);
-      })
-      .catch(function (error) {
-        console.log(error);
-      });
-  }
-
   useEffect(() => {
-    setAdminToken();
     setLogoImg();
   });
 
@@ -247,7 +237,7 @@ function Header() {
                 </Typography>
               </MenuItem>
               {/* 로그아웃 메뉴 버튼 */}
-              <MenuItem key={"로그아웃"} onClick={handleCloseUserMenu}>
+              <MenuItem key={"로그아웃"} onClick={doLogout}>
                 <Typography textAlign="center">{"로그아웃"}</Typography>
               </MenuItem>
             </Menu>
