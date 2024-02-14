@@ -21,11 +21,11 @@ const PostDetailPopup = ({ postId, onRefresh, setShowDetailPopup }) => {
       .then((response) => {
         if (response.data) {
           const detailedPost = response.data.postDetail;
-          console.log("Comments:", detailedPost.comments);
           setPostDetail({
             ...detailedPost,
             content: detailedPost.content,
             likes: detailedPost.likes,
+            comments: detailedPost.comments || [],
           });
           setEditedTitle(detailedPost.title);
           setEditedContent(
