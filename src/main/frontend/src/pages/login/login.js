@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Button,
   Avatar,
@@ -56,6 +56,24 @@ export default function Login() {
       .catch(function (error) {
         console.log(error);
       });
+  };
+
+  useEffect(() => {
+    // 뒤로가기 비활성화
+    doBackButtonDisable();
+  }, []);
+
+  const doBackButtonDisable = () => {
+    window.history.pushState(null, null, window.location.pathname);
+    window.addEventListener("popstate", handleBackButtonDisable);
+
+    return () => {
+      window.removeEventListener("popstate", handleBackButtonDisable);
+    };
+  };
+
+  const handleBackButtonDisable = (event) => {
+    window.history.pushState(null, null, window.location.pathname);
   };
 
   const routeJoin = () => {

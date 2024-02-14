@@ -43,6 +43,7 @@ function Header() {
   const doLogout = () => {
     navigate(menuTree.login.path);
     localStorage.removeItem("token");
+    alert("로그아웃 되었습니다.");
   };
 
   // 통계 내 서브메뉴
