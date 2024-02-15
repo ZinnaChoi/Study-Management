@@ -1,9 +1,12 @@
 import React from "react";
 import CommonDialog from "../../components/CommonDialog";
 import { Button, TextField } from "@mui/material";
+import MemberBySchedule from "./MemberBySchedule";
+import MemberByWakeup from "./MemberByWakeup";
 import "../../styles/Button.css";
+import "../../styles/NoticeBoard.css";
 
-// 부재 일정 화면
+// 홈 화면
 export default function MembersInfo() {
   // prop 전달을 위한 변수
   const dialogProps = {
@@ -18,10 +21,27 @@ export default function MembersInfo() {
     submitEvt: doSomeAction,
     showButton: true,
   };
+
+  const wakeupSuccess = () => {
+    // TODO: 다연님 기상 체크 버튼 클릭 시 로직 작성
+    alert("기상 확인 로직 구현 바랍니다.");
+  };
+
   return (
     <React.Fragment>
-      <h1>스터디원 정보 조회 화면 - 홈(메인) 화면</h1>
-      <button>구현 시 기상 성공 버튼 추가 필요!!</button>
+      <div className="wakeup-block">
+        <h3>스케줄 별 스터디원</h3>
+        <Button className="accept-btn" type="button" onClick={wakeupSuccess}>
+          기상 체크
+        </Button>
+      </div>
+      <hr />
+      <MemberBySchedule />
+      <h3>기상 시간 별 스터디원</h3>
+      <hr />
+      <MemberByWakeup />
+
+      {/* TODO: 다이얼로그 예제, 삭제 예정임 */}
       <hr />
       <div>
         {/* 필요없는 props 경우는 전달하지 않아도 됨 */}

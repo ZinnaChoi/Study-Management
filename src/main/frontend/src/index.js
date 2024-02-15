@@ -9,7 +9,7 @@ import MyPage from "./pages/my-page/MyPage";
 import NoticeBoard from "./pages/notice-board/NoticeBoard";
 import AttendanceStatistics from "./pages/study/AttendanceStatistics";
 import Management from "./pages/study/Management";
-import MembersInfo from "./pages/study/MembersInfo";
+import MembersInfo from "./pages/home/MembersInfo";
 import WakeUpSuccessRate from "./pages/study/WakeUpSuccessRate";
 import Login from "./pages/login/login";
 import Join from "./pages/join/join";

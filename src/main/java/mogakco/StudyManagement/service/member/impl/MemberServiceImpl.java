@@ -3,6 +3,7 @@ package mogakco.StudyManagement.service.member.impl;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -354,7 +355,10 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
         }
 
         members.stream().map(m -> {
-            memberInfos.add(new MemberInfo(m.getId(), m.getName()));
+            List<MemberSchedule> memberSchedules = memberScheduleRepository.findAllByMember(m);
+            List<String> scheduleNames = memberSchedules.stream().map(ms -> ms.getSchedule().getScheduleName())
+                    .collect(Collectors.toList());
+            memberInfos.add(MemberInfo.builder().id(m.getId()).name(m.getName()).scheduleNames(scheduleNames).build());
             return m;
         }).collect(Collectors.toList());
 
@@ -378,7 +382,9 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
         List<Member> members = memberRepository.findAllById(ids);
 
         members.stream().map(m -> {
-            memberInfos.add(new MemberInfo(m.getId(), m.getName()));
+            WakeUp wakeUp = wakeUpRepository.findByMember(m);
+            memberInfos.add(
+                    MemberInfo.builder().id(m.getId()).name(m.getName()).wakeupTime(wakeUp.getWakeupTime()).build());
             return m;
         }).collect(Collectors.toList());
 
@@ -414,7 +420,8 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
 
         List<WakeUp> wakeUps = wakeUpRepository.findAll();
 
-        Set<String> result = wakeUps.stream().map(WakeUp::getWakeupTime).collect(Collectors.toSet());
+        Set<String> result = wakeUps.stream().map(WakeUp::getWakeupTime).sorted()
+                .collect(Collectors.toCollection(TreeSet::new));
 
         return new RegistedWakeupRes(systemId, ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), result);
     }
