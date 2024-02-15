@@ -355,7 +355,10 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
         }
 
         members.stream().map(m -> {
-            memberInfos.add(new MemberInfo(m.getId(), m.getName()));
+            List<MemberSchedule> memberSchedules = memberScheduleRepository.findAllByMember(m);
+            List<String> scheduleNames = memberSchedules.stream().map(ms -> ms.getSchedule().getScheduleName())
+                    .collect(Collectors.toList());
+            memberInfos.add(MemberInfo.builder().id(m.getId()).name(m.getName()).scheduleNames(scheduleNames).build());
             return m;
         }).collect(Collectors.toList());
 
@@ -379,7 +382,9 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
         List<Member> members = memberRepository.findAllById(ids);
 
         members.stream().map(m -> {
-            memberInfos.add(new MemberInfo(m.getId(), m.getName()));
+            WakeUp wakeUp = wakeUpRepository.findByMember(m);
+            memberInfos.add(
+                    MemberInfo.builder().id(m.getId()).name(m.getName()).wakeupTime(wakeUp.getWakeupTime()).build());
             return m;
         }).collect(Collectors.toList());
 

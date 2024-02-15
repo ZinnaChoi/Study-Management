@@ -7,13 +7,28 @@ import "../../styles/NoticeBoard.css";
 import "../../styles/Home.css";
 
 // 기상 시간 별 스터디원
-export default function MemberByWakeup(props) {
+export default function MemberByWakeup() {
   const [searchType, setSearchType] = useState("ALL");
   const [wakeupTimes, setWakeupTimes] = useState([]);
   const [memberInfoByWakeupTime, setMemberInfoByWakeupTime] = useState([]);
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [size, setSize] = useState(10);
+
+  const columns = [
+    {
+      Header: "아이디",
+      accessor: "id",
+    },
+    {
+      Header: "이름",
+      accessor: "name",
+    },
+    {
+      Header: "기상 시간",
+      accessor: "wakeupTime",
+    },
+  ];
 
   const getWakeupTimes = () => {
     authClient
@@ -42,7 +57,14 @@ export default function MemberByWakeup(props) {
       .get("/members/wakeup-time", { params })
       .then((response) => {
         if (response && response.data) {
-          setMemberInfoByWakeupTime(response.data.members);
+          const members = response.data.members;
+          members.forEach((m, index) => {
+            members[index].wakeupTime = `${m.wakeupTime.slice(
+              0,
+              2
+            )}:${m.wakeupTime.slice(2)}`;
+          });
+          setMemberInfoByWakeupTime(members);
           setPage(response.data.pageable.page);
           setSize(response.data.pageable.size);
           setTotalPages(response.data.pageable.totalPages);
@@ -89,7 +111,7 @@ export default function MemberByWakeup(props) {
           ))}
         </select>
       </div>
-      <Table columns={props.columns} contents={memberInfoByWakeupTime} />
+      <Table columns={columns} contents={memberInfoByWakeupTime} />
       <Pagination
         totalPages={totalPages}
         currentPage={page}

@@ -7,13 +7,28 @@ import "../../styles/NoticeBoard.css";
 import "../../styles/Home.css";
 
 // 스케줄 별 스터디원
-export default function MemberBySchedule(props) {
+export default function MemberBySchedule() {
   const [searchType, setSearchType] = useState("ALL");
   const [schedules, setSchedules] = useState([]);
   const [memberInfoBySchedule, setMemberInfoBySchedule] = useState([]);
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [size, setSize] = useState(10);
+
+  const columns = [
+    {
+      Header: "아이디",
+      accessor: "id",
+    },
+    {
+      Header: "이름",
+      accessor: "name",
+    },
+    {
+      Header: "스케줄 목록",
+      accessor: "scheduleNames",
+    },
+  ];
 
   const getSchedules = () => {
     authClient
@@ -42,6 +57,10 @@ export default function MemberBySchedule(props) {
       .get("/members/schedule-name", { params })
       .then((response) => {
         if (response && response.data) {
+          const members = response.data.members;
+          members.forEach((m, index) => {
+            members[index].scheduleNames = m.scheduleNames.toString();
+          });
           setMemberInfoBySchedule(response.data.members);
           setPage(response.data.pageable.page);
           setSize(response.data.pageable.size);
@@ -94,7 +113,7 @@ export default function MemberBySchedule(props) {
           ))}
         </select>
       </div>
-      <Table columns={props.columns} contents={memberInfoBySchedule} />
+      <Table columns={columns} contents={memberInfoBySchedule} />
       <Pagination
         totalPages={totalPages}
         currentPage={page}

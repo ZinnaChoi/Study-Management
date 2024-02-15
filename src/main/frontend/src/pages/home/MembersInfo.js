@@ -22,17 +22,6 @@ export default function MembersInfo() {
     showButton: true,
   };
 
-  const columns = [
-    {
-      Header: "아이디",
-      accessor: "id",
-    },
-    {
-      Header: "이름",
-      accessor: "name",
-    },
-  ];
-
   const wakeupSuccess = () => {
     // TODO: 다연님 기상 체크 버튼 클릭 시 로직 작성
     alert("기상 확인 로직 구현 바랍니다.");
@@ -47,10 +36,10 @@ export default function MembersInfo() {
         </Button>
       </div>
       <hr />
-      <MemberBySchedule columns={columns} />
+      <MemberBySchedule />
       <h3>기상 시간 별 스터디원</h3>
       <hr />
-      <MemberByWakeup columns={columns} />
+      <MemberByWakeup />
 
       {/* TODO: 다이얼로그 예제, 삭제 예정임 */}
       <hr />
