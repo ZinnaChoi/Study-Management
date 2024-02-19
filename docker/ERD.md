@@ -23,7 +23,7 @@
 | id          | Unique      | String | 사용자 식별자      |
 | password    |             | String | 비밀번호           |
 | name        |             | String | 사용자 이름        |
-| email       |             | String | 연락처             |
+| email       |             | String | 이메일 주소        |
 | role        |             | String | 사용자 역할        |
 | created_at  |             | String | 생성 날짜          |
 | updated_at  |             | String | 정보 업데이트 날짜 |
