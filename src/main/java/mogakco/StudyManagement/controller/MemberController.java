@@ -53,7 +53,7 @@ public class MemberController extends CommonController {
             result.setSystemId(systemId);
         } catch (Exception e) {
             result = new MemberLoginRes(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
-                    ErrorCode.INTERNAL_ERROR.getMessage(), "");
+                    ErrorCode.INTERNAL_ERROR.getMessage(), "", "");
         }
         return result;
     }
@@ -68,7 +68,7 @@ public class MemberController extends CommonController {
             result = memberService.logout();
         } catch (Exception e) {
             result = new MemberLoginRes(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
-                    ErrorCode.INTERNAL_ERROR.getMessage(), "");
+                    ErrorCode.INTERNAL_ERROR.getMessage(), "", "");
         }
         return result;
     }

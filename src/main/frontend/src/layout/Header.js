@@ -43,6 +43,7 @@ function Header() {
   const doLogout = () => {
     navigate(menuTree.login.path);
     localStorage.removeItem("token");
+    localStorage.removeItem("role");
     alert("로그아웃 되었습니다.");
   };
 

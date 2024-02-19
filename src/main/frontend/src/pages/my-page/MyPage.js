@@ -197,7 +197,6 @@ export default function MyPage() {
           (schedule) => schedule.value
         );
         reqBody.scheduleName = scheduleNames;
-        // reqBody.scheduleName = formJson["스케줄"].split(",");
         break;
       case "WAKEUP":
         successStr = "기상 시간";

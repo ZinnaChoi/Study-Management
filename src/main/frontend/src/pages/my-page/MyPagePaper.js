@@ -38,7 +38,8 @@ export default function MyPagePaper(props) {
                       }
                     />
                   ) : (
-                    props.useBtn[index] && (
+                    props.useBtn[index] &&
+                    localStorage.getItem("role") !== "ADMIN" && (
                       <CommonDialog
                         btnTitle={"수정"}
                         btnClass={"edit-btn"}

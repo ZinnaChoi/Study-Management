@@ -122,7 +122,8 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
             return response;
         }
 
-        String token = jwtUtil.createJwt(member.getId(), member.getRole().toString(), expiredTime);
+        MemberRole role = member.getRole();
+        String token = jwtUtil.createJwt(member.getId(), role.toString(), expiredTime);
         try {
             // redis에 JWT:admin(key) / 23jijiofj2io3hi32hiongiodsninioda(value) 형태로 저장
             redisTemplate.opsForValue().set("JWT:" + member.getId(), token, jwtUtil.getExpiration(token),
@@ -134,6 +135,7 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
         response.setRetMsg(ErrorCode.OK.getMessage());
         response.setRetCode(ErrorCode.OK.getCode());
         response.setToken(token);
+        response.setRole(role.toString());
         return response;
     }
 
