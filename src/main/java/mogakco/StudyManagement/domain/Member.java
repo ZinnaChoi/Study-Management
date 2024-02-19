@@ -36,7 +36,7 @@ public class Member {
   private String name;
 
   @Column(nullable = false)
-  private String contact;
+  private String email;
 
   @Enumerated(EnumType.STRING)
   @Column(nullable = false)
@@ -56,7 +56,7 @@ public class Member {
     this.password = password;
   }
 
-  public void updateContact(String contact) {
-    this.contact = contact;
+  public void updateEmail(String email) {
+    this.email = email;
   }
 }

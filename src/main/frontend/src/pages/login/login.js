@@ -48,6 +48,7 @@ export default function Login() {
       .then(function (response) {
         if (response.data?.retCode === 200) {
           localStorage.setItem("token", "Bearer " + response?.data?.token);
+          localStorage.setItem("role", response?.data?.role);
           navigate(menuTree.main.path);
           window.location.reload();
         } else {

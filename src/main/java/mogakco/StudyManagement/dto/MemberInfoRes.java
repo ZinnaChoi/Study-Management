@@ -20,8 +20,8 @@ public class MemberInfoRes extends CommonRes {
     @Schema(example = "HongGilDong")
     private String name;
 
-    @Schema(example = "01011112222")
-    private String contact;
+    @Schema(example = "email1@gmail.com")
+    private String email;
 
     @Schema(example = "USER")
     private MemberRole role;
@@ -35,12 +35,12 @@ public class MemberInfoRes extends CommonRes {
     @Schema(example = "1530")
     private String wakeupTime;
 
-    public MemberInfoRes(String systemId, int retCode, String retMsg, String id, String name, String contact,
+    public MemberInfoRes(String systemId, int retCode, String retMsg, String id, String name, String email,
             MemberRole role, String studyName, List<String> scheduleName, String wakeupTime) {
         super(systemId, retCode, retMsg);
         this.id = id;
         this.name = name;
-        this.contact = contact;
+        this.email = email;
         this.role = role;
         this.studyName = studyName;
         this.scheduleName = scheduleName;

@@ -132,7 +132,7 @@ public class NoticeServiceImpl implements NoticeService {
                     Boolean linkShareValue = noticeRepository.findByMember_MemberId(notifier).get().getLinkShare();
                     if (linkShareValue != null && linkShareValue) {
                         sendEmailService.sendEmail(notifierMember.get().getName(), MessageType.GENERAL,
-                                notifierMember.get().getContact());
+                                notifierMember.get().getEmail());
                     }
                     noticeRepository.updateLastShareDateByMemberId(DateUtil.getCurrentDateTime().substring(0, 12),
                             notifier);
@@ -185,7 +185,7 @@ public class NoticeServiceImpl implements NoticeService {
 
         for (Long targetedMemberId : targetedMembers) {
             Optional<Member> mmember = memberRepository.findById(targetedMemberId);
-            sendEmailService.sendEmail(member.getName(), type, mmember.get().getContact());
+            sendEmailService.sendEmail(member.getName(), type, mmember.get().getEmail());
         }
 
     }

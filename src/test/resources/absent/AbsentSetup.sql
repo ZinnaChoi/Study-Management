@@ -1,8 +1,8 @@
 INSERT INTO study.`member`
-(contact, created_at, updated_at, id, name, password, `role`)
+(email, created_at, updated_at, id, name, password, `role`)
 VALUES
-('010-1111-2222', '20240112222007395', '20240112222007395', 'AbsentUser', 'AbsentUser', '$2a$10$LFyW8UyygbwOdyVODxN/lOMVo.Euubxgx9F7c7tX49bqHOgOXE/Z6', 'USER'),
-('010-1111-2222', '20240112222007395', '20240112222007395', 'AbsentUser2', 'AbsentUser2', '$2a$10$LFyW8UyygbwOdyVODxN/lOMVo.Euubxgx9F7c7tX49bqHOgOXE/Z6', 'USER');
+('email1@gmail.com', '20240112222007395', '20240112222007395', 'AbsentUser', 'AbsentUser', '$2a$10$LFyW8UyygbwOdyVODxN/lOMVo.Euubxgx9F7c7tX49bqHOgOXE/Z6', 'USER'),
+('email1@gmail.com', '20240112222007395', '20240112222007395', 'AbsentUser2', 'AbsentUser2', '$2a$10$LFyW8UyygbwOdyVODxN/lOMVo.Euubxgx9F7c7tX49bqHOgOXE/Z6', 'USER');
 
 
 INSERT INTO study.schedule

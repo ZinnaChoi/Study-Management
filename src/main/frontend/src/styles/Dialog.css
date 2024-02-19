@@ -2,6 +2,7 @@
 .dialog-content {
   display: flex !important;
   align-items: center !important;
+  min-width: 250px !important;
 }
 
 .dialog-input {

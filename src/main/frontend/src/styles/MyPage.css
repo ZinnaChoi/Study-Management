@@ -1,0 +1,42 @@
+.paper-align {
+  display: flex !important;
+  justify-content: center !important;
+}
+
+.paper-title {
+  margin: 0px 0px 0px 20px;
+  padding-top: 10px;
+}
+
+.grid-container {
+  margin-left: 12% !important;
+  margin-right: 15% !important;
+}
+
+.value-box {
+  display: flex;
+  align-items: center;
+}
+
+.value-title {
+  margin-right: 5px;
+}
+
+.value-description {
+  color: gray;
+  font-size: 11px;
+}
+
+.divide-line {
+  margin-left: 12% !important;
+  margin-right: 14% !important;
+}
+
+.content-space {
+  margin-bottom: 8px;
+}
+
+.mypage-select-title {
+  width: 35%;
+  font-size: 14px;
+}

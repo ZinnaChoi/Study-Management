@@ -15,9 +15,13 @@ public class MemberLoginRes extends CommonRes {
     @Schema(example = "aaaaa.bbbbb.ccccc")
     private String token;
 
-    public MemberLoginRes(String systemId, int retCode, String retMsg, String token) {
+    @Schema(example = "USER")
+    private String role;
+
+    public MemberLoginRes(String systemId, int retCode, String retMsg, String token, String role) {
         super(systemId, retCode, retMsg);
         this.token = token;
+        this.role = role;
     }
 
 }
