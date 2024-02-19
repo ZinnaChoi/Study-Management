@@ -157,7 +157,7 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
                 .id(joinInfo.getId())
                 .password(bCryptPasswordEncoder.encode(joinInfo.getPassword()))
                 .name(joinInfo.getName())
-                .contact(joinInfo.getContact())
+                .email(joinInfo.getEmail())
                 .role(MemberRole.USER) // 회원가입시 무조건 USER 권한
                 .createdAt(DateUtil.getCurrentDateTime())
                 .updatedAt(DateUtil.getCurrentDateTime())
@@ -211,7 +211,7 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
         Member member = memberRepository.findById(SecurityUtil.getLoginUserId());
         result.setId(member.getId());
         result.setName(member.getName());
-        result.setContact(member.getContact());
+        result.setEmail(member.getEmail());
         result.setRole(member.getRole());
 
         List<StudyInfo> studyInfos = studyInfoRepository.findAll();
@@ -294,21 +294,25 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
 
                 break;
 
-            case CONTACT:
+            case EMAIL:
                 // member 테이블 업데이트
-                String changedContact = updateInfo.getContact();
-                member.updateContact(changedContact);
+                String changedEmail = updateInfo.getEmail();
+                member.updateEmail(changedEmail);
 
                 memberRepository.save(member);
 
                 break;
             case PASSWORD:
                 // member 테이블 업데이트
+                String prePassword = updateInfo.getPrePassword();
                 String changedPassword = updateInfo.getPassword();
                 String originPassword = member.getPassword();
+
                 // 비밀번호 현재 비밀번호랑 일치 여부 확인
                 if (bCryptPasswordEncoder.matches(changedPassword, originPassword)) {
                     return ExceptionUtil.handleException(new InvalidRequestException("현재 비밀번호와 동일합니다."));
+                } else if (!bCryptPasswordEncoder.matches(prePassword, originPassword)) {
+                    return ExceptionUtil.handleException(new InvalidRequestException("현재 비밀번호가 일치하지 않습니다."));
                 }
                 // 비밀번호 암호화
                 member.updatePassword(bCryptPasswordEncoder.encode(changedPassword));

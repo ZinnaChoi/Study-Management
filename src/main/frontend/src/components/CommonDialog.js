@@ -47,7 +47,11 @@ export default function CommonDialog(props) {
   return (
     <React.Fragment>
       {props.showButton && props.btnTitle && (
-        <Button variant="outlined" onClick={handleOpen}>
+        <Button
+          variant="outlined"
+          className={props.btnClass}
+          onClick={handleOpen}
+        >
           {props.btnTitle}
         </Button>
       )}

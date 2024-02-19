@@ -36,7 +36,7 @@ public class AccountConfig {
                     .id("admin")
                     .password(bCryptPasswordEncoder.encode(password))
                     .name("관리자")
-                    .contact("")
+                    .email("")
                     .role(MemberRole.ADMIN)
                     .createdAt(DateUtil.getCurrentDateTime())
                     .updatedAt(DateUtil.getCurrentDateTime())

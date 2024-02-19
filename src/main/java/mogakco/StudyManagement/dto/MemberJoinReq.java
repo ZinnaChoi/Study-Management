@@ -28,8 +28,9 @@ public class MemberJoinReq {
     @Schema(example = "HongGilDong")
     private String name;
 
-    @Schema(example = "01011112222")
-    private String contact;
+    @Schema(example = "example123@mail.com")
+    @Pattern(regexp = "^[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*.[a-zA-Z]{2,3}$", message = "올바른 이메일 형식이 아닙니다.")
+    private String email;
 
     @Schema(example = "모각코 스터디")
     private String studyName;

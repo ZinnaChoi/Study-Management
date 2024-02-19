@@ -1,5 +1,5 @@
 INSERT INTO study.`member`
-(contact, created_at, updated_at, id, name, password, `role`)
+(email, created_at, updated_at, id, name, password, `role`)
 VALUES
 ('dayeondayeon@naver.com', '20240117122007395', '20240112222007395', 'noticeUser1', 'noticeUser1', '$2ahjFyW8werwefffgdX49fdgdfvxxcxh087845645667g', 'USER'),
 ('wowdayeon@gmail.com', '20240117122007316', '20240112222007495', 'noticeUser2', 'noticeUser2', '$2ahjFwerwerOdyVODxN/lOMp;[sdsdcdcsdfsewere34m*$', 'USER'),
