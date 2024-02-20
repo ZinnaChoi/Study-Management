@@ -228,26 +228,28 @@ const AttendanceStatistics = () => {
   return (
     <React.Fragment>
       <div>
-        <div className="radio-button">
-          <label>
-            <input
-              type="radio"
-              value="주간"
-              checked={selectedPeriod === "주간"}
-              onChange={handlePeriodChange}
-            />
-            주간
-          </label>
-          <label>
-            {" "}
-            <input
-              type="radio"
-              value="월간"
-              checked={selectedPeriod === "월간"}
-              onChange={handlePeriodChange}
-            />
-            월간
-          </label>
+        <div className="select-date">
+          <div className="radio-button">
+            <label>
+              <input
+                type="radio"
+                value="주간"
+                checked={selectedPeriod === "주간"}
+                onChange={handlePeriodChange}
+              />
+              주간
+            </label>
+            <label>
+              {" "}
+              <input
+                type="radio"
+                value="월간"
+                checked={selectedPeriod === "월간"}
+                onChange={handlePeriodChange}
+              />
+              월간
+            </label>
+          </div>
           <div style={{ marginBottom: "20px" }}> </div>
           <div className="date-picker">
             <div>
