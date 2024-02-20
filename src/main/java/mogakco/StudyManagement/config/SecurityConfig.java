@@ -40,6 +40,7 @@ public class SecurityConfig {
         http.authorizeHttpRequests((auth) -> auth
                 .requestMatchers("/", "api/v1/login", "api/v1/join", "api/v1/join/check-id")
                 .permitAll() // 회원가입, 로그인, 중복 아이디 확인은 인증 X
+                .requestMatchers(HttpMethod.GET, "api/v1/schedules").permitAll()
                 .requestMatchers("/swagger-ui.html", "/v1/api-docs/**", "/swagger-ui/**", "/swagger-resources/**")
                 .permitAll() // swagger 경로
                 // 접근 허용
