@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import java.util.List;
+import java.util.Map;
 
 import mogakco.StudyManagement.domain.Member;
 import mogakco.StudyManagement.domain.MemberSchedule;
@@ -23,4 +24,9 @@ public interface MemberScheduleRepository extends JpaRepository<MemberSchedule, 
 
     @Query("SELECT ms.member FROM MemberSchedule ms WHERE ms.schedule.scheduleId = :scheduleId")
     List<Member> findMembersByScheduleId(@Param("scheduleId") Long scheduleId);
+
+    @Query("SELECT NEW map(ms.member.id AS memberId, ms.member.name AS memberName, COUNT(ms) AS maxSchedule) " +
+            "FROM MemberSchedule ms " +
+            "GROUP BY ms.member.id, ms.member.name")
+    List<Map<String, Object>> findMaxSchedulePerMember();
 }

@@ -31,9 +31,13 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.springframework.transaction.annotation.Transactional;
+import mogakco.StudyManagement.util.DateUtil;
 
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 @ActiveProfiles("test")
 @AutoConfigureMockMvc
@@ -63,63 +67,45 @@ public class StatControllerTest {
     private static final String POST_ABSENT_STAT_API_URL = "/api/v1/stat/absent";
     private static final String POST_WAKEUP_STAT_API_URL = "/api/v1/stat/wakeup";
 
+    String currentDate = DateUtil.getCurrentDateTime().substring(0, 8);
+    String oneDayBeforeDate = LocalDate.parse(currentDate, DateTimeFormatter.BASIC_ISO_DATE)
+            .minusDays(1)
+            .format(DateTimeFormatter.BASIC_ISO_DATE);
+
     @Test
     @Sql("/stat/StatListSetup.sql")
     @WithMockUser(username = "statUser1", authorities = { "USER" })
-    @DisplayName("통계 목록 조회 성공 - Page 0 Size 1")
-    public void getStatListSuccessPage0Size1() throws Exception {
+    @DisplayName("통계 목록 조회 성공")
+    public void getStatListSuccess() throws Exception {
 
         UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(GET_STAT_API_URL);
 
         uriBuilder
                 .queryParam("type", LogType.WAKEUP)
-                .queryParam("page", 0)
-                .queryParam("size", 1)
-                .queryParam("sort", "member");
+                .queryParam("startDate", oneDayBeforeDate)
+                .queryParam("endDate", currentDate);
 
         MvcResult result = TestUtil.performRequest(mockMvc, uriBuilder.toUriString(), null, "GET", 200, 200);
         JsonNode responseBody = objectMapper.readTree(result.getResponse().getContentAsString());
 
         int contentCount = responseBody.path("content").size();
-        assertTrue(contentCount == 1);
-
-    }
-
-    @Test
-    @Sql("/stat/StatListSetup.sql")
-    @WithMockUser(username = "statUser2", authorities = { "USER" })
-    @DisplayName("통계 목록 조회 성공 - Page 1 Size 2")
-    public void getStatListSuccessPage1Size2() throws Exception {
-
-        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(GET_STAT_API_URL);
-
-        uriBuilder
-                .queryParam("type", LogType.WAKEUP)
-                .queryParam("page", 1)
-                .queryParam("size", 2)
-                .queryParam("sort", "member");
-
-        MvcResult result = TestUtil.performRequest(mockMvc, uriBuilder.toUriString(), null, "GET", 200, 200);
-        JsonNode responseBody = objectMapper.readTree(result.getResponse().getContentAsString());
-
-        int contentCount = responseBody.path("content").size();
-        assertTrue(contentCount == 1);
+        assertTrue(contentCount == 4);
 
     }
 
     @Test
     @Sql("/stat/StatListSetup.sql")
     @WithMockUser(username = "statUser3", authorities = { "USER" })
-    @DisplayName("통계 목록 조회 실패 - 존재하지 않는 field로 정렬")
-    public void getStatListFailPage0Size1() throws Exception {
+    @DisplayName("통계 목록 조회 실패 - 존재하지 않는 날짜로 검색")
+    public void getStatListFail() throws Exception {
 
         UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(GET_STAT_API_URL);
 
         uriBuilder
                 .queryParam("type", LogType.ABSENT)
-                .queryParam("page", 0)
-                .queryParam("size", 1)
-                .queryParam("sort", "invalid value");
+                .queryParam("startDate", currentDate)
+                .queryParam("endDate", "19971021");
+        ;
 
         MvcResult result = TestUtil.performRequest(mockMvc, uriBuilder.toUriString(), null, "GET", 200, 404);
         JsonNode responseBody = objectMapper.readTree(result.getResponse().getContentAsString());

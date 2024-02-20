@@ -1,18 +1,18 @@
 package mogakco.StudyManagement.service.stat.impl;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import org.springframework.transaction.annotation.Transactional;
 
 import mogakco.StudyManagement.domain.DailyLog;
-import mogakco.StudyManagement.dto.SimplePageable;
 import mogakco.StudyManagement.dto.StatGetRes;
 import mogakco.StudyManagement.dto.StatList;
 import mogakco.StudyManagement.enums.ErrorCode;
@@ -25,8 +25,6 @@ import mogakco.StudyManagement.service.notice.NoticeService;
 import mogakco.StudyManagement.service.stat.StatService;
 import mogakco.StudyManagement.util.DateUtil;
 import mogakco.StudyManagement.util.ExceptionUtil;
-import mogakco.StudyManagement.util.PageUtil;
-
 import mogakco.StudyManagement.domain.AbsentSchedule;
 
 import mogakco.StudyManagement.domain.Member;
@@ -72,22 +70,39 @@ public class StatServiceImpl implements StatService {
     NoticeService noticeService;
 
     @Override
-    public StatGetRes getStat(LogType type, Pageable pageable) {
+    public StatGetRes getStat(LogType type, String startDate, String endDate) {
         try {
-            Page<DailyLog> dailyLogs;
-            dailyLogs = statRepository.findByType(type, pageable);
-            List<StatList> dailyLogLists = dailyLogs.getContent().stream().map(StatList::new)
-                    .collect(Collectors.toList());
+            List<DailyLog> dailyLogs = statRepository.findByTypeAndDateBetween(type, startDate, endDate);
 
-            SimplePageable simplePageable = PageUtil.createSimplePageable(dailyLogs);
+            List<StatList> dailyLogLists = dailyLogs.stream().map(StatList::new).collect(Collectors.toList());
+
+            List<Map<String, Object>> attendanceMaxScore = calculateMaxScore();
 
             return new StatGetRes(systemId, ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), dailyLogLists,
-                    simplePageable);
+                    attendanceMaxScore);
         } catch (Exception e) {
-            return new StatGetRes(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
-                    ErrorCode.INTERNAL_ERROR.getMessage(), null, null);
+            return new StatGetRes(systemId, ErrorCode.INTERNAL_ERROR.getCode(), ErrorCode.INTERNAL_ERROR.getMessage(),
+                    null, null);
+        }
+    }
+
+    private List<Map<String, Object>> calculateMaxScore() {
+        List<Map<String, Object>> result = new ArrayList<>();
+
+        List<Map<String, Object>> maxSchedules = memberScheduleRepository.findMaxSchedulePerMember();
+
+        for (Map<String, Object> maxSchedule : maxSchedules) {
+            String memberName = (String) maxSchedule.get("memberName");
+            Long maxScore = (Long) maxSchedule.get("maxSchedule");
+
+            Map<String, Object> maxScoreMap = new HashMap<>();
+            maxScoreMap.put("memberName", memberName);
+            maxScoreMap.put("score", maxScore);
+
+            result.add(maxScoreMap);
         }
 
+        return result;
     }
 
     @Override
