@@ -19,7 +19,7 @@ public class DailyAbsentScheduler {
         this.statService = statService;
     }
 
-    @Scheduled(cron = "0 59 23 * * ?")
+    @Scheduled(cron = "0 59 23 ? * MON-FRI")
     public void executeDailyLog() {
         try {
             statService.createAbsentLog();
