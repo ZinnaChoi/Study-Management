@@ -309,7 +309,7 @@ const WakeUpSuccessRate = () => {
           <div>
             {highestSuccessRateMember && (
               <p className="attendance-king">
-                출석왕은 {highestSuccessRateMember.memberName} 입니다.
+                기상왕은 {highestSuccessRateMember.memberName} 입니다.
               </p>
             )}
           </div>
