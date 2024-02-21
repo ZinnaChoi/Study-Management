@@ -62,6 +62,7 @@ public class MemberControllerTest {
     private static final String LOGIN_URL = "/api/v1/login";
     private static final String LOGOUT_URL = "/api/v1/logout";
     private static final String JOIN_URL = "/api/v1/join";
+    private static final String RESIGN_URL = "/api/v1/resign";
     private static final String ID_DUPLICATED_CHECK_URL = "/api/v1/join/check-id";
     private static final String MEMBER_INFO_URL = "/api/v1/member";
     private static final String MEMEBER_LIST_URL = "/api/v1/members";
@@ -158,6 +159,28 @@ public class MemberControllerTest {
         String requestBodyJson = objectMapper.writeValueAsString(req);
 
         TestUtil.performRequest(mockMvc, JOIN_URL, requestBodyJson, "POST", 400, 400);
+    }
+
+    /////////////////////////////////////////////////////////////////
+
+    @Test
+    @WithMockUser(username = "user1", authorities = { "USER" })
+    @Transactional
+    @Sql("/member/MemberSetup.sql")
+    @DisplayName("회원탈퇴 API 성공")
+    void resignSuccess() throws Exception {
+        TestUtil.performRequest(mockMvc, RESIGN_URL, null, "DELETE", 200, 200);
+    }
+
+    /////////////////////////////////////////////////////////////////
+
+    @Test
+    @WithMockUser(username = "admin", authorities = { "ADMIN" })
+    @Transactional
+    @Sql("/member/MemberSetup.sql")
+    @DisplayName("회원탈퇴 API 실패_관리자 권한")
+    void resignFail_roleAdmin() throws Exception {
+        TestUtil.performRequest(mockMvc, RESIGN_URL, null, "DELETE", 403, null);
     }
 
     /////////////////////////////////////////////////////////////////

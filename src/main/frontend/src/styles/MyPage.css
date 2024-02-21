@@ -40,3 +40,10 @@
   width: 35%;
   font-size: 14px;
 }
+
+.resign-align {
+  display: flex;
+  justify-content: end;
+  width: 85%;
+  margin-bottom: 20px;
+}

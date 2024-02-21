@@ -44,6 +44,8 @@ public class SecurityConfig {
                 .requestMatchers("/swagger-ui.html", "/v1/api-docs/**", "/swagger-ui/**", "/swagger-resources/**")
                 .permitAll() // swagger 경로
                 // 접근 허용
+                // 회원탈퇴는 USER만 가능
+                .requestMatchers(HttpMethod.DELETE, "/api/v1/resign").hasAuthority("USER")
                 // /api/v1/study/** 요청 중 get 메소드만 모든 권한 접근 가능
                 .requestMatchers(HttpMethod.GET, "/api/v1/study/**").hasAnyAuthority("ADMIN", "USER")
                 .requestMatchers("/api/v1/study/**").hasAuthority("ADMIN") // admin 권한만 접근 가능!

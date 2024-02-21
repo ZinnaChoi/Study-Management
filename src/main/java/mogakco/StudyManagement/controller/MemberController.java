@@ -3,6 +3,7 @@ package mogakco.StudyManagement.controller;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -103,6 +104,21 @@ public class MemberController extends CommonController {
         }
         return result;
 
+    }
+
+    @Operation(summary = "회원탈퇴", description = "회원탈퇴를 통해 사용자 정보 삭제")
+    @SecurityRequirement(name = "bearer-key")
+    @DeleteMapping("/resign")
+    public CommonRes doResign(HttpServletRequest request) {
+        CommonRes result = new CommonRes();
+
+        try {
+            result = memberService.resign();
+        } catch (Exception e) {
+            result = new CommonRes(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
+                    ErrorCode.INTERNAL_ERROR.getMessage());
+        }
+        return result;
     }
 
     @Operation(summary = "MyPage 회원 정보 조회", description = "로그인 된 회원 정보 조회")

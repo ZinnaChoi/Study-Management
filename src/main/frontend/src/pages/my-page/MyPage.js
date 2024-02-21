@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import Select from "react-select";
+import { useNavigate } from "react-router-dom";
 import { authClient } from "../../services/APIService";
+import { menuTree } from "../../constants/constants";
 import PersonIcon from "@mui/icons-material/Person";
 import EmailIcon from "@mui/icons-material/Email";
 import KeyIcon from "@mui/icons-material/Key";
@@ -11,9 +13,11 @@ import LockIcon from "@mui/icons-material/Lock";
 import MyPagePaper from "./MyPagePaper";
 import "../../styles/Button.css";
 import "../../styles/MyPage.css";
+import { Button } from "@mui/material";
 
 // 내 정보 화면
 export default function MyPage() {
+  const navigate = useNavigate();
   const [myProfileValueTitles, setMyProfileValueTitles] = useState([]);
   const [myProfileValueDescription, setMyProfileValueDescription] = useState(
     []
@@ -231,8 +235,38 @@ export default function MyPage() {
       });
   };
 
+  const doResign = () => {
+    const isConfirm = window.confirm(
+      "회원 탈퇴 시 사용자의 모든 정보가 삭제됩니다. \n정말 탈퇴하시겠습니까?"
+    );
+
+    if (isConfirm) {
+      authClient
+        .delete("/resign")
+        .then(function (response) {
+          if (response.data?.retCode === 200) {
+            alert("회원 정보가 정상적으로 삭제되었습니다.");
+            navigate(menuTree.login.path);
+          } else {
+            alert(response.data?.retMsg);
+          }
+        })
+        .catch(function (error) {
+          console.log(error);
+          alert(error.message);
+        });
+    }
+  };
+
   return (
     <React.Fragment>
+      {localStorage.getItem("role") !== "ADMIN" && (
+        <div className="resign-align">
+          <Button className="cancel-btn" onClick={doResign}>
+            회원 탈퇴
+          </Button>
+        </div>
+      )}
       <MyPagePaper
         paperTitle={myProfileProps.paperTitle}
         keys={myProfileProps.keys}

@@ -196,6 +196,22 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
     }
 
     @Override
+    @Transactional
+    public CommonRes resign() {
+        String loginUserId = SecurityUtil.getLoginUserId();
+
+        // redis에 접속한 아이디 정보가 있다면 삭제(회원 탈퇴 시 JWT 만료시키기 위함)
+        if (redisTemplate.opsForValue().get("JWT:" + loginUserId) != null) {
+            redisTemplate.delete("JWT:" + loginUserId);
+        }
+
+        Member member = memberRepository.findById(loginUserId);
+        memberRepository.delete(member);
+
+        return new CommonRes(systemId, ErrorCode.OK.getCode(), ErrorCode.OK.getMessage());
+    }
+
+    @Override
     public boolean isIdDuplicated(MemberIdDuplReq idInfo) {
 
         boolean isExist = memberRepository.existsById(idInfo.getId());

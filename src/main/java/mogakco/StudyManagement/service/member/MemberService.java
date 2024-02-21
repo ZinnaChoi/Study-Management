@@ -25,6 +25,8 @@ public interface MemberService {
 
     CommonRes join(MemberJoinReq joinInfo);
 
+    CommonRes resign();
+
     boolean isIdDuplicated(MemberIdDuplReq idInfo);
 
     MemberInfoRes getMemberInfo();
