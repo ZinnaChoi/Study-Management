@@ -62,7 +62,7 @@ public class MemberControllerTest {
     private static final String LOGIN_URL = "/api/v1/login";
     private static final String LOGOUT_URL = "/api/v1/logout";
     private static final String JOIN_URL = "/api/v1/join";
-    private static final String RESIGN_URL = "/api/v1/resign";
+    private static final String WITHDRAW_URL = "/api/v1/withdraw";
     private static final String ID_DUPLICATED_CHECK_URL = "/api/v1/join/check-id";
     private static final String MEMBER_INFO_URL = "/api/v1/member";
     private static final String MEMEBER_LIST_URL = "/api/v1/members";
@@ -168,8 +168,8 @@ public class MemberControllerTest {
     @Transactional
     @Sql("/member/MemberSetup.sql")
     @DisplayName("회원탈퇴 API 성공")
-    void resignSuccess() throws Exception {
-        TestUtil.performRequest(mockMvc, RESIGN_URL, null, "DELETE", 200, 200);
+    void withdrawSuccess() throws Exception {
+        TestUtil.performRequest(mockMvc, WITHDRAW_URL, null, "DELETE", 200, 200);
     }
 
     /////////////////////////////////////////////////////////////////
@@ -179,8 +179,17 @@ public class MemberControllerTest {
     @Transactional
     @Sql("/member/MemberSetup.sql")
     @DisplayName("회원탈퇴 API 실패_관리자 권한")
-    void resignFail_roleAdmin() throws Exception {
-        TestUtil.performRequest(mockMvc, RESIGN_URL, null, "DELETE", 403, null);
+    void withdrawFail_roleAdmin() throws Exception {
+        TestUtil.performRequest(mockMvc, WITHDRAW_URL, null, "DELETE", 403, null);
+    }
+
+    /////////////////////////////////////////////////////////////////
+
+    @Test
+    @WithMockUser(username = "sajdwqe81236234", authorities = { "USER" })
+    @DisplayName("회원탈퇴 API 실패_존재하지 않는 회원 탈퇴")
+    void withdrawFail_InvalidId() throws Exception {
+        TestUtil.performRequest(mockMvc, WITHDRAW_URL, null, "DELETE", 200, 400);
     }
 
     /////////////////////////////////////////////////////////////////

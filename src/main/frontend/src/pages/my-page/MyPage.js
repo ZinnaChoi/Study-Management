@@ -230,19 +230,21 @@ export default function MyPage() {
         }
       })
       .catch(function (error) {
-        console.log(error);
-        alert(error.response?.data.retMsg);
+        alert(
+          "회원 정보 변경 실패: " +
+            (error.response?.data.retMsg || "Unknown error")
+        );
       });
   };
 
-  const doResign = () => {
+  const doWithdraw = () => {
     const isConfirm = window.confirm(
       "회원 탈퇴 시 사용자의 모든 정보가 삭제됩니다. \n정말 탈퇴하시겠습니까?"
     );
 
     if (isConfirm) {
       authClient
-        .delete("/resign")
+        .delete("/withdraw")
         .then(function (response) {
           if (response.data?.retCode === 200) {
             alert("회원 정보가 정상적으로 삭제되었습니다.");
@@ -252,21 +254,13 @@ export default function MyPage() {
           }
         })
         .catch(function (error) {
-          console.log(error);
-          alert(error.message);
+          alert("회원 탈퇴 실패: " + (error.message || "Unknown error"));
         });
     }
   };
 
   return (
     <React.Fragment>
-      {localStorage.getItem("role") !== "ADMIN" && (
-        <div className="resign-align">
-          <Button className="cancel-btn" onClick={doResign}>
-            회원 탈퇴
-          </Button>
-        </div>
-      )}
       <MyPagePaper
         paperTitle={myProfileProps.paperTitle}
         keys={myProfileProps.keys}
@@ -303,6 +297,13 @@ export default function MyPage() {
         switchClicked={handleSwitchChange}
         useSwitch={true}
       />
+      {localStorage.getItem("role") !== "ADMIN" && (
+        <div className="resign-align">
+          <Button className="cancel-btn" onClick={doWithdraw}>
+            회원 탈퇴
+          </Button>
+        </div>
+      )}
     </React.Fragment>
   );
 }

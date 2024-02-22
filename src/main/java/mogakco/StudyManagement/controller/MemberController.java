@@ -108,12 +108,12 @@ public class MemberController extends CommonController {
 
     @Operation(summary = "회원탈퇴", description = "회원탈퇴를 통해 사용자 정보 삭제")
     @SecurityRequirement(name = "bearer-key")
-    @DeleteMapping("/resign")
-    public CommonRes doResign(HttpServletRequest request) {
+    @DeleteMapping("/withdraw")
+    public CommonRes doWithDraw(HttpServletRequest request) {
         CommonRes result = new CommonRes();
 
         try {
-            result = memberService.resign();
+            result = memberService.withdraw();
         } catch (Exception e) {
             result = new CommonRes(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
                     ErrorCode.INTERNAL_ERROR.getMessage());

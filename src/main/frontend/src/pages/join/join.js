@@ -12,10 +12,9 @@ import "../../styles/Join.css";
 export default function Join() {
   const navigate = useNavigate();
   const [id, setId] = useState("");
-  const [pwd, setPwd] = useState({ password: "", showPassword: false });
-  const [confirmPwd, setConfirmPwd] = useState({
-    password: "",
-    showPassword: false,
+  const [passwords, setPasswords] = useState({
+    pwd: { value: "", show: false },
+    confirmPwd: { value: "", show: false },
   });
 
   const [schedules, setSchedules] = useState([]);
@@ -72,15 +71,21 @@ export default function Join() {
 
   const handleClickShowPassword = (val) => {
     if (val === "password") {
-      setPwd({
-        ...pwd,
-        showPassword: !pwd.showPassword,
-      });
+      setPasswords((prevPasswords) => ({
+        ...prevPasswords,
+        pwd: {
+          ...prevPasswords.pwd,
+          show: !prevPasswords.pwd.show,
+        },
+      }));
     } else if (val === "password-confirm") {
-      setConfirmPwd({
-        ...confirmPwd,
-        showPassword: !confirmPwd.showPassword,
-      });
+      setPasswords((prevPasswords) => ({
+        ...prevPasswords,
+        confirmPwd: {
+          ...prevPasswords.confirmPwd,
+          show: !prevPasswords.confirmPwd.show,
+        },
+      }));
     }
   };
 
@@ -105,15 +110,30 @@ export default function Join() {
         }
       })
       .catch(function (error) {
-        console.log(error);
+        alert(
+          "중복 아이디 확인 실패: " +
+            (error.response?.data.retMsg || "Unknown error")
+        );
       });
   };
 
   const handleChange = (prop) => (event) => {
     if (prop === "password") {
-      setPwd({ ...pwd, password: event.target.value });
+      setPasswords((prevPasswords) => ({
+        ...prevPasswords,
+        pwd: {
+          ...prevPasswords.pwd,
+          value: event.target.value,
+        },
+      }));
     } else if (prop === "password-confirm") {
-      setConfirmPwd({ ...confirmPwd, password: event.target.value });
+      setPasswords((prevPasswords) => ({
+        ...prevPasswords,
+        confirmPwd: {
+          ...prevPasswords.confirmPwd,
+          value: event.target.value,
+        },
+      }));
     }
   };
 
@@ -150,7 +170,6 @@ export default function Join() {
         }
       })
       .catch(function (error) {
-        console.log(error);
         const messages = JSON.parse(error.response?.data.retMsg);
         let message = "";
         for (let key in messages) {
@@ -216,8 +235,8 @@ export default function Join() {
                   className="input-size"
                   id="password"
                   name="password"
-                  type={pwd.showPassword ? "text" : "password"}
-                  value={pwd.password}
+                  type={passwords.pwd.show ? "text" : "password"}
+                  value={passwords.pwd.value}
                   onChange={handleChange("password")}
                   placeholder="8~16자 영문 대 소문자, 숫자, 특수문자"
                   autoComplete="current-password"
@@ -226,7 +245,7 @@ export default function Join() {
                       size="small"
                       onClick={() => handleClickShowPassword("password")}
                     >
-                      {pwd.showPassword ? (
+                      {passwords.pwd.show ? (
                         <Visibility fontSize="small" />
                       ) : (
                         <VisibilityOff fontSize="small" />
@@ -246,8 +265,8 @@ export default function Join() {
                   className="input-size"
                   id="password-confirm"
                   name="password-confirm"
-                  type={confirmPwd.showPassword ? "text" : "password"}
-                  value={confirmPwd.password}
+                  type={passwords.confirmPwd.show ? "text" : "password"}
+                  value={passwords.confirmPwd.value}
                   onChange={handleChange("password-confirm")}
                   endAdornment={
                     <Button
@@ -256,7 +275,7 @@ export default function Join() {
                         handleClickShowPassword("password-confirm")
                       }
                     >
-                      {confirmPwd.showPassword ? (
+                      {passwords.confirmPwd.show ? (
                         <Visibility fontSize="small" />
                       ) : (
                         <VisibilityOff fontSize="small" />
