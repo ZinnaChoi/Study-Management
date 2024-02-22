@@ -14,18 +14,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 import mogakco.StudyManagement.dto.MemberLoginRes;
 
 import org.springframework.web.context.request.RequestContextHolder;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 @Aspect
 @Component
+@Slf4j
 public class LoggingAspect {
-
-    private static final Logger logger = LoggerFactory.getLogger(LoggingAspect.class);
     private static final ThreadLocal<Long> startTime = new ThreadLocal<>();
     private static final ThreadLocal<Long> dbStartTime = new ThreadLocal<>();
 
@@ -55,7 +52,7 @@ public class LoggingAspect {
                 return objectMapper.writeValueAsString(object);
             }
         } catch (JsonProcessingException e) {
-            logger.error("JSON serialization error", e);
+            log.error("JSON serialization error", e);
             return "Error serializing object to JSON";
         }
     }
@@ -69,7 +66,7 @@ public class LoggingAspect {
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         HttpServletRequest request = attributes.getRequest();
 
-        logger.info("Started API: {} {} in system {}",
+        log.info("Started API: {} {} in system {}",
                 request.getMethod(),
                 request.getRequestURL().toString(),
                 systemId);
@@ -80,7 +77,7 @@ public class LoggingAspect {
         long executionTime = System.currentTimeMillis() - startTime.get();
         startTime.remove();
 
-        logger.info("Completed API: {} with responseBody: {} in {} ms",
+        log.info("Completed API: {} with responseBody: {} in {} ms",
                 request.getRequestURL().toString(),
                 responseBodyJson,
                 executionTime);
@@ -92,7 +89,7 @@ public class LoggingAspect {
     public void logDbAccessStart(JoinPoint joinPoint) {
         long start = System.currentTimeMillis();
         dbStartTime.set(start);
-        logger.info("DB Access Start: {}", joinPoint.getSignature().getName());
+        log.info("DB Access Start: {}", joinPoint.getSignature().getName());
     }
 
     @After("execution(* mogakco.StudyManagement.repository..*(..))")
@@ -100,7 +97,7 @@ public class LoggingAspect {
         long end = System.currentTimeMillis();
         long duration = end - dbStartTime.get();
         dbStartTime.remove();
-        logger.info("DB Access End: {} took {} ms", joinPoint.getSignature().getName(), duration);
+        log.info("DB Access End: {} took {} ms", joinPoint.getSignature().getName(), duration);
     }
 
 }
