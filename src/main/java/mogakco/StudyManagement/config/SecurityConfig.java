@@ -40,9 +40,12 @@ public class SecurityConfig {
         http.authorizeHttpRequests((auth) -> auth
                 .requestMatchers("/", "api/v1/login", "api/v1/join", "api/v1/join/check-id")
                 .permitAll() // 회원가입, 로그인, 중복 아이디 확인은 인증 X
+                .requestMatchers(HttpMethod.GET, "api/v1/schedules").permitAll()
                 .requestMatchers("/swagger-ui.html", "/v1/api-docs/**", "/swagger-ui/**", "/swagger-resources/**")
                 .permitAll() // swagger 경로
                 // 접근 허용
+                // 회원탈퇴는 USER만 가능
+                .requestMatchers(HttpMethod.DELETE, "/api/v1/withdraw").hasAuthority("USER")
                 // /api/v1/study/** 요청 중 get 메소드만 모든 권한 접근 가능
                 .requestMatchers(HttpMethod.GET, "/api/v1/study/**").hasAnyAuthority("ADMIN", "USER")
                 .requestMatchers("/api/v1/study/**").hasAuthority("ADMIN") // admin 권한만 접근 가능!

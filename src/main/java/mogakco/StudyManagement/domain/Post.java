@@ -18,6 +18,9 @@ import mogakco.StudyManagement.util.DateUtil;
 
 import java.util.Objects;
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 @Entity
 @Builder
 @NoArgsConstructor
@@ -31,7 +34,8 @@ public class Post {
     private Long postId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id", nullable = false)
+    @JoinColumn(name = "member_id", nullable = true)
+    @OnDelete(action = OnDeleteAction.SET_NULL)
     private Member member;
 
     @Column(length = 60, nullable = false)

@@ -1,0 +1,39 @@
+.join-layout {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+.join-paper-size {
+  padding: 20px !important;
+  min-width: 400px !important;
+  max-width: 500px !important;
+}
+
+.join-row-space {
+  margin-top: 20px;
+}
+
+.join-input-key {
+  font-size: 14px !important;
+  margin-top: 5px;
+  min-width: 25%;
+}
+
+.join-content {
+  display: flex !important;
+  align-items: center !important;
+  min-width: 300px !important;
+}
+
+.join-contents {
+  margin-left: 20px;
+}
+.input-size {
+  width: 70% !important;
+}
+
+.join-title {
+  font-weight: bold !important;
+}

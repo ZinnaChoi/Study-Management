@@ -27,7 +27,7 @@ public class PostList {
     public PostList(Post post, Integer likes, Integer commentCnt) {
         this.postId = post.getPostId();
         this.title = post.getTitle();
-        this.memberName = post.getMember().getName();
+        this.memberName = post.getMember() == null ? "[Unknown]" : post.getMember().getName();
         this.viewCnt = post.getViewCnt();
         this.createdAt = post.getCreatedAt();
         this.updatedAt = post.getUpdatedAt();
