@@ -30,7 +30,7 @@ public class PostDetail {
 
     public PostDetail(Post post, Integer likes, List<PostDetailComment> comments) {
         this.postId = post.getPostId();
-        this.memberName = post.getMember().getName();
+        this.memberName = post.getMember() == null ? "[Unknown]" : post.getMember().getName();
         this.title = post.getTitle();
         this.content = post.getContent();
         this.viewCnt = post.getViewCnt();

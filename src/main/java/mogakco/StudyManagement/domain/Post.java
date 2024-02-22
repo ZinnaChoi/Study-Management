@@ -34,8 +34,8 @@ public class Post {
     private Long postId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id", nullable = false)
-    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JoinColumn(name = "member_id", nullable = true)
+    @OnDelete(action = OnDeleteAction.SET_NULL)
     private Member member;
 
     @Column(length = 60, nullable = false)
