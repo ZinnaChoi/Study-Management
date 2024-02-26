@@ -136,14 +136,14 @@ public class StatServiceImpl implements StatService {
             WakeUp wakeUpMember = wakeUpRepository.findByMember(member);
 
             if (wakeUpMember == null) {
-                throw new NotFoundException(ErrorCode.NOT_FOUND.getMessage("member의 목표 기상 시간"));
+                throw new NotFoundException(ErrorCode.NOT_FOUND.getMessage(member.getName() + "의 목표 기상 시간"));
             }
 
             boolean checkdailylog = dailyLogRepository.existsByTypeAndDateAndMember(LogType.WAKEUP,
                     DateUtil.getCurrentDate(),
                     member);
             if (checkdailylog) {
-                throw new NotFoundException(ErrorCode.CONFLICT.getMessage("member의 금일 기상 로그"));
+                throw new NotFoundException(ErrorCode.CONFLICT.getMessage(member.getName() + "의 금일 기상 로그"));
             }
 
             DailyLog newLog;

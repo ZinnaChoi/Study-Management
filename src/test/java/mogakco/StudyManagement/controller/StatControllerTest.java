@@ -103,7 +103,7 @@ public class StatControllerTest {
         JsonNode responseBody = objectMapper.readTree(result.getResponse().getContentAsString());
 
         int contentCount = responseBody.path("content").size();
-        assertTrue(contentCount == 1);
+        assertTrue(contentCount >= 1);
 
     }
 

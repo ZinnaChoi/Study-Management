@@ -45,11 +45,10 @@ export default function MembersInfo() {
       <h3>기상 시간 별 스터디원</h3>
       <hr />
       <MemberByWakeup />
-      <WakeupPopup
-        open={openWakeupPopup}
-        onClose={closeWakeupPopup}
-        onRefresh={doSomeAction}
-      />
+      <WakeupPopup 
+        open={openWakeupPopup} 
+        onClose={closeWakeupPopup} 
+        />
       {/* TODO: 다이얼로그 예제, 삭제 예정임 */}
       <hr />
       <div>
