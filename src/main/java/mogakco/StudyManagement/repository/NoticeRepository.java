@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import mogakco.StudyManagement.domain.Member;
 import mogakco.StudyManagement.domain.Notice;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,6 +17,8 @@ import org.springframework.transaction.annotation.Transactional;
 public interface NoticeRepository extends JpaRepository<Notice, Long> {
 
     Optional<Notice> findByMember_MemberId(@Param("memberId") Long memberId);
+
+    Notice findByMember(Member member);
 
     @Transactional
     @Modifying
