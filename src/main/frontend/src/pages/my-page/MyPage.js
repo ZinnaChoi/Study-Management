@@ -276,7 +276,7 @@ export default function MyPage() {
 
   const getNoticeStat = () => {
     authClient
-      .get("notice/stat")
+      .get("notice")
       .then((response) => {
         if (response.data?.retCode === 200) {
           const content = response.data?.content || {};
@@ -341,7 +341,7 @@ export default function MyPage() {
 
   const updateNoticeStat = (updatedSwitchStates) => {
     authClient
-      .patch("/notice/update", updatedSwitchStates)
+      .patch("/notice", updatedSwitchStates)
       .then((response) => {
         if (response.data?.retCode === 200) {
           alert("알림 설정이 업데이트되었습니다.");
