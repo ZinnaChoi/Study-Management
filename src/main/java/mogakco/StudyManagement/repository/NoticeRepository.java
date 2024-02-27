@@ -37,4 +37,8 @@ public interface NoticeRepository extends JpaRepository<Notice, Long> {
     @Query("SELECT n.member.memberId FROM Notice n WHERE n.wakeup = true")
     List<Long> findByWakeupTrue();
 
+    @Modifying
+    default void insertNoticeForMember(Member member) {
+        save(new Notice(member));
+    }
 }
