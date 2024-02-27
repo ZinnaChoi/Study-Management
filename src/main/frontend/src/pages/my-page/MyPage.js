@@ -25,6 +25,13 @@ export default function MyPage() {
 
   const [schedules, setSchedules] = useState([]);
   const [selectedSchedules, setSelectedSchedules] = useState([]);
+  const [switchStates, setSwitchStates] = useState({
+    ALL: null,
+    linkShare: null,
+    absent: null,
+    wakeup: null,
+    newPost: null,
+  });
 
   const SchedulesSelect = () => {
     return (
@@ -88,7 +95,7 @@ export default function MyPage() {
 
   const alarmConfigProps = {
     paperTitle: "알람 설정",
-    keys: ["ALL", "GOOGLE_MEET", "ABSENT", "WAKEUP_SUCCESS", "NEW_POST"],
+    keys: ["ALL", "linkShare", "absent", "wakeup", "newPost"],
     iconComponents: [],
     valueTitle: [
       "전체",
@@ -98,11 +105,19 @@ export default function MyPage() {
       "새 글",
     ],
     valueDescription: [],
+    content: {
+      ALL: false,
+      wakeup: false,
+      absent: false,
+      newPost: false,
+      linkShare: false,
+    },
   };
 
   useEffect(() => {
     getMemberInfo();
     getSchedules();
+    getNoticeStat();
   }, []);
 
   // myProfileValueTitles 상태가 변경된 후에 실행될 로직 처리
@@ -259,6 +274,91 @@ export default function MyPage() {
     }
   };
 
+  const getNoticeStat = () => {
+    authClient
+      .get("notice/stat")
+      .then((response) => {
+        if (response.data?.retCode === 200) {
+          const content = response.data?.content || {};
+          if (
+            content.linkShare === true &&
+            content.absent === true &&
+            content.wakeup === true &&
+            content.newPost === true
+          ) {
+            setSwitchStates({
+              ALL: true,
+              linkShare: content.linkShare,
+              absent: content.absent,
+              wakeup: content.wakeup,
+              newPost: content.newPost,
+            });
+          } else {
+            setSwitchStates({
+              ALL: false,
+              linkShare: content.linkShare,
+              absent: content.absent,
+              wakeup: content.wakeup,
+              newPost: content.newPost,
+            });
+          }
+        } else {
+          alert(response.data?.retMsg);
+        }
+      })
+      .catch((error) => {
+        alert(
+          "알림 상태 조회 실패: " +
+            (error.response?.data.retMsg || "Unknown error")
+        );
+      });
+  };
+
+  const handleSwitchChange = (key, isChecked) => {
+    let updatedSwitchStates;
+    if (key === "ALL") {
+      updatedSwitchStates = {
+        ALL: isChecked,
+        linkShare: isChecked === false ? false : true,
+        absent: isChecked === false ? false : true,
+        wakeup: isChecked === false ? false : true,
+        newPost: isChecked === false ? false : true,
+      };
+    } else {
+      updatedSwitchStates = {
+        ...switchStates,
+        [key]: isChecked,
+      };
+
+      updatedSwitchStates.ALL = Object.values(updatedSwitchStates)
+        .slice(0, 4)
+        .every((value) => value);
+    }
+
+    setSwitchStates(updatedSwitchStates);
+    updateNoticeStat(updatedSwitchStates);
+  };
+
+  const updateNoticeStat = (updatedSwitchStates) => {
+    authClient
+      .patch("/notice/update", updatedSwitchStates)
+      .then((response) => {
+        if (response.data?.retCode === 200) {
+          alert("알림 설정이 업데이트되었습니다.");
+        } else {
+          alert(response.data?.retMsg);
+        }
+      })
+      .catch((error) => {
+        alert(
+          "알림 설정 업데이트 실패: " +
+            (error.response?.data.retMsg || "Unknown error")
+        );
+      });
+
+    setSwitchStates(updatedSwitchStates);
+  };
+
   return (
     <React.Fragment>
       <MyPagePaper
@@ -296,6 +396,7 @@ export default function MyPage() {
         valueDescription={alarmConfigProps.valueDescription}
         switchClicked={handleSwitchChange}
         useSwitch={true}
+        switchStates={switchStates}
       />
       {localStorage.getItem("role") !== "ADMIN" && (
         <div className="resign-align">
@@ -307,13 +408,3 @@ export default function MyPage() {
     </React.Fragment>
   );
 }
-
-/**
- * To 다연님
- * 스위치 버튼 클릭 시 아래 함수 실행됨
- * 함수만 만들어 놓았으며, 전체 버튼 on/off 시 다른 스위치 버튼 동작 처리,
- * 기본 설정값 반영등은 직접 구현해야함
- * */
-const handleSwitchChange = (key, isChecked) => {
-  alert(key + " 스위치 버튼 " + isChecked);
-};
