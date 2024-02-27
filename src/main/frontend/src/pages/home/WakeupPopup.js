@@ -3,14 +3,13 @@ import { authClient } from "../../services/APIService";
 import CommonDialog from "../../components/CommonDialog";
 import { TextField } from "@mui/material";
 
-const WakeupPopup = ({ open, onClose, onRefresh }) => {
+const WakeupPopup = ({ open, onClose }) => {
   const fetchWakeupLog = () => {
     authClient
       .post("/stat/wakeup")
       .then((response) => {
         alert(response.data.retMsg);
         onClose();
-        onRefresh();
       })
       .catch((error) => {
         alert(
