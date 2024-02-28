@@ -1,7 +1,6 @@
 package mogakco.StudyManagement.controller;
 
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -33,14 +32,14 @@ public class NoticeController extends CommonController {
     }
 
     @Operation(summary = "알림 상태 조회", description = "개인별 알림 수신 여부 상태 조회")
-    @GetMapping("/notice/{memberId}")
+    @GetMapping("/notice")
     public NoticeGetRes getNotice(
-            HttpServletRequest request, @PathVariable(name = "memberId", required = true) Long memberId) {
+            HttpServletRequest request) {
 
         NoticeGetRes result = new NoticeGetRes();
 
         try {
-            result = noticeService.getNotice(memberId);
+            result = noticeService.getNotice();
         } catch (Exception e) {
             result = new NoticeGetRes(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
                     ErrorCode.INTERNAL_ERROR.getMessage(), null);
@@ -51,14 +50,12 @@ public class NoticeController extends CommonController {
 
     @Operation(summary = "알림 상태 수정", description = "개인별 알림 수신 여부 상태 수정")
     @SecurityRequirement(name = "bearer-key")
-    @PatchMapping(value = "/notice/{memberId}")
-    public CommonRes updateNotice(HttpServletRequest request,
-            @PathVariable(name = "memberId", required = true) Long memberId,
-            @RequestBody @Valid NoticeReq noticeReq) {
+    @PatchMapping(value = "/notice")
+    public CommonRes updateNotice(HttpServletRequest request, @RequestBody @Valid NoticeReq noticeReq) {
         CommonRes result = new CommonRes();
 
         try {
-            result = noticeService.updateNotice(memberId, noticeReq);
+            result = noticeService.updateNotice(noticeReq);
             result.setSystemId(systemId);
         } catch (Exception e) {
             e.printStackTrace();
