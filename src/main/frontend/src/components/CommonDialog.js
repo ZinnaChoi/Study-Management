@@ -65,7 +65,7 @@ export default function CommonDialog(props) {
             event.preventDefault();
             const formData = new FormData(event.currentTarget);
             const formJson = Object.fromEntries(formData.entries());
-            props.submitEvt(formJson);
+            props.submitEvt(formJson, event);
             closeAfterSubmit && handleClose(event, reason);
           },
         }}
@@ -83,6 +83,7 @@ export default function CommonDialog(props) {
                   margin="dense"
                   id={name}
                   name={name}
+                  value={props.defaultValues && props.defaultValues[index]}
                   helperText={props.descriptions && props.descriptions[index]}
                   type={props.inputTypes && props.inputTypes[index]}
                   variant="outlined"
