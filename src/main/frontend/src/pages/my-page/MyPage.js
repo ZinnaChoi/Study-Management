@@ -26,11 +26,11 @@ export default function MyPage() {
   const [schedules, setSchedules] = useState([]);
   const [selectedSchedules, setSelectedSchedules] = useState([]);
   const [switchStates, setSwitchStates] = useState({
-    ALL: null,
-    linkShare: null,
-    absent: null,
-    wakeup: null,
-    newPost: null,
+    ALL: false,
+    linkShare: false,
+    absent: false,
+    wakeup: false,
+    newPost: false,
   });
 
   const SchedulesSelect = () => {
@@ -331,7 +331,7 @@ export default function MyPage() {
       };
 
       updatedSwitchStates.ALL = Object.values(updatedSwitchStates)
-        .slice(0, 4)
+        .slice(1)
         .every((value) => value);
     }
 
