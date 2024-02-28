@@ -10,4 +10,6 @@ public interface StatService {
     CommonRes createAbsentLog();
 
     CommonRes createWakeUpLog();
+
+    CommonRes createEmptyWakeUpLog();
 }

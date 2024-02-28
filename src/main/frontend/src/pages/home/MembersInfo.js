@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import CommonDialog from "../../components/CommonDialog";
 import { Button, TextField } from "@mui/material";
 import MemberBySchedule from "./MemberBySchedule";
 import MemberByWakeup from "./MemberByWakeup";
+import WakeupPopup from "./WakeupPopup";
 import "../../styles/Button.css";
 import "../../styles/NoticeBoard.css";
 
@@ -21,10 +22,14 @@ export default function MembersInfo() {
     submitEvt: doSomeAction,
     showButton: true,
   };
+  const [openWakeupPopup, setOpenWakeupPopup] = useState(false);
 
   const wakeupSuccess = () => {
-    // TODO: 다연님 기상 체크 버튼 클릭 시 로직 작성
-    alert("기상 확인 로직 구현 바랍니다.");
+    setOpenWakeupPopup(true);
+  };
+
+  const closeWakeupPopup = () => {
+    setOpenWakeupPopup(false);
   };
 
   return (
@@ -40,7 +45,10 @@ export default function MembersInfo() {
       <h3>기상 시간 별 스터디원</h3>
       <hr />
       <MemberByWakeup />
-
+      <WakeupPopup 
+        open={openWakeupPopup} 
+        onClose={closeWakeupPopup} 
+        />
       {/* TODO: 다이얼로그 예제, 삭제 예정임 */}
       <hr />
       <div>

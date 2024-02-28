@@ -145,11 +145,20 @@ public class StatServiceImpl implements StatService {
     @Transactional
     public CommonRes createWakeUpLog() {
         try {
+
             Member member = getLoginMember();
+
             WakeUp wakeUpMember = wakeUpRepository.findByMember(member);
 
             if (wakeUpMember == null) {
-                throw new NotFoundException(ErrorCode.NOT_FOUND.getMessage("member의 목표 기상 시간"));
+                throw new NotFoundException(ErrorCode.NOT_FOUND.getMessage(member.getName() + "의 목표 기상 시간"));
+            }
+
+            boolean checkdailylog = dailyLogRepository.existsByTypeAndDateAndMember(LogType.WAKEUP,
+                    DateUtil.getCurrentDate(),
+                    member);
+            if (checkdailylog) {
+                throw new NotFoundException(ErrorCode.CONFLICT.getMessage(member.getName() + "의 금일 기상 로그"));
             }
 
             DailyLog newLog;
@@ -171,4 +180,33 @@ public class StatServiceImpl implements StatService {
             return ExceptionUtil.handleException(e);
         }
     }
+
+    @Override
+    @Transactional
+    public CommonRes createEmptyWakeUpLog() {
+        try {
+
+            List<WakeUp> WakeUp = wakeUpRepository.findAll();
+            DailyLog newLog = null;
+
+            for (WakeUp w : WakeUp) {
+
+                if (!dailyLogRepository.existsByTypeAndDateAndMember(LogType.WAKEUP, DateUtil.getCurrentDate(),
+                        w.getMember())) {
+
+                    newLog = new DailyLog(w.getMember(), DateUtil.getCurrentDate(), LogType.WAKEUP, 0,
+                            DateUtil.getCurrentDateTime());
+
+                }
+
+                dailyLogRepository.save(newLog);
+            }
+
+            return new CommonRes(systemId, ErrorCode.OK.getCode(), "기상 로그 업데이트가 성공적으로 완료되었습니다.");
+        } catch (NotFoundException | InvalidRequestException e) {
+            return ExceptionUtil.handleException(e);
+        }
+
+    }
+
 }
