@@ -79,7 +79,6 @@ root.render(
                             <Management />
                           )
                         }
-                        // element={<Management />}
                       ></Route>
                       {/* 상단에 위치하는 라우트들의 규칙을 모두 확인, 일치하는 라우트가 없는경우 처리 */}
                       <Route
