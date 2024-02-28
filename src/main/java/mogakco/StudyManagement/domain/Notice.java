@@ -78,4 +78,12 @@ public class Notice {
         return this;
     }
 
+    public Notice(Member member) {
+        this.member = member;
+        this.absent = true;
+        this.lastShareDate = "0";
+        this.linkShare = true;
+        this.newPost = true;
+        this.wakeup = true;
+    }
 }

@@ -36,6 +36,11 @@ export default function MyPagePaper(props) {
                       onChange={(e) =>
                         props.switchClicked(props.keys[index], e.target.checked)
                       }
+                      checked={
+                        props.useSwitch
+                          ? props.switchStates[props.keys[index]]
+                          : false
+                      }
                     />
                   ) : (
                     props.useBtn[index] &&

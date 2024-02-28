@@ -8,9 +8,9 @@ import mogakco.StudyManagement.enums.MessageType;
 
 public interface NoticeService {
 
-    NoticeGetRes getNotice(Long memberId);
+    NoticeGetRes getNotice();
 
-    CommonRes updateNotice(Long memberId, NoticeReq noticeReq);
+    CommonRes updateNotice(NoticeReq noticeReq);
 
     CommonRes createGeneralNotice();
 
