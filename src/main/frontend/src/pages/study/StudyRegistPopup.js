@@ -1,11 +1,17 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Tooltip, Chip } from "@mui/material";
 import CommonDialog from "../../components/CommonDialog";
-import "../../styles/Button.css";
-import "../../styles/MyPage.css";
+import "../../styles/Dialog.css";
+import "../../styles/StudyManagement.css";
 
 export default function StudyRegistPopup(props) {
   const [addedSchedules, setAddedSchedules] = useState([]);
+
+  useEffect(() => {
+    if (props.schedules) {
+      setAddedSchedules(props.schedules);
+    }
+  }, [props.schedules]);
 
   const handleChipDelete = (target) => {
     setAddedSchedules((prevSchedules) => {
@@ -29,7 +35,7 @@ export default function StudyRegistPopup(props) {
     return (
       <div>
         <div className="dialog-content">
-          <div className="mypage-select-title">스케줄</div>
+          <div className="study-select-title">스케줄</div>
           <CommonDialog
             btnTitle={"추가"}
             title={"스케줄 등록"}
@@ -43,7 +49,7 @@ export default function StudyRegistPopup(props) {
           ></CommonDialog>
         </div>
         <div className="dialog-content">
-          <div className="mypage-select-title"></div>
+          <div className="study-select-title"></div>
           {addedSchedules.map((as, index) => (
             <Tooltip
               key={index}
@@ -52,7 +58,7 @@ export default function StudyRegistPopup(props) {
               )} ~ ${as.endTime.slice(0, 2)}:${as.endTime.slice(2)}`}
             >
               <Chip
-                style={{ marginTop: "5px" }}
+                className="study-regist-chip-space"
                 onDelete={() => handleChipDelete(as)}
                 label={as.scheduleName}
               ></Chip>
@@ -73,6 +79,8 @@ export default function StudyRegistPopup(props) {
         isRequireds={[true, false]}
         inputTypes={["", "file"]}
         acceptStr={"등록"}
+        cancleStr={props.useCancel && "취소"}
+        onClose={props.onClose && props.onClose}
         submitEvt={(data) => props.doAction(data, addedSchedules)}
         showButton={false}
         extraComponents={<SchedulesAdd />}

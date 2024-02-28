@@ -1,0 +1,35 @@
+.study-paper-content {
+  margin: 0px 50px 0px 50px;
+}
+
+.study-select-title {
+  width: 35%;
+  font-size: 14px;
+}
+
+.study-btn-align {
+  display: flex;
+  justify-content: end;
+}
+
+.study-btn-space {
+  margin-right: 15px !important;
+}
+
+.study-logo-container {
+  display: flex;
+  justify-content: center;
+  margin: auto;
+  width: 320px;
+  height: 320px;
+  border: 1px solid black;
+  border-radius: 4px;
+}
+
+.study-manage-chip-space {
+  margin-right: 3px !important;
+}
+
+.study-regist-chip-space {
+  margin-top: 5px !important;
+}
