@@ -34,7 +34,7 @@ export default function StudyRegistPopup(props) {
   const SchedulesAdd = () => {
     return (
       <div>
-        <div className="dialog-content">
+        <div className="dialog-content fullwidth-content">
           <div className="study-select-title">스케줄</div>
           <CommonDialog
             btnTitle={"추가"}
@@ -48,7 +48,7 @@ export default function StudyRegistPopup(props) {
             showButton={true}
           ></CommonDialog>
         </div>
-        <div className="dialog-content">
+        <div className="dialog-content fullwidth-content">
           <div className="study-select-title"></div>
           {addedSchedules.map((as, index) => (
             <Tooltip
@@ -80,9 +80,12 @@ export default function StudyRegistPopup(props) {
         inputTypes={["", "file"]}
         acceptStr={"등록"}
         cancleStr={props.useCancel && "취소"}
+        defaultValues={props.studyName && [props.studyName, ""]}
         onClose={props.onClose && props.onClose}
         submitEvt={(data) => props.doAction(data, addedSchedules)}
         showButton={false}
+        useCheckbox={props.currentLogoCheckbox && props.currentLogoCheckbox}
+        checkboxLabel={props.logoCheckboxLabel}
         extraComponents={<SchedulesAdd />}
       ></CommonDialog>
     </div>

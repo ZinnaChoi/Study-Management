@@ -24,6 +24,7 @@ function Header() {
   const [anchorElStudy, setAnchorElStudy] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
   const [logo, setLogo] = React.useState(null);
+  const [studyName, setStudyName] = React.useState("");
 
   const handleOpenStatisticsSubMenu = (event) => {
     setAnchorElStudy(event.currentTarget);
@@ -68,6 +69,7 @@ function Header() {
       .get("/study")
       .then(function (response) {
         setLogo(response.data?.logo);
+        setStudyName(response.data?.studyName);
         if (
           !response.data?.studyName &&
           location.pathname !== menuTree.management.path
@@ -127,6 +129,7 @@ function Header() {
               <HomeIcon fontSize="large" />
             )}
           </Link>
+          <h4 style={{ marginLeft: "10px" }}>{studyName}</h4>
           <Box
             sx={{
               gap: 3,

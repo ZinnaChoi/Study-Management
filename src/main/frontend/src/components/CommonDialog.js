@@ -8,6 +8,9 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  FormGroup,
+  FormControlLabel,
+  Checkbox,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
@@ -15,11 +18,23 @@ import useMediaQuery from "@mui/material/useMediaQuery";
 export default function CommonDialog(props) {
   const [internalOpen, setInternalOpen] = useState(false);
   const isControlled = props.open !== undefined;
+  const [isChecked, setIsChecked] = useState(true);
   const open = isControlled ? props.open : internalOpen;
   const closeAfterSubmit = props.closeDialog == false ? false : true;
   const theme = useTheme();
   const fullScreen =
     useMediaQuery(theme.breakpoints.down("sm")) || props.fullScreen;
+  const [inputValue, setInputValue] = useState([]);
+
+  const handleInputChange = (event, index) => {
+    const updatedInputValue = [...inputValue];
+    updatedInputValue[index] = event.target.value;
+    setInputValue(updatedInputValue);
+  };
+
+  const handleCheckbox = () => {
+    setIsChecked(!isChecked);
+  };
 
   const handleOpen = () => {
     if (!isControlled) {
@@ -38,6 +53,11 @@ export default function CommonDialog(props) {
       props.onClose(event, reason);
     }
   };
+
+  useEffect(() => {
+    setInputValue(props.defaultValues || []);
+  }, [props.defaultValues]);
+
   useEffect(() => {
     if (isControlled) {
       setInternalOpen(props.open);
@@ -76,14 +96,22 @@ export default function CommonDialog(props) {
         <DialogContent>
           {props.names &&
             props.names.map((name, index) => (
-              <div className="dialog-content" key={index}>
+              <div
+                className={`dialog-content ${
+                  props.fullScreen ? "fullwidth-content" : ""
+                }`}
+                key={index}
+              >
                 <div className="input-key">{name}</div>
                 <TextField
                   required={props.isRequireds && props.isRequireds[index]}
                   margin="dense"
                   id={name}
                   name={name}
-                  value={props.defaultValues && props.defaultValues[index]}
+                  value={inputValue && inputValue[index]}
+                  onChange={(event) =>
+                    props.defaultValues && handleInputChange(event, index)
+                  }
                   helperText={props.descriptions && props.descriptions[index]}
                   type={props.inputTypes && props.inputTypes[index]}
                   variant="outlined"
@@ -98,6 +126,28 @@ export default function CommonDialog(props) {
               </div>
             ))}
           {props.extraComponents}
+
+          {props.useCheckbox && (
+            <FormGroup>
+              <FormControlLabel
+                className={`dialog-content ${
+                  props.fullScreen ? "fullwidth-content" : ""
+                }`}
+                control={
+                  <>
+                    <div className="checkbox-key">
+                      {props.checkboxLabel || ""}
+                    </div>
+                    <Checkbox
+                      name="checkbox"
+                      checked={isChecked}
+                      onChange={handleCheckbox}
+                    />
+                  </>
+                }
+              />
+            </FormGroup>
+          )}
         </DialogContent>
 
         <DialogActions className="action-btn">

@@ -114,6 +114,7 @@ public class StudyController extends CommonController {
               {
                   "studyName": "현재 스터디 이름",
                   "updateStudyName": "변경할 스터디 이름",
+                  "useCurrentLogo": "현재 등록된 로고 사용 여부",
                   "schedules": [
                     {
                       "scheduleName": "AM2",
@@ -131,6 +132,7 @@ public class StudyController extends CommonController {
               {
                   "studyName": "현재 스터디 이름",
                   "updateStudyName": "변경할 스터디 이름",
+                  "useCurrentLogo": "true",
                   "schedules": [
                     {
                       "scheduleName": "AM2",

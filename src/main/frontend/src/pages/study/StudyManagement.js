@@ -54,6 +54,7 @@ export default function StudyManagement() {
     const updateStudyName = data["스터디 이름"];
     const logoFile =
       data["로고"].name === "" || data["로고"].size === 0 ? null : data["로고"];
+    const useCurrentLogo = data["checkbox"];
     const newAddedSchedules = addedSchedules.map(
       ({ scheduleId, ...rest }) => rest
     );
@@ -62,6 +63,7 @@ export default function StudyManagement() {
       studyName: studyInfo.name,
       updateStudyName: updateStudyName,
       schedules: schedules,
+      useCurrentLogo: useCurrentLogo === "on" ? true : false,
     };
 
     const formData = new FormData();
@@ -127,6 +129,9 @@ export default function StudyManagement() {
               schedules={schedules}
               doAction={doStudyEdit}
               onClose={() => setEditDialogOpen(false)}
+              studyName={studyInfo.name}
+              currentLogoCheckbox={true}
+              logoCheckboxLabel={"기존 로고 사용"}
             />
             <Button className="cancel-btn" onClick={doStudyDelete}>
               스터디 삭제

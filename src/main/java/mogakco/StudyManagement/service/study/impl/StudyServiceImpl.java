@@ -176,7 +176,8 @@ public class StudyServiceImpl implements StudyService {
                                                 studyReq.getStudyName() + " 이름으로 등록된 스터디가 없어 수정할 수 없습니다");
                         }
                         for (StudyInfo info : sInfos) {
-                                if (info.getStudyName().equals(studyReq.getUpdateStudyName())) {
+                                if (info.getStudyName().equals(studyReq.getUpdateStudyName())
+                                                && !studyReq.getStudyName().equals(studyReq.getUpdateStudyName())) {
                                         throw new InvalidRequestException(
                                                         "업데이트 할 " + studyReq.getUpdateStudyName()
                                                                         + " 스터디 이름이 이미 존재합니다.");
@@ -187,7 +188,9 @@ public class StudyServiceImpl implements StudyService {
                         }
                         // study_info 객체에 study_name, img set
                         sInfo.updateStudyName(studyReq.getUpdateStudyName());
-                        sInfo.updateStudyLogo(imageFile == null ? null : imageFile.getBytes());
+                        if (!studyReq.isUseCurrentLogo()) {
+                                sInfo.updateStudyLogo(imageFile == null ? null : imageFile.getBytes());
+                        }
                 } catch (NullPointerException e) {
                         return ExceptionUtil.handleException(new NotFoundException(e.getMessage()));
                 } catch (IOException e) {
