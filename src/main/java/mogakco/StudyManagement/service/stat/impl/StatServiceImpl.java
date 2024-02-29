@@ -137,7 +137,7 @@ public class StatServiceImpl implements StatService {
         } catch (Exception e) {
 
             return new CommonRes(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
-                    ErrorCode.INTERNAL_ERROR.getMessage("부재 일정 확인 및 로그 업데이트 중 오류"));
+                    ErrorCode.INTERNAL_ERROR.getMessage("부재 일정 확인 및 로그 업데이트 중 오류가 발생하였습니다."));
         }
     }
 
@@ -176,8 +176,8 @@ public class StatServiceImpl implements StatService {
             noticeService.createSpecificNotice(member, MessageType.WAKE_UP);
 
             return new CommonRes(systemId, ErrorCode.OK.getCode(), "기상 로그 업데이트가 성공적으로 완료되었습니다.");
-        } catch (NotFoundException | InvalidRequestException e) {
-            return ExceptionUtil.handleException(e);
+        } catch (Exception e) {
+            return new CommonRes(systemId, ErrorCode.INTERNAL_ERROR.getCode(), "기상 로그 업데이트에 실패하였습니다.");
         }
     }
 
@@ -203,8 +203,8 @@ public class StatServiceImpl implements StatService {
             }
 
             return new CommonRes(systemId, ErrorCode.OK.getCode(), "기상 로그 업데이트가 성공적으로 완료되었습니다.");
-        } catch (NotFoundException | InvalidRequestException e) {
-            return ExceptionUtil.handleException(e);
+        } catch (Exception e) {
+            return new CommonRes(systemId, ErrorCode.INTERNAL_ERROR.getCode(), "기상 로그 업데이트에 실패하였습니다.");
         }
 
     }

@@ -16,6 +16,7 @@ const WakeUpSuccessRate = () => {
   const [chartInstance, setChartInstance] = useState(null);
   const [highestSuccessRateMember, setHighestSuccessRateMember] =
     useState(null);
+  const [minSuccessRate, setMinSuccessRate] = useState(0);
   const [selectedPeriod, setSelectedPeriod] = useState("주간");
 
   const handlePeriodChange = (event) => {
@@ -90,7 +91,7 @@ const WakeUpSuccessRate = () => {
   const renderChart = () => {
     if (chartRef.current) {
       const minSuccessRate = Math.min(
-        ...chartData.map((item) => parseFloat(item.successRate))
+        ...chartData.map((item) => parseFloat(item.successRate) - 10)
       );
       const newChartInstance = new Chart(chartRef.current, {
         type: "bar",
@@ -101,7 +102,7 @@ const WakeUpSuccessRate = () => {
           scales: {
             y: {
               beginAtZero: false,
-              min: 50,
+              min: minSuccessRate,
             },
           },
           elements: {
@@ -273,7 +274,8 @@ const WakeUpSuccessRate = () => {
                 responsive: true,
                 scales: {
                   y: {
-                    beginAtZero: true,
+                    beginAtZero: false,
+                    min: setMinSuccessRate,
                   },
                 },
                 elements: {

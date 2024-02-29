@@ -83,74 +83,70 @@ public class NoticeServiceImpl implements NoticeService {
     @Transactional
     public CommonRes updateNotice(NoticeReq noticeReq) {
 
-        try {
-            CommonRes result = new CommonRes();
-            Member member = getLoginMember();
-            Notice NoticeStat = noticeRepository.findByMember(member);
+        CommonRes result = new CommonRes();
+        Member member = getLoginMember();
+        Notice NoticeStat = noticeRepository.findByMember(member);
 
-            if (NoticeStat != null) {
+        if (NoticeStat != null) {
 
-                if (NoticeStat.isNoticeChanged(noticeReq)) {
-                    noticeRepository.save(NoticeStat.updateNotice(noticeReq));
-                    result.setRetCode(ErrorCode.OK.getCode());
-                    result.setRetMsg(ErrorCode.OK.getMessage("알림 상태"));
-                } else {
-                    result.setRetCode(ErrorCode.UNCHANGED.getCode());
-                    result.setRetMsg(ErrorCode.UNCHANGED.getMessage("알림 상태"));
-                }
+            if (NoticeStat.isNoticeChanged(noticeReq)) {
+                noticeRepository.save(NoticeStat.updateNotice(noticeReq));
+                result.setRetCode(ErrorCode.OK.getCode());
+                result.setRetMsg(ErrorCode.OK.getMessage("알림 상태"));
             } else {
-                result.setRetCode(ErrorCode.NOT_FOUND.getCode());
-                result.setRetMsg(ErrorCode.NOT_FOUND.getMessage(member.getName() + "의 알림 상태"));
+                result.setRetCode(ErrorCode.UNCHANGED.getCode());
+                result.setRetMsg(ErrorCode.UNCHANGED.getMessage("알림 상태"));
             }
-            return result;
-        } catch (NotFoundException | UnauthorizedAccessException e) {
-            return ExceptionUtil.handleException(e);
+        } else {
+            result.setRetCode(ErrorCode.NOT_FOUND.getCode());
+            result.setRetMsg(ErrorCode.NOT_FOUND.getMessage(member.getName() + "의 알림 상태"));
         }
+        return result;
+
     }
 
     @Override
     @Transactional
     public CommonRes createGeneralNotice() {
-        try {
-            CommonRes result = new CommonRes();
 
-            String formattedTime = LocalDateTime.now().plusMinutes(10).format(DateTimeFormatter.ofPattern("HH:mm"));
+        CommonRes result = new CommonRes();
 
-            Schedule upcomingSchedulesId = scheduleRepository.findScheduleIdMatchingStartTime(formattedTime);
+        String formattedTime = LocalDateTime.now().plusMinutes(10).format(DateTimeFormatter.ofPattern("HH:mm"));
 
-            if (upcomingSchedulesId != null) {
-                List<Member> scheduleParticipants = memberScheduleRepository
-                        .findMembersByScheduleId(upcomingSchedulesId.getScheduleId());
-                List<Member> participants = new ArrayList<>(scheduleParticipants);
+        Schedule upcomingSchedulesId = scheduleRepository.findScheduleIdMatchingStartTime(formattedTime);
 
-                for (Member participant : scheduleParticipants) {
-                    List<Member> absentParticipants = absentScheduleRepository
-                            .findAbsentParticipants(participant, DateUtil.getCurrentDateTime().substring(0, 8),
-                                    upcomingSchedulesId);
-                    participants.removeAll(absentParticipants);
-                }
+        if (upcomingSchedulesId != null) {
+            List<Member> scheduleParticipants = memberScheduleRepository
+                    .findMembersByScheduleId(upcomingSchedulesId.getScheduleId());
+            List<Member> participants = new ArrayList<>(scheduleParticipants);
 
-                Long notifier = findNotifier(participants);
-                Optional<Member> notifierMember = memberRepository.findById(notifier);
-
-                try {
-                    Boolean linkShareValue = noticeRepository.findByMember_MemberId(notifier).get().getLinkShare();
-                    if (linkShareValue != null && linkShareValue) {
-                        sendEmailService.sendEmail(notifierMember.get().getName(), MessageType.GENERAL,
-                                notifierMember.get().getEmail());
-                    }
-                    noticeRepository.updateLastShareDateByMemberId(DateUtil.getCurrentDateTime().substring(0, 12),
-                            notifier);
-
-                    result.setRetCode(ErrorCode.OK.getCode());
-                } catch (NotFoundException | UnauthorizedAccessException e) {
-                    return ExceptionUtil.handleException(e);
-                }
+            for (Member participant : scheduleParticipants) {
+                List<Member> absentParticipants = absentScheduleRepository
+                        .findAbsentParticipants(participant, DateUtil.getCurrentDateTime().substring(0, 8),
+                                upcomingSchedulesId);
+                participants.removeAll(absentParticipants);
             }
-            return result;
-        } catch (NotFoundException | UnauthorizedAccessException e) {
-            return ExceptionUtil.handleException(e);
+
+            Long notifier = findNotifier(participants);
+            Optional<Member> notifierMember = memberRepository.findById(notifier);
+
+            Boolean linkShareValue = noticeRepository.findByMember_MemberId(notifier).get().getLinkShare();
+            if (linkShareValue != null && linkShareValue) {
+                sendEmailService.sendEmail(notifierMember.get().getName(), MessageType.GENERAL,
+                        notifierMember.get().getEmail());
+            }
+            noticeRepository.updateLastShareDateByMemberId(DateUtil.getCurrentDateTime().substring(0, 12),
+                    notifier);
+
+            result.setRetCode(ErrorCode.OK.getCode());
+            result.setRetMsg(ErrorCode.INTERNAL_ERROR.getMessage("구글 미트 링크 알림 생성을 생성하였습니다."));
+
+        } else {
+            result.setRetCode(ErrorCode.INTERNAL_ERROR.getCode());
+            result.setRetMsg(ErrorCode.INTERNAL_ERROR.getMessage("구글 미트 링크 알림 생성에 실패하였습니다."));
         }
+        return result;
+
     }
 
     public Long findNotifier(List<Member> participants) {
