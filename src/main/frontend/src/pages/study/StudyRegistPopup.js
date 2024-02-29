@@ -55,7 +55,9 @@ export default function StudyRegistPopup(props) {
               )} ~ ${as.endTime.slice(0, 2)}:${as.endTime.slice(2)}`}
             >
               <Chip
-                className="study-regist-chip-space"
+                className={`study-regist-chip-space ${
+                  index === 0 ? "first-chip" : ""
+                }`}
                 onDelete={() => handleChipDelete(as)}
                 label={as.scheduleName}
               ></Chip>
