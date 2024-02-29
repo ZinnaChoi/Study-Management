@@ -12,7 +12,6 @@ const WakeUpSuccessRate = () => {
   const oneWeekAgo = new Date();
   oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
   const [startDate, setStartDate] = useState(oneWeekAgo);
-  const [dataFetched, setDataFetched] = useState(false);
   const chartRef = useRef(null);
   const [chartInstance, setChartInstance] = useState(null);
   const [highestSuccessRateMember, setHighestSuccessRateMember] =
@@ -56,8 +55,6 @@ const WakeUpSuccessRate = () => {
             chartInstance.destroy();
           }
         }
-        console.log("기상 성공률 조회 성공");
-        console.log(response.data.content);
       })
       .catch((error) => {
         alert(
@@ -87,29 +84,14 @@ const WakeUpSuccessRate = () => {
       newEndDate = endDate;
     }
 
-    try {
-      const params = {
-        type: "WAKEUP",
-        startDate: formatDateString(newStartDate),
-        endDate: formatDateString(newEndDate),
-      };
-
-      const response = await authClient.get("/stat", { params });
-
-      if (response && response.data) {
-        setContent(response.data.content);
-        setDataFetched(true);
-      }
-    } catch (error) {
-      alert(
-        "기상 통계 조회 실패: " +
-          (error.response?.data.retMsg || "Unknown error")
-      );
-    }
+    fetchWakeupStat();
   };
 
   const renderChart = () => {
     if (chartRef.current) {
+      const minSuccessRate = Math.min(
+        ...chartData.map((item) => parseFloat(item.successRate))
+      );
       const newChartInstance = new Chart(chartRef.current, {
         type: "bar",
         data: data,
@@ -118,7 +100,8 @@ const WakeUpSuccessRate = () => {
           responsive: true,
           scales: {
             y: {
-              beginAtZero: true,
+              beginAtZero: false,
+              min: 50,
             },
           },
           elements: {

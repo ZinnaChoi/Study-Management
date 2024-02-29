@@ -51,11 +51,15 @@ const AttendanceStatistics = () => {
       .get("/stat", { params })
       .then((response) => {
         if (response && response.data) {
-          setContent(response.data.content);
-          setAttendanceMaxScore(response.data.attendanceMaxScore);
-          setDataFetched(true);
+          if (response.data.retCode == 200) {
+            setContent(response.data.content);
+            setAttendanceMaxScore(response.data.attendanceMaxScore);
+            setDataFetched(true);
 
-          updateChartAndTable(response.data.content);
+            updateChartAndTable(response.data.content);
+          } else {
+            alert("출석 통계 조회 실패 " + response.data.retMsg);
+          }
         }
       })
       .catch((error) => {
