@@ -47,9 +47,6 @@ export default function StudyRegistPopup(props) {
             submitEvt={addSchedule}
             showButton={true}
           ></CommonDialog>
-        </div>
-        <div className="dialog-content fullwidth-content">
-          <div className="study-select-title"></div>
           {addedSchedules.map((as, index) => (
             <Tooltip
               key={index}

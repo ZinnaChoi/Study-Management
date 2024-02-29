@@ -18,7 +18,7 @@ import useMediaQuery from "@mui/material/useMediaQuery";
 export default function CommonDialog(props) {
   const [internalOpen, setInternalOpen] = useState(false);
   const isControlled = props.open !== undefined;
-  const [isChecked, setIsChecked] = useState(true);
+  const [isChecked, setIsChecked] = useState(false);
   const open = isControlled ? props.open : internalOpen;
   const closeAfterSubmit = props.closeDialog == false ? false : true;
   const theme = useTheme();
@@ -96,58 +96,61 @@ export default function CommonDialog(props) {
         <DialogContent>
           {props.names &&
             props.names.map((name, index) => (
-              <div
-                className={`dialog-content ${
-                  props.fullScreen ? "fullwidth-content" : ""
-                }`}
-                key={index}
-              >
-                <div className="input-key">{name}</div>
-                <TextField
-                  required={props.isRequireds && props.isRequireds[index]}
-                  margin="dense"
-                  id={name}
-                  name={name}
-                  value={inputValue && inputValue[index]}
-                  onChange={(event) =>
-                    props.defaultValues && handleInputChange(event, index)
-                  }
-                  helperText={props.descriptions && props.descriptions[index]}
-                  type={props.inputTypes && props.inputTypes[index]}
-                  variant="outlined"
-                  className="dialog-input"
-                  sx={{
-                    width: "65%",
-                    "& .MuiInputBase-root": {
-                      height: 32,
-                    },
-                  }}
-                />
+              <div key={index}>
+                <div
+                  className={`dialog-content ${
+                    props.fullScreen ? "fullwidth-content" : ""
+                  }`}
+                >
+                  <div className="input-key">{name}</div>
+                  <TextField
+                    required={props.isRequireds && props.isRequireds[index]}
+                    margin="dense"
+                    id={name}
+                    name={name}
+                    value={inputValue && inputValue[index]}
+                    onChange={(event) =>
+                      props.defaultValues && handleInputChange(event, index)
+                    }
+                    disabled={isChecked && name === "로고"}
+                    helperText={props.descriptions && props.descriptions[index]}
+                    type={props.inputTypes && props.inputTypes[index]}
+                    variant="outlined"
+                    className="dialog-input"
+                    sx={{
+                      width: "65%",
+                      "& .MuiInputBase-root": {
+                        height: 32,
+                      },
+                    }}
+                  />
+                </div>
+                <div>
+                  {props.useCheckbox && name === "로고" && (
+                    <FormGroup>
+                      <FormControlLabel
+                        className={`dialog-content ${
+                          props.fullScreen ? "fullwidth-content" : ""
+                        }`}
+                        control={
+                          <>
+                            <div className="checkbox-key">
+                              {props.checkboxLabel || ""}
+                            </div>
+                            <Checkbox
+                              name="checkbox"
+                              checked={isChecked}
+                              onChange={handleCheckbox}
+                            />
+                          </>
+                        }
+                      />
+                    </FormGroup>
+                  )}
+                </div>
               </div>
             ))}
           {props.extraComponents}
-
-          {props.useCheckbox && (
-            <FormGroup>
-              <FormControlLabel
-                className={`dialog-content ${
-                  props.fullScreen ? "fullwidth-content" : ""
-                }`}
-                control={
-                  <>
-                    <div className="checkbox-key">
-                      {props.checkboxLabel || ""}
-                    </div>
-                    <Checkbox
-                      name="checkbox"
-                      checked={isChecked}
-                      onChange={handleCheckbox}
-                    />
-                  </>
-                }
-              />
-            </FormGroup>
-          )}
         </DialogContent>
 
         <DialogActions className="action-btn">

@@ -53,7 +53,9 @@ export default function StudyManagement() {
     }
     const updateStudyName = data["스터디 이름"];
     const logoFile =
-      data["로고"].name === "" || data["로고"].size === 0 ? null : data["로고"];
+      data["로고"]?.name === "" || data["로고"]?.size === 0
+        ? null
+        : data["로고"];
     const useCurrentLogo = data["checkbox"];
     const newAddedSchedules = addedSchedules.map(
       ({ scheduleId, ...rest }) => rest
