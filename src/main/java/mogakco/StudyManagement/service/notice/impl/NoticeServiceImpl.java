@@ -15,7 +15,6 @@ import mogakco.StudyManagement.domain.Notice;
 import mogakco.StudyManagement.domain.Schedule;
 import mogakco.StudyManagement.dto.CommonRes;
 import mogakco.StudyManagement.dto.NoticeGetRes;
-import mogakco.StudyManagement.dto.NoticeList;
 import mogakco.StudyManagement.dto.NoticeReq;
 import mogakco.StudyManagement.enums.ErrorCode;
 
@@ -31,6 +30,7 @@ import mogakco.StudyManagement.service.external.SendEmailService;
 import mogakco.StudyManagement.service.notice.NoticeService;
 import mogakco.StudyManagement.util.DateUtil;
 import mogakco.StudyManagement.util.ExceptionUtil;
+import mogakco.StudyManagement.util.SecurityUtil;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -55,6 +55,10 @@ public class NoticeServiceImpl implements NoticeService {
 
     }
 
+    protected Member getLoginMember() {
+        return memberRepository.findById(SecurityUtil.getLoginUserId());
+    }
+
     @Value("${study.systemId}")
     protected String systemId;
 
@@ -62,31 +66,32 @@ public class NoticeServiceImpl implements NoticeService {
     SendEmailService sendEmailService;
 
     @Override
-    public NoticeGetRes getNotice(Long memberId) {
+    public NoticeGetRes getNotice() {
 
-        Optional<Notice> noticeOptional = noticeRepository.findByMember_MemberId(memberId);
-        if (noticeOptional.isPresent()) {
-            Notice notice = noticeOptional.get();
-            NoticeList noticeList = new NoticeList(notice);
-            return new NoticeGetRes(systemId, ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), List.of(noticeList));
+        Member member = getLoginMember();
+        Notice NoticeStat = noticeRepository.findByMember(member);
+
+        if (NoticeStat != null) {
+            return new NoticeGetRes(systemId, ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), NoticeStat);
         } else {
             return new NoticeGetRes(systemId, ErrorCode.NOT_FOUND.getCode(),
-                    ErrorCode.NOT_FOUND.getMessage("memberId"), null);
+                    ErrorCode.NOT_FOUND.getMessage(member.getName() + "의 알림 상태"), null);
         }
     }
 
     @Override
     @Transactional
-    public CommonRes updateNotice(Long memberId, NoticeReq noticeReq) {
+    public CommonRes updateNotice(NoticeReq noticeReq) {
 
         try {
             CommonRes result = new CommonRes();
-            Optional<Notice> noticeOptional = noticeRepository.findByMember_MemberId(memberId);
+            Member member = getLoginMember();
+            Notice NoticeStat = noticeRepository.findByMember(member);
 
-            if (noticeOptional.isPresent()) {
-                Notice notice = noticeOptional.get();
-                if (notice.isNoticeChanged(noticeReq)) {
-                    noticeRepository.save(notice.updateNotice(noticeReq));
+            if (NoticeStat != null) {
+
+                if (NoticeStat.isNoticeChanged(noticeReq)) {
+                    noticeRepository.save(NoticeStat.updateNotice(noticeReq));
                     result.setRetCode(ErrorCode.OK.getCode());
                     result.setRetMsg(ErrorCode.OK.getMessage("알림 상태"));
                 } else {
@@ -95,7 +100,7 @@ public class NoticeServiceImpl implements NoticeService {
                 }
             } else {
                 result.setRetCode(ErrorCode.NOT_FOUND.getCode());
-                result.setRetMsg(ErrorCode.NOT_FOUND.getMessage("memberId"));
+                result.setRetMsg(ErrorCode.NOT_FOUND.getMessage(member.getName() + "의 알림 상태"));
             }
             return result;
         } catch (NotFoundException | UnauthorizedAccessException e) {

@@ -1,11 +1,10 @@
 package mogakco.StudyManagement.dto;
 
-import java.util.List;
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import mogakco.StudyManagement.domain.Notice;
 
 @Getter
 @Setter
@@ -13,9 +12,9 @@ import lombok.Setter;
 @NoArgsConstructor
 public class NoticeGetRes extends CommonRes {
 
-    private List<NoticeList> content;
+    private Notice content;
 
-    public NoticeGetRes(String systemId, int retCode, String retMsg, List<NoticeList> content) {
+    public NoticeGetRes(String systemId, int retCode, String retMsg, Notice content) {
         super(systemId, retCode, retMsg);
         this.content = content;
 

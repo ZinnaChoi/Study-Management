@@ -44,6 +44,7 @@ import mogakco.StudyManagement.enums.ErrorCode;
 import mogakco.StudyManagement.enums.MemberRole;
 import mogakco.StudyManagement.repository.MemberRepository;
 import mogakco.StudyManagement.repository.MemberScheduleRepository;
+import mogakco.StudyManagement.repository.NoticeRepository;
 import mogakco.StudyManagement.repository.ScheduleRepository;
 import mogakco.StudyManagement.repository.StudyInfoRepository;
 import mogakco.StudyManagement.repository.WakeUpRepository;
@@ -62,6 +63,7 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
     private final WakeUpRepository wakeUpRepository;
     private final ScheduleRepository scheduleRepository;
     private final StudyInfoRepository studyInfoRepository;
+    private final NoticeRepository noticeRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final JWTUtil jwtUtil;
     private final RedisTemplate<String, Object> redisTemplate;
@@ -77,6 +79,7 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
             WakeUpRepository wakeUpRepository,
             ScheduleRepository scheduleRepository,
             StudyInfoRepository studyInfoRepository,
+            NoticeRepository noticeRepository,
             BCryptPasswordEncoder bCryptPasswordEncoder,
             JWTUtil jwtUtil,
             RedisTemplate<String, Object> redisTemplate) {
@@ -85,6 +88,7 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
         this.wakeUpRepository = wakeUpRepository;
         this.scheduleRepository = scheduleRepository;
         this.studyInfoRepository = studyInfoRepository;
+        this.noticeRepository = noticeRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.jwtUtil = jwtUtil;
         this.redisTemplate = redisTemplate;
@@ -186,6 +190,7 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
             memberRepository.save(member);
             wakeUpRepository.save(wakeUp);
             memberScheduleRepository.saveAll(mSchedules);
+            noticeRepository.insertNoticeForMember(member);
 
         } else {
             result = new CommonRes(systemId, ErrorCode.BAD_REQUEST.getCode(),
