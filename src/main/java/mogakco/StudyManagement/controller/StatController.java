@@ -39,9 +39,9 @@ public class StatController extends CommonController {
         StatGetRes result = new StatGetRes();
         try {
             result = statService.getStat(type, startDate, endDate);
-            if (result == null || result.getContent() == null || result.getContent().isEmpty()) {
+            if (result.getContent() == null || result.getContent().isEmpty()) {
                 result = new StatGetRes(systemId, ErrorCode.NOT_FOUND.getCode(),
-                        ErrorCode.NOT_FOUND.getMessage("content"), null, null);
+                        ErrorCode.NOT_FOUND.getMessage("content"), result.getContent(), result.getAttendanceMaxScore());
             }
         } catch (Exception e) {
             result = new StatGetRes(systemId, ErrorCode.INTERNAL_ERROR.getCode(),

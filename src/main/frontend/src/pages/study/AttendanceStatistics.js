@@ -54,8 +54,9 @@ const AttendanceStatistics = () => {
           setContent(response.data.content);
           setAttendanceMaxScore(response.data.attendanceMaxScore);
           setDataFetched(true);
+
+          updateChartAndTable(response.data.content);
         }
-        console.log("출석 통계 조회 성공");
       })
       .catch((error) => {
         alert(
@@ -84,37 +85,11 @@ const AttendanceStatistics = () => {
         0
       );
     }
-
-    try {
-      const params = {
-        type: "ABSENT",
-        startDate: formatDateString(newStartDate),
-        endDate: formatDateString(newEndDate),
-      };
-
-      const response = await authClient.get("/stat", { params });
-
-      if (response && response.data) {
-        setContent(response.data.content);
-        setAttendanceMaxScore(response.data.attendanceMaxScore);
-        setDataFetched(true);
-
-        updateChartAndTable(response.data.content);
-      }
-    } catch (error) {
-      alert(
-        "출석 통계 조회 실패: " +
-          (error.response?.data.retMsg || "Unknown error")
-      );
-    }
+    fetchAttendanceStat();
   };
   const findAttendanceKing = (groupedData) => {
     let highestRatio = -1;
     let attendanceKing = "";
-
-    const dayDifference = Math.abs(
-      (startDate.getTime() - endDate.getTime()) / (1000 * 60 * 60 * 24)
-    );
 
     const attendanceMaxScoreData = attendanceMaxScore.reduce((acc, entry) => {
       if (!acc[entry.memberName]) {
@@ -199,6 +174,7 @@ const AttendanceStatistics = () => {
         Member: memberName,
         TotalScore: totalScore,
         AttendanceMaxScore: attendanceMaxScore,
+        AttendanceRate: ((totalScore / attendanceMaxScore) * 100).toFixed(0),
       };
     });
     return tableData;
@@ -212,8 +188,8 @@ const AttendanceStatistics = () => {
         setChartData(null);
         setAttendanceKing(null);
 
-        await fetchAttendanceStat();
-        await fetchData();
+        fetchAttendanceStat();
+        fetchData();
       } catch (error) {
         alert(
           "출석 통계 조회 실패: " +
@@ -305,6 +281,7 @@ const AttendanceStatistics = () => {
                 { Header: "참여 멤버", accessor: "Member" },
                 { Header: "출석 점수", accessor: "TotalScore" },
                 { Header: "최대 출석 점수", accessor: "AttendanceMaxScore" },
+                { Header: "출석률 (%)", accessor: "AttendanceRate" },
               ]}
               contents={generateSummaryData()}
             />
