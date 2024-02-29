@@ -19,6 +19,9 @@ public class StudyReq {
     @Schema(example = "변경할 스터디 이름", description = "스터디 정보 수정 API에 사용")
     private String updateStudyName;
 
+    @Schema(example = "현재 등록된 로고 사용 여부", description = "true: 현재 등록 로고 사용, false: 새 로고 또는 빈 로고 사용")
+    private boolean useCurrentLogo;
+
     private List<ScheduleReq> schedules;
 
     public StudyReq(String studyName,

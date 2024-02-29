@@ -21,6 +21,8 @@ const root = ReactDOM.createRoot(document.getElementById("root"));
 
 const token = localStorage.getItem("token");
 
+const role = localStorage.getItem("role");
+
 root.render(
   <React.Fragment>
     <CssBaseline />
@@ -70,7 +72,13 @@ root.render(
                       ></Route>
                       <Route
                         path={menuTree.management.path}
-                        element={<Management />}
+                        element={
+                          role === "USER" ? (
+                            <Navigate to={menuTree.notFound.path} replace />
+                          ) : (
+                            <Management />
+                          )
+                        }
                       ></Route>
                       {/* 상단에 위치하는 라우트들의 규칙을 모두 확인, 일치하는 라우트가 없는경우 처리 */}
                       <Route

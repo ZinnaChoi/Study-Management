@@ -13,16 +13,18 @@ import {
   Tooltip,
   MenuItem,
 } from "@mui/material";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { menuTree } from "../constants/constants";
 import { authClient } from "../services/APIService";
 import HomeIcon from "@mui/icons-material/Home";
 
 function Header() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [anchorElStudy, setAnchorElStudy] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
   const [logo, setLogo] = React.useState(null);
+  const [studyName, setStudyName] = React.useState("");
 
   const handleOpenStatisticsSubMenu = (event) => {
     setAnchorElStudy(event.currentTarget);
@@ -42,8 +44,7 @@ function Header() {
 
   const doLogout = () => {
     navigate(menuTree.login.path);
-    localStorage.removeItem("token");
-    localStorage.removeItem("role");
+    clearAuthData();
     alert("로그아웃 되었습니다.");
   };
 
@@ -63,19 +64,48 @@ function Header() {
     );
   };
 
-  function setLogoImg() {
+  function setStudyInfo() {
     authClient
       .get("/study")
       .then(function (response) {
         setLogo(response.data?.logo);
+        setStudyName(response.data?.studyName);
+        if (
+          !response.data?.studyName &&
+          location.pathname !== menuTree.management.path
+        ) {
+          const role = localStorage.getItem("role");
+          if (role === "ADMIN") {
+            const isConfirm = window.confirm(
+              "등록된 스터디 정보가 없습니다. \n스터디 등록을 진행하시겠습니까?"
+            );
+
+            isConfirm ? navigate(menuTree.management.path) : moveLoginPage();
+          } else if (role === "USER") {
+            alert(
+              "등록된 스터디 정보가 없습니다. \n스터디 관리자에게 문의하여 스터디를 등록 해주세요."
+            );
+            moveLoginPage();
+          }
+        }
       })
       .catch(function (error) {
         console.log(error);
       });
   }
 
+  function clearAuthData() {
+    localStorage.removeItem("token");
+    localStorage.removeItem("role");
+  }
+
+  function moveLoginPage() {
+    clearAuthData();
+    navigate(menuTree.login.path);
+  }
+
   useEffect(() => {
-    setLogoImg();
+    setStudyInfo();
   });
 
   return (
@@ -99,6 +129,7 @@ function Header() {
               <HomeIcon fontSize="large" />
             )}
           </Link>
+          <h4 style={{ marginLeft: "10px" }}>{studyName}</h4>
           <Box
             sx={{
               gap: 3,
@@ -180,13 +211,14 @@ function Header() {
               style={{
                 textDecoration: "none",
                 color: "inherit",
-                pointerEvents: menuTree.management.disabled ? "none" : "",
+                pointerEvents:
+                  localStorage.getItem("role") === "USER" ? "none" : "",
               }}
             >
               <Button
                 key={menuTree.management.path}
                 sx={{ color: "black", display: "block" }}
-                disabled={menuTree.management.disabled}
+                disabled={localStorage.getItem("role") === "USER"}
               >
                 {menuTree.management.name}
               </Button>

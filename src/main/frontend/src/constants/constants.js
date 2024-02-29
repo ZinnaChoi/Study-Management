@@ -11,7 +11,7 @@ export const menuTree = {
       name: "기상 통계",
     },
   },
-  management: { path: "/management", name: "스터디 관리", disabled: true },
+  management: { path: "/management", name: "스터디 관리" },
   login: { path: "/login", name: "로그인" },
   join: { path: "/join", name: "회원가입" },
   notFound: { path: "*", name: "not found" },
