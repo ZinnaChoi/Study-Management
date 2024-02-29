@@ -23,6 +23,10 @@ export default function StudyRegistPopup(props) {
 
   const addSchedule = (data, event) => {
     event.stopPropagation();
+    if (!isValidTime(data["시작 시간"], data["종료 시간"])) {
+      alert("종료 시간은 시작 시간보다 이르거나 같을 수 없습니다");
+      return;
+    }
     const schedule = {
       scheduleName: data["스케줄 이름"],
       startTime: data["시작 시간"].replace(":", ""),
@@ -30,6 +34,25 @@ export default function StudyRegistPopup(props) {
     };
     setAddedSchedules((prevSchedules) => [...prevSchedules, schedule]);
   };
+
+  function isValidTime(startTime, endTime) {
+    const [sHours, sMinutes] = startTime.split(":").map(Number);
+    const [eHours, eMinutes] = endTime.split(":").map(Number);
+
+    const startDate = new Date();
+    startDate.setHours(sHours);
+    startDate.setMinutes(sMinutes);
+
+    const endDate = new Date();
+    endDate.setHours(eHours);
+    endDate.setMinutes(eMinutes);
+
+    if (endDate <= startDate) {
+      return false;
+    }
+
+    return true;
+  }
 
   const SchedulesAdd = () => {
     return (
