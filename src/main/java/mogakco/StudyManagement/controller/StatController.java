@@ -1,8 +1,5 @@
 package mogakco.StudyManagement.controller;
 
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -36,14 +33,15 @@ public class StatController extends CommonController {
     @GetMapping("/stat")
     public StatGetRes getStat(
             HttpServletRequest request, @RequestParam("type") LogType type,
-            @PageableDefault(size = 10, page = 0, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+            @RequestParam("startDate") String startDate,
+            @RequestParam("endDate") String endDate) {
 
         StatGetRes result = new StatGetRes();
         try {
-            result = statService.getStat(type, pageable);
-            if (result == null || result.getContent() == null || result.getContent().isEmpty()) {
+            result = statService.getStat(type, startDate, endDate);
+            if (result.getContent() == null || result.getContent().isEmpty()) {
                 result = new StatGetRes(systemId, ErrorCode.NOT_FOUND.getCode(),
-                        ErrorCode.NOT_FOUND.getMessage("content"), null, null);
+                        ErrorCode.NOT_FOUND.getMessage("content"), result.getContent(), result.getAttendanceMaxScore());
             }
         } catch (Exception e) {
             result = new StatGetRes(systemId, ErrorCode.INTERNAL_ERROR.getCode(),

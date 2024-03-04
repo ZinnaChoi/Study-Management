@@ -1,22 +1,21 @@
 package mogakco.StudyManagement.service.stat.impl;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import org.springframework.transaction.annotation.Transactional;
 
 import mogakco.StudyManagement.domain.DailyLog;
-import mogakco.StudyManagement.dto.SimplePageable;
 import mogakco.StudyManagement.dto.StatGetRes;
 import mogakco.StudyManagement.dto.StatList;
 import mogakco.StudyManagement.enums.ErrorCode;
-import mogakco.StudyManagement.exception.InvalidRequestException;
 import mogakco.StudyManagement.exception.NotFoundException;
 import mogakco.StudyManagement.enums.LogType;
 import mogakco.StudyManagement.enums.MessageType;
@@ -25,8 +24,6 @@ import mogakco.StudyManagement.service.notice.NoticeService;
 import mogakco.StudyManagement.service.stat.StatService;
 import mogakco.StudyManagement.util.DateUtil;
 import mogakco.StudyManagement.util.ExceptionUtil;
-import mogakco.StudyManagement.util.PageUtil;
-
 import mogakco.StudyManagement.domain.AbsentSchedule;
 
 import mogakco.StudyManagement.domain.Member;
@@ -72,69 +69,81 @@ public class StatServiceImpl implements StatService {
     NoticeService noticeService;
 
     @Override
-    public StatGetRes getStat(LogType type, Pageable pageable) {
+    public StatGetRes getStat(LogType type, String startDate, String endDate) {
         try {
-            Page<DailyLog> dailyLogs;
-            dailyLogs = statRepository.findByType(type, pageable);
-            List<StatList> dailyLogLists = dailyLogs.getContent().stream().map(StatList::new)
-                    .collect(Collectors.toList());
+            List<DailyLog> dailyLogs = statRepository.findByTypeAndDateBetween(type, startDate, endDate);
 
-            SimplePageable simplePageable = PageUtil.createSimplePageable(dailyLogs);
+            List<StatList> dailyLogLists = dailyLogs.stream().map(StatList::new).collect(Collectors.toList());
+
+            List<Map<String, Object>> attendanceMaxScore = calculateMaxScore();
 
             return new StatGetRes(systemId, ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), dailyLogLists,
-                    simplePageable);
+                    attendanceMaxScore);
         } catch (Exception e) {
-            return new StatGetRes(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
-                    ErrorCode.INTERNAL_ERROR.getMessage(), null, null);
+            return new StatGetRes(systemId, ErrorCode.INTERNAL_ERROR.getCode(), ErrorCode.INTERNAL_ERROR.getMessage(),
+                    null, null);
+        }
+    }
+
+    private List<Map<String, Object>> calculateMaxScore() {
+        List<Map<String, Object>> result = new ArrayList<>();
+
+        List<Map<String, Object>> maxSchedules = memberScheduleRepository.findMaxSchedulePerMember();
+
+        for (Map<String, Object> maxSchedule : maxSchedules) {
+            String memberName = (String) maxSchedule.get("memberName");
+            Long maxScore = (Long) maxSchedule.get("maxSchedule");
+
+            Map<String, Object> maxScoreMap = new HashMap<>();
+            maxScoreMap.put("memberName", memberName);
+            maxScoreMap.put("score", maxScore);
+
+            result.add(maxScoreMap);
         }
 
+        return result;
     }
 
     @Override
     @Transactional
     public CommonRes createAbsentLog() {
 
-        try {
-            List<Member> allMembers = memberRepository.findAll();
-            DailyLog newLog = new DailyLog();
+        List<Member> allMembers = memberRepository.findAll();
+        DailyLog newLog = new DailyLog();
 
-            for (Member member : allMembers) {
-                Integer totalScoreForMember = memberScheduleRepository.countByMember(member);
+        for (Member member : allMembers) {
+            Integer totalScoreForMember = memberScheduleRepository.countByMember(member);
 
-                if (totalScoreForMember != 0) {
-                    List<AbsentSchedule> todayAbsentSchedules = absentScheduleRepository
-                            .findByAbsentDateAndMember(DateUtil.getCurrentDate(), member);
+            if (totalScoreForMember != 0) {
+                List<AbsentSchedule> todayAbsentSchedules = absentScheduleRepository
+                        .findByAbsentDateAndMember(DateUtil.getCurrentDate(), member);
 
-                    if (todayAbsentSchedules.size() == 0) {
-                        newLog = new DailyLog(member, DateUtil.getCurrentDate(), LogType.ABSENT,
-                                totalScoreForMember,
-                                DateUtil.getCurrentDateTime());
-                    } else {
-                        int todayScore = (int) (totalScoreForMember - todayAbsentSchedules.size());
-                        newLog = new DailyLog(member, DateUtil.getCurrentDate(), LogType.ABSENT, todayScore,
-                                DateUtil.getCurrentDateTime());
-                    }
-                    dailyLogRepository.save(newLog);
+                if (todayAbsentSchedules.size() == 0) {
+                    newLog = new DailyLog(member, DateUtil.getCurrentDate(), LogType.ABSENT,
+                            totalScoreForMember,
+                            DateUtil.getCurrentDateTime());
+                } else {
+                    int todayScore = (int) (totalScoreForMember - todayAbsentSchedules.size());
+                    newLog = new DailyLog(member, DateUtil.getCurrentDate(), LogType.ABSENT, todayScore,
+                            DateUtil.getCurrentDateTime());
                 }
-
+                dailyLogRepository.save(newLog);
             }
-            return new CommonRes(systemId, ErrorCode.OK.getCode(), "부재 일정 확인 및 로그 업데이트가 성공적으로 완료되었습니다.");
-        } catch (Exception e) {
 
-            return new CommonRes(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
-                    ErrorCode.INTERNAL_ERROR.getMessage("부재 일정 확인 및 로그 업데이트 중 오류"));
         }
+        return new CommonRes(systemId, ErrorCode.OK.getCode(), "부재 일정 확인 및 로그 업데이트가 성공적으로 완료되었습니다.");
+
     }
 
     @Override
     @Transactional
     public CommonRes createWakeUpLog() {
+
+        Member member = getLoginMember();
+
+        WakeUp wakeUpMember = wakeUpRepository.findByMember(member);
+
         try {
-
-            Member member = getLoginMember();
-
-            WakeUp wakeUpMember = wakeUpRepository.findByMember(member);
-
             if (wakeUpMember == null) {
                 throw new NotFoundException(ErrorCode.NOT_FOUND.getMessage(member.getName() + "의 목표 기상 시간"));
             }
@@ -161,36 +170,33 @@ public class StatServiceImpl implements StatService {
             noticeService.createSpecificNotice(member, MessageType.WAKE_UP);
 
             return new CommonRes(systemId, ErrorCode.OK.getCode(), "기상 로그 업데이트가 성공적으로 완료되었습니다.");
-        } catch (NotFoundException | InvalidRequestException e) {
+        } catch (NotFoundException e) {
             return ExceptionUtil.handleException(e);
         }
+
     }
 
     @Override
     @Transactional
     public CommonRes createEmptyWakeUpLog() {
-        try {
 
-            List<WakeUp> WakeUp = wakeUpRepository.findAll();
-            DailyLog newLog = null;
+        List<WakeUp> WakeUp = wakeUpRepository.findAll();
+        DailyLog newLog = null;
 
-            for (WakeUp w : WakeUp) {
+        for (WakeUp w : WakeUp) {
 
-                if (!dailyLogRepository.existsByTypeAndDateAndMember(LogType.WAKEUP, DateUtil.getCurrentDate(),
-                        w.getMember())) {
+            if (!dailyLogRepository.existsByTypeAndDateAndMember(LogType.WAKEUP, DateUtil.getCurrentDate(),
+                    w.getMember())) {
 
-                    newLog = new DailyLog(w.getMember(), DateUtil.getCurrentDate(), LogType.WAKEUP, 0,
-                            DateUtil.getCurrentDateTime());
+                newLog = new DailyLog(w.getMember(), DateUtil.getCurrentDate(), LogType.WAKEUP, 0,
+                        DateUtil.getCurrentDateTime());
 
-                }
-
-                dailyLogRepository.save(newLog);
             }
 
-            return new CommonRes(systemId, ErrorCode.OK.getCode(), "기상 로그 업데이트가 성공적으로 완료되었습니다.");
-        } catch (NotFoundException | InvalidRequestException e) {
-            return ExceptionUtil.handleException(e);
+            dailyLogRepository.save(newLog);
         }
+
+        return new CommonRes(systemId, ErrorCode.OK.getCode(), "기상 로그 업데이트가 성공적으로 완료되었습니다.");
 
     }
 

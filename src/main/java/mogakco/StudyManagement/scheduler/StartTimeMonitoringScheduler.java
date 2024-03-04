@@ -29,7 +29,7 @@ public class StartTimeMonitoringScheduler {
         try {
             noticeService.createGeneralNotice();
         } catch (Exception e) {
-            System.err.println("구글 링크 생성을 위한 스케줄 모니터링 작업 도중 오류가 발생했습니다: " + e.getMessage());
+            System.err.println("구글 미트 링크 생성을 위한 스케줄 모니터링 작업 도중 오류가 발생했습니다: " + e.getMessage());
         }
     }
 }

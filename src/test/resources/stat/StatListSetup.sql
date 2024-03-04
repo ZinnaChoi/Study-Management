@@ -5,33 +5,10 @@ VALUES
 ('email2@gmail.com', '20240117122007395', '20240112222007395', 'statUser2', 'statUser2', '$2ahjFwerwerOdyVODxN/lOMp;[sdsdcdcsdfsewere34m*$', 'USER'),
 ('email3@gmail.com', '20240117122007395', '20240112222007395', 'statUser3', 'statUser3', '$2ahjFyW8234sd@#sdfnfvaQWR34ert234^&^%#$BGHDFWxdv', 'USER');
 
-
-INSERT INTO study.`daily_log` (score, member_id, created_at, date, type)
-SELECT
-    1,
-    m.member_id,
-    '20240116152007395',
-    '20240116',
-    'WAKEUP'
-FROM study.`member` m
-WHERE m.id = 'statUser1';
-
-INSERT INTO study.`daily_log` (score, member_id, created_at, date, type)
-SELECT
-    1,
-    m.member_id,
-    '20240116152007395',
-    '20240116',
-    'WAKEUP'
-FROM study.`member` m
-WHERE m.id = 'statUser2';
-
-INSERT INTO study.`daily_log` (score, member_id, created_at, date, type)
-SELECT
-    1,
-    m.member_id,
-    '20240116152007395',
-    '20240116',
-    'WAKEUP'
-FROM study.`member` m
-WHERE m.id = 'statUser3';
+INSERT INTO daily_log (score,member_id,created_at,`date`,`type`) VALUES
+	 (0,(SELECT member_id FROM study.`member` WHERE id = 'statUser1'),'20240207122007395',DATE_FORMAT(CURDATE()-2, '%Y%m%d'),'WAKEUP'),
+	 (0,(SELECT member_id FROM study.`member` WHERE id = 'statUser1'),'20240207122007395',DATE_FORMAT(CURDATE()-1, '%Y%m%d'),'WAKEUP'),
+	 (1,(SELECT member_id FROM study.`member` WHERE id = 'statUser2'),'20240208122008395',DATE_FORMAT(CURDATE(), '%Y%m%d'),'WAKEUP'),
+	 (1,(SELECT member_id FROM study.`member` WHERE id = 'statUser2'),'20240208122008395',DATE_FORMAT(CURDATE()-2, '%Y%m%d'),'WAKEUP'),
+	 (1,(SELECT member_id FROM study.`member` WHERE id = 'statUser3'),'20240209122006395',DATE_FORMAT(CURDATE()-1, '%Y%m%d'),'WAKEUP'),
+	 (1,(SELECT member_id FROM study.`member` WHERE id = 'statUser3'),'20240209122006395',DATE_FORMAT(CURDATE(), '%Y%m%d'),'WAKEUP');
