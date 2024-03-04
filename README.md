@@ -11,11 +11,11 @@
 
 ### (2) 팀원 및 역할
 
-| 작업자 | 담당 기능                 | 담당 역할     | 추가 역할                                        | git 주소                          |
-| ------ | ------------------------- | ------------- | ------------------------------------------------ | --------------------------------- |
-| 최예희 | 부재일정 관리, 게시판     | 설계, API, UI | 프로젝트 기획, Docker 환경 설정, JPA entity 생성 | https://github.com/ZinnaChoi      |
-| 이다연 | 통계, 알림                | 설계, API, UI | Readme 작성, 프로젝트 init, 배포                 | https://github.com/dayeon-dayeon  |
-| 이찬혁 | 계정 및 권한, 스터디 관리 | 설계, API, UI | 프로젝트 일정 관리, UI Layout                    | https://github.com/MeMyself-And-I |
+| 작업자 | 담당 기능                 | 담당 역할     | 추가 역할                                                                                                                               | git 주소                          |
+| ------ | ------------------------- | ------------- | --------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------- |
+| 최예희 | 부재일정 관리, 게시판     | 설계, API, UI | 프로젝트 기획, Docker 환경 구성, JPA 엔티티 설계 및 구현, 로깅 시스템 개발                                                              | https://github.com/ZinnaChoi      |
+| 이다연 | 통계, 알림                | 설계, API, UI | Readme 작성, 프로젝트 init, 배포                                                                                                        | https://github.com/dayeon-dayeon  |
+| 이찬혁 | 계정 및 권한, 스터디 관리 | 설계, API, UI | [프로젝트 일정 관리](https://docs.google.com/spreadsheets/d/1VXsirwc0Vpu-1I1Nq3qSeFSSbDZcV-1SRO0ZoidfiSI/edit#gid=148490993), UI Layout | https://github.com/MeMyself-And-I |
 
 ### (3) ERD
 
@@ -28,22 +28,50 @@
 
 참조 : https://docs.google.com/presentation/d/1fEcGCQcjfnf8uTkW8xaAKWsY-t_qPGdPkzJy83yHVJA/edit
 
-http://localhost:8090/swagger-ui/index.html
-
-### (5) Swagger 접속 정보
-
-```
-http://localhost:8090/swagger-ui/index.html
-```
-
-### (6) 배포 URL
+### (5) 배포 URL
 
 ```
 개발 버전 :
 릴리즈 버전 :
 ```
 
-## 02. 시작 가이드
+## 02. 주요 기능
+
+### 1. 부재 일정 캘린더
+
+- AS-IS : 개별 카카오톡 메세지를 통해 스터디 참/불참 여부를 공유, 특정 일자의 참여 멤버 파악이 어려움.
+- TO-BE : 캘린더에 부재 일정을 등록함으로써 참여 멤버를 한 눈에 파악할 수 있으며, 개인별 알림 설정을 통해 멤버들의 상태에 대해 알림을 받을 수 있음.
+
+### 2. Google Meet 개설 알림
+
+- AS-IS : 먼저 접속하는 스터디원이 Google Meet를 개설하여 대부분 특정 스터디원이 Google Meet을 개설함.
+- TO-BE : 해당 일자에 참여할 멤버에게 돌아가면서 Google Meet 개설 알림을 이메일로 전송. 이를 통해 멤버 모두가 골고루 Google Meet 를 개설할 수 있도록 유도함.
+
+### 3. 게시판
+
+- AS-IS : 스터디 관련 정보를 카카오톡 채팅방에 공유하여, 필요할 때 정보 찾기 어려움.
+- TO-BE : 정보 공유를 위한 전용 게시판 개설해 게시글과 댓글을 통해 정보 및 의견 공유가 가능함.
+
+### 4. 통계
+
+- AS-IS : 기상 시 카카오톡 메시지에 기상 확인 카톡 전송, 부재 시 사전 공유함.
+- TO-BE : 부재 일정을 통한 참여왕, 개인별 목표 기상시간 설정 및 달성일 측정으로 기상왕을 선정하여 스터디원의 참여율 증진 및 의욕을 고취함.
+
+## 03. 기술 스택
+
+### Environment
+
+<img src="https://img.shields.io/badge/Visual Studio Code-007ACC?style=for-the-badge&logo=Visual Studio Code&logoColor=white"> <img src="https://img.shields.io/badge/Git-F05032?style=for-the-badge&logo=Git&logoColor=white"> <img src="https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=GitHub&logoColor=white">
+
+### Development
+
+<img src="https://img.shields.io/badge/Spring Boot-6DB33F?style=for-the-badge&logo=Spring Boot&logoColor=white"> <img src="https://img.shields.io/badge/Java-437291?style=for-the-badge&logo=OpenJDK&logoColor=white"> <img src="https://img.shields.io/badge/React-61DAFB?style=for-the-badge&logo=React&logoColor=white"> <img src="https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=Docker&logoColor=white"> <img src="https://img.shields.io/badge/MySQL-39477F?style=for-the-badge&logo=mysql&logoColor=white">
+
+### Communication
+
+<img src="https://img.shields.io/badge/Google Drive-4285F4?style=for-the-badge&logo=Google Drive&logoColor=white"> <img src="https://img.shields.io/badge/Google Meet-00897B?style=for-the-badge&logo=Google Meet&logoColor=white">
+
+## 04. 시작 가이드
 
 ### (1) 요구사항
 
@@ -91,55 +119,18 @@ jdbc:mysql://localhost:3307/study
 
 ##### Junit Test
 
+- build/reports/tests/test/index.html 에서 세부 정보 확인
+
 ```
 ./gradlew test
-( build/reports/tests/test/index.html 에서 세부 정보 확인 )
 ```
 
-## 03. 기술 스택
+##### Swagger 접속 정보
 
-### Environment
+```
+http://localhost:8090/swagger-ui/index.html
+```
 
-<img src="https://img.shields.io/badge/Visual Studio Code-007ACC?style=for-the-badge&logo=Visual Studio Code&logoColor=white"> <img src="https://img.shields.io/badge/Git-F05032?style=for-the-badge&logo=Git&logoColor=white"> <img src="https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=GitHub&logoColor=white">
-
-### Config
-
-<img src="https://img.shields.io/badge/npm-CB3837?style=for-the-badge&logo=npm&logoColor=white">
-
-### Development
-
-<img src="https://img.shields.io/badge/Spring Boot-6DB33F?style=for-the-badge&logo=Spring Boot&logoColor=white"> <img src="https://img.shields.io/badge/Java-437291?style=for-the-badge&logo=OpenJDK&logoColor=white"> <img src="https://img.shields.io/badge/React-61DAFB?style=for-the-badge&logo=React&logoColor=white">
-
-### Communication
-
-<img src="https://img.shields.io/badge/Google Drive-4285F4?style=for-the-badge&logo=Google Drive&logoColor=white"> <img src="https://img.shields.io/badge/Google Meet-00897B?style=for-the-badge&logo=Google Meet&logoColor=white">
-
-## 04. 주요 기능
-
-### 1. 부재 일정 캘린더
-
-- AS-IS : 개별 카카오톡 메세지를 통해 스터디 참/불참 여부를 공유, 특정 일자의 참여 멤버 파악이 어려움.
-- TO-BE : 캘린더에 부재 일정을 등록함으로써 참여 멤버를 한 눈에 파악할 수 있으며, 개인별 알림 설정을 통해 멤버들의 상태에 대해 알림을 받을 수 있음.
-
-### 2. Google Meet 개설 알림
-
-- AS-IS : 먼저 접속하는 스터디원이 Google Meet를 개설하여 대부분 특정 스터디원이 Google Meet을 개설함.
-- TO-BE : 해당 일자에 참여할 멤버에게 돌아가면서 Google Meet 개설 알림을 이메일로 전송. 이를 통해 멤버 모두가 골고루 Google Meet 를 개설할 수 있도록 유도함.
-
-### 3. 게시판
-
-- AS-IS : 스터디 관련 정보를 카카오톡 채팅방에 공유하여, 필요할 때 정보 찾기 어려움.
-- TO-BE : 정보 공유를 위한 전용 게시판 개설해 게시글과 댓글을 통해 정보 및 의견 공유가 가능함.
-
-### 4. 통계
-
-- AS-IS : 기상 시 카카오톡 메시지에 기상 확인 카톡 전송, 부재 시 사전 공유함.
-- TO-BE : 부재 일정을 통한 참여왕, 개인별 목표 기상시간 설정 및 달성일 측정으로 기상왕을 선정하여 스터디원의 참여율 증진 및 의욕을 고취함.
-
-## 05. 아키 텍쳐
-
-- https://docs.google.com/document/d/17DK1u2veQeac7lkg1GLOgCA7f2sdTXtTKE2knuNY0OY/edit
-
-## 06. 기타 추가 사항
+## 05. 기타 추가 사항
 
 - 일정 관리 : https://docs.google.com/spreadsheets/d/1VXsirwc0Vpu-1I1Nq3qSeFSSbDZcV-1SRO0ZoidfiSI/edit#gid=148490993
