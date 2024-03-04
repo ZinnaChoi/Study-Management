@@ -6,8 +6,9 @@
 
 ### (1) 목적
 
-- Google Meet를 활용한 스터디에서 그룹 멤버들의 효율성과 참여율을 향상시키는 것을 목표로 합니다.
-- 분산되고 수동적인 방법을 사용하여 스터디 활동을 관리하는 한계를 극복하는 것이 목표로, 부재 일정 캘린더, Google Meet 생성 알림, 전용 토론 게시판, 출석/기상 통계 등의 솔루션을 제공합니다.
+> Google Meet를 활용한 스터디에서 그룹 멤버들의 효율성과 참여율을 향상시키는 것을 목표로 합니다.
+
+> 분산되고 수동적인 방법을 사용하여 스터디 활동을 관리하는 한계를 극복하는 것이 목표로, 부재 일정 캘린더, Google Meet 생성 알림, 전용 토론 게시판, 출석/기상 통계 등의 솔루션을 제공합니다.
 
 ### (2) 팀원 및 역할
 
@@ -92,13 +93,13 @@ git clone https://github.com/ZinnaChoi/Study-Management
 
 #### Backend
 
-```
+```bash
 ./gradlew bootRun
 ```
 
 #### Frontend
 
-```
+```cmd
 cd src/main/frontend
 npm install
 npm start
@@ -106,7 +107,7 @@ npm start
 
 #### Docker Setup
 
-```
+```cmd
 cd docker
 docker-compose up -d
 ```
@@ -119,10 +120,10 @@ jdbc:mysql://localhost:3307/study
 
 ##### Junit Test
 
-- build/reports/tests/test/index.html 에서 세부 정보 확인
+- `build/reports/tests/test/index.html` 에서 세부 정보 확인
 
-```
-./gradlew test
+```bash
+./gradlew test --tests "mogakco.StudyManagement.StudyManagementApplicationTests"
 ```
 
 ##### Swagger 접속 정보
@@ -130,7 +131,3 @@ jdbc:mysql://localhost:3307/study
 ```
 http://localhost:8090/swagger-ui/index.html
 ```
-
-## 05. 기타 추가 사항
-
-- 일정 관리 : https://docs.google.com/spreadsheets/d/1VXsirwc0Vpu-1I1Nq3qSeFSSbDZcV-1SRO0ZoidfiSI/edit#gid=148490993
