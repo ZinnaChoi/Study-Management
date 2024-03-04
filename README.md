@@ -28,7 +28,15 @@
 
 참조 : https://docs.google.com/presentation/d/1fEcGCQcjfnf8uTkW8xaAKWsY-t_qPGdPkzJy83yHVJA/edit
 
-### (5) 배포 URL
+http://localhost:8090/swagger-ui/index.html
+
+### (5) Swagger 접속 정보
+
+```
+http://localhost:8090/swagger-ui/index.html
+```
+
+### (6) 배포 URL
 
 ```
 개발 버전 :
