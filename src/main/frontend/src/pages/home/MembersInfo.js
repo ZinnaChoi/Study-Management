@@ -3,6 +3,8 @@ import CommonDialog from "../../components/CommonDialog";
 import { Button, TextField } from "@mui/material";
 import MemberBySchedule from "./MemberBySchedule";
 import MemberByWakeup from "./MemberByWakeup";
+import StudyMemberTable from "./StudyMemberTable";
+import ScheduleTable from "./ScheduleTable";
 import WakeupPopup from "./WakeupPopup";
 import "../../styles/Button.css";
 import "../../styles/NoticeBoard.css";
@@ -21,17 +23,23 @@ export default function MembersInfo() {
 
   return (
     <React.Fragment>
-      <div className="wakeup-block">
-        <h3>스케줄 별 스터디원</h3>
+      <div style={{ textAlign: "right" }}>
         <Button className="accept-btn" type="button" onClick={wakeupSuccess}>
           기상 체크
         </Button>
       </div>
-      <hr />
-      <MemberBySchedule />
-      <h3>기상 시간 별 스터디원</h3>
-      <hr />
-      <MemberByWakeup />
+      <div className="wakeup-block">
+        <div style={{ width: "65%", marginRight: "10px" }}>
+          <h3>스터디원</h3>
+          <hr />
+          <StudyMemberTable />
+        </div>
+        <div style={{ width: "35%" }}>
+          <h3>전체 스터디 시간</h3>
+          <hr />
+          <ScheduleTable />
+        </div>
+      </div>
       <WakeupPopup open={openWakeupPopup} onClose={closeWakeupPopup} />
     </React.Fragment>
   );

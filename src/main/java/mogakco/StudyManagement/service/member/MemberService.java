@@ -8,6 +8,8 @@ import mogakco.StudyManagement.dto.CommonRes;
 import mogakco.StudyManagement.dto.MemberIdDuplReq;
 import mogakco.StudyManagement.dto.MemberInfoRes;
 import mogakco.StudyManagement.dto.MemberInfoUpdateReq;
+import mogakco.StudyManagement.dto.MemberInfosReq;
+import mogakco.StudyManagement.dto.MemberInfosRes;
 import mogakco.StudyManagement.dto.MemberJoinReq;
 import mogakco.StudyManagement.dto.MemberListRes;
 import mogakco.StudyManagement.dto.MemberLoginReq;
@@ -30,6 +32,8 @@ public interface MemberService {
     boolean isIdDuplicated(MemberIdDuplReq idInfo);
 
     MemberInfoRes getMemberInfo();
+
+    MemberInfosRes getMembersInfo(MemberInfosReq memberInfosReq, Pageable pageable);
 
     MemberListRes getMemberList();
 

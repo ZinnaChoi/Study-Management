@@ -1,6 +1,7 @@
 package mogakco.StudyManagement.service.member.impl;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -31,6 +32,8 @@ import mogakco.StudyManagement.dto.MemberIdDuplReq;
 import mogakco.StudyManagement.dto.MemberInfo;
 import mogakco.StudyManagement.dto.MemberInfoRes;
 import mogakco.StudyManagement.dto.MemberInfoUpdateReq;
+import mogakco.StudyManagement.dto.MemberInfosReq;
+import mogakco.StudyManagement.dto.MemberInfosRes;
 import mogakco.StudyManagement.dto.MemberJoinReq;
 import mogakco.StudyManagement.dto.MemberListRes;
 import mogakco.StudyManagement.dto.MemberLoginReq;
@@ -42,6 +45,7 @@ import mogakco.StudyManagement.dto.SimplePageable;
 import mogakco.StudyManagement.dto.StudyMembersRes;
 import mogakco.StudyManagement.enums.ErrorCode;
 import mogakco.StudyManagement.enums.MemberRole;
+import mogakco.StudyManagement.enums.MemberSearchType;
 import mogakco.StudyManagement.repository.MemberRepository;
 import mogakco.StudyManagement.repository.MemberScheduleRepository;
 import mogakco.StudyManagement.repository.NoticeRepository;
@@ -263,6 +267,46 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
 
         return result;
 
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public MemberInfosRes getMembersInfo(MemberInfosReq memberInfosReq, Pageable pageable) {
+
+        String searchKeyWord = memberInfosReq.getSearchKeyWord().trim();
+        Page<Object[]> members;
+
+        if (searchKeyWord.length() == 0) {
+            members = memberRepository.findMembersWithSchedulesAndWakeupTime(pageable);
+        } else {
+            if (memberInfosReq.getSearchType() == MemberSearchType.PARTICIPATION) {
+                members = memberRepository.findMembersWithSchedulesAndWakeupTimeByScheduleName(searchKeyWord,
+                        pageable);
+            } else {
+                searchKeyWord = searchKeyWord.replaceAll("[:시분]", "");
+                members = memberRepository.findMembersWithSchedulesAndWakeupTimeByWakeupTime(searchKeyWord,
+                        pageable);
+            }
+        }
+
+        List<Object[]> queryResults = members.getContent();
+        List<MemberInfo> membersInfo = new ArrayList<>();
+
+        for (Object[] row : queryResults) {
+            // 각 row에서 필요한 데이터 추출
+            String id = (String) row[0];
+            String name = (String) row[1];
+            String[] scheduleNamesArray = ((String) row[2]).split(", ");
+            List<String> scheduleNames = Arrays.asList(scheduleNamesArray);
+            String wakeupTime = (String) row[3];
+
+            membersInfo.add(
+                    MemberInfo.builder().id(id).name(name).scheduleNames(scheduleNames).wakeupTime(wakeupTime).build());
+        }
+
+        return new MemberInfosRes(systemId, ErrorCode.OK.getCode(),
+                ErrorCode.OK.getMessage(), membersInfo,
+                PageUtil.createSimplePageable(members));
     }
 
     @Override
