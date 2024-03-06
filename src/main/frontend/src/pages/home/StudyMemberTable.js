@@ -21,12 +21,12 @@ export default function StudyMemberTable() {
       accessor: "name",
     },
     {
-      Header: "참여 스터디",
-      accessor: "scheduleNames",
-    },
-    {
       Header: "목표 기상 시간",
       accessor: "wakeupTime",
+    },
+    {
+      Header: "참여 스터디",
+      accessor: "scheduleNames",
     },
   ];
 
@@ -43,8 +43,13 @@ export default function StudyMemberTable() {
       .get("/members-info", { params })
       .then((response) => {
         if (response && response.data) {
-          console.log(response.data);
-          setMembersInfo(response.data.content);
+          const modifiedData = response.data?.content.map((item) => ({
+            ...item,
+            scheduleNames: item.scheduleNames.toString(),
+            wakeupTime:
+              item.wakeupTime.slice(0, 2) + ":" + item.wakeupTime.slice(2),
+          }));
+          setMembersInfo(modifiedData);
           setPage(response.data.pageable.page);
           setSize(response.data.pageable.size);
           setTotalPages(response.data.pageable.totalPages);
@@ -63,14 +68,19 @@ export default function StudyMemberTable() {
     getMembersInfo();
   }, []);
 
-  // searchType 변경시마다 실행
+  // page 변경시마다 실행
   useEffect(() => {
-    // getMemberInfoBySchedule();
-  }, [searchType, page]);
+    getMembersInfo();
+  }, [page]);
 
   const handleSchedulePageChange = (newPage) => {
-    console.log(newPage);
     setPage(newPage);
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      getMembersInfo();
+    }
   };
 
   return (
@@ -81,20 +91,17 @@ export default function StudyMemberTable() {
           onChange={(e) => setSearchType(e.target.value)}
           className="selectAndInputBase select"
         >
-          <option value="PARTICIPATION">참여 시간</option>
+          <option value="PARTICIPATION">참여 스터디</option>
           <option value="WAKEUP">기상 시간</option>
         </select>
         <input
           type="text"
-          // value={searchKeyword}
-          // onChange={(e) => setSearchKeyword(e.target.value)}
-          // onKeyDown={handleKeyDown}
+          value={searchKeyword}
+          onChange={(e) => setSearchKeyword(e.target.value)}
+          onKeyDown={handleKeyDown}
           className="selectAndInputBase input"
         />
-        <button
-          // onClick={handleSearch}
-          className="searchButton search-btn"
-        >
+        <button onClick={getMembersInfo} className="searchButton search-btn">
           검색
         </button>
       </div>

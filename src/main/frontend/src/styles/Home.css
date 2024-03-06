@@ -22,3 +22,16 @@
   display: flex;
   justify-content: space-between;
 }
+
+.wakeup-check-align {
+  text-align: right;
+}
+
+.study-member-table {
+  width: 65%;
+  margin-right: 10px;
+}
+
+.schedule-table {
+  width: 35%;
+}

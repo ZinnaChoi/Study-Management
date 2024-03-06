@@ -25,41 +25,41 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     Boolean existsById(String id);
 
-    @Query(value = "SELECT m.id, m.name, " +
-            "(SELECT GROUP_CONCAT(DISTINCT s.schedule_name ORDER BY s.schedule_name ASC) FROM member_schedule ms " +
-            "INNER JOIN schedule s ON ms.schedule_id = s.schedule_id WHERE ms.member_id = m.member_id) AS schedules, " +
+    @Query(value = "SELECT m.id, " +
+            "m.name, " +
+            "GROUP_CONCAT(DISTINCT s.schedule_name ORDER BY s.schedule_name ASC SEPARATOR ', ') AS schedules, " +
             "w.wakeup_time " +
             "FROM member m " +
             "LEFT JOIN wakeup w ON m.member_id = w.member_id " +
+            "LEFT JOIN member_schedule ms ON m.member_id = ms.member_id " +
+            "LEFT JOIN schedule s ON ms.schedule_id = s.schedule_id " +
             "WHERE m.id != 'admin' " +
-            "GROUP BY m.id, m.name, m.email, w.wakeup_time", nativeQuery = true)
+            "GROUP BY m.id, m.name, w.wakeup_time", nativeQuery = true)
     Page<Object[]> findMembersWithSchedulesAndWakeupTime(Pageable pageable);
 
     @Query(value = "SELECT m.id, m.name, " +
-            "(SELECT GROUP_CONCAT(DISTINCT s.schedule_name ORDER BY s.schedule_name ASC) FROM member_schedule ms " +
-            "INNER JOIN schedule s ON ms.schedule_id = s.schedule_id WHERE ms.member_id = m.member_id) AS schedule_name, "
+            "(SELECT GROUP_CONCAT(DISTINCT s.scheduleName) FROM MemberSchedule ms " +
+            "INNER JOIN schedule s ON ms.schedule.scheduleId = s.scheduleId WHERE ms.member.memberId = m.memberId) AS schedules, "
             +
-            "w.wakeup_time " +
-            "FROM member m " +
-            "LEFT JOIN wakeup w ON m.member_id = w.member_id " +
-            "INNER JOIN member_schedule ms ON m.member_id = ms.member_id " +
-            "INNER JOIN schedule s ON ms.schedule_id = s.schedule_id " +
-            "WHERE m.id != 'admin' AND s.schedule_name LIKE %:searchKeyword% " +
-            "GROUP BY m.member_id, m.name, m.email, w.wakeup_time", nativeQuery = true)
+            "w.wakeupTime " +
+            "FROM Member m " +
+            "LEFT JOIN WakeUp w ON m.memberId = w.member.memberId " +
+            "INNER JOIN MemberSchedule ms ON m.memberId = ms.member.memberId " +
+            "INNER JOIN Schedule s ON ms.schedule.scheduleId = s.scheduleId " +
+            "WHERE m.id != 'admin' AND s.scheduleName LIKE %:searchKeyword% " +
+            "GROUP BY m.memberId, m.name, w.wakeupTime")
     Page<Object[]> findMembersWithSchedulesAndWakeupTimeByScheduleName(@Param("searchKeyword") String searchKeyword,
             Pageable pageable);
 
     @Query(value = "SELECT m.id, m.name, " +
-            "(SELECT GROUP_CONCAT(DISTINCT s.schedule_name ORDER BY s.schedule_name ASC) FROM member_schedule ms " +
-            "INNER JOIN schedule s ON ms.schedule_id = s.schedule_id WHERE ms.member_id = m.member_id) AS schedule_name, "
-            +
+            "GROUP_CONCAT(DISTINCT s.schedule_name ORDER BY s.schedule_name ASC SEPARATOR ', ') AS schedules, " +
             "w.wakeup_time " +
             "FROM member m " +
             "LEFT JOIN wakeup w ON m.member_id = w.member_id " +
             "INNER JOIN member_schedule ms ON m.member_id = ms.member_id " +
             "INNER JOIN schedule s ON ms.schedule_id = s.schedule_id " +
             "WHERE m.id != 'admin' AND TIME_FORMAT(w.wakeup_time, '%H%i') <= TIME_FORMAT(:searchKeyword, '%H%i') " +
-            "GROUP BY m.member_id, m.name, m.email, w.wakeup_time", nativeQuery = true)
+            "GROUP BY m.member_id, m.name, w.wakeup_time", nativeQuery = true)
     Page<Object[]> findMembersWithSchedulesAndWakeupTimeByWakeupTime(@Param("searchKeyword") String searchKeyword,
             Pageable pageable);
 
