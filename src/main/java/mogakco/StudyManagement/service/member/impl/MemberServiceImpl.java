@@ -344,7 +344,7 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
                 // member_schedule 테이블 업데이트
                 List<String> userScheduleNames = updateInfo.getScheduleName();
                 if (userScheduleNames == null || userScheduleNames.size() == 0) {
-                    return ExceptionUtil.handleException(new InvalidRequestException("참여 스터디 스케줄을 선택해주세요"));
+                    return ExceptionUtil.handleException(new InvalidRequestException("참여 스케줄을 선택해주세요"));
                 }
 
                 List<MemberSchedule> mSchedules = memberScheduleRepository.findAllByMember(member);

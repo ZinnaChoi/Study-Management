@@ -27,15 +27,15 @@ export default function MembersInfo() {
         </Button>
       </div>
       <div className="wakeup-block">
+        <div className="schedule-table">
+          <h3>스터디 시간표</h3>
+          <hr />
+          <ScheduleTable />
+        </div>
         <div className="study-member-table">
           <h3>스터디원</h3>
           <hr />
           <StudyMemberTable />
-        </div>
-        <div className="schedule-table">
-          <h3>전체 스터디 시간</h3>
-          <hr />
-          <ScheduleTable />
         </div>
       </div>
       <WakeupPopup open={openWakeupPopup} onClose={closeWakeupPopup} />

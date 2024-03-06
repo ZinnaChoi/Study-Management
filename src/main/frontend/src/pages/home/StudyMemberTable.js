@@ -25,7 +25,7 @@ export default function StudyMemberTable() {
       accessor: "wakeupTime",
     },
     {
-      Header: "참여 스터디",
+      Header: "참여 스케줄",
       accessor: "scheduleNames",
     },
   ];
@@ -91,7 +91,7 @@ export default function StudyMemberTable() {
           onChange={(e) => setSearchType(e.target.value)}
           className="selectAndInputBase select"
         >
-          <option value="PARTICIPATION">참여 스터디</option>
+          <option value="PARTICIPATION">참여 스케줄</option>
           <option value="WAKEUP">기상 시간</option>
         </select>
         <input
