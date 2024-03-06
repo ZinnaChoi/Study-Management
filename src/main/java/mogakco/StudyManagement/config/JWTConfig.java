@@ -4,11 +4,13 @@ import java.io.IOException;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -48,11 +50,16 @@ public class JWTConfig extends OncePerRequestFilter {
         // Bearer 부분 제거 후 순수 토큰만 획득
         String token = authorization.split(" ")[1];
 
-        // 토큰 소멸 시간 검증
-        if (jwtUtil.isExpired(token)) {
-            // 다음 필터 실행
-            filterChain.doFilter(request, response);
-            // 조건이 해당되면 메소드 종료
+        try {
+            // 토큰 소멸 시간 검증
+            if (jwtUtil.isExpired(token)) {
+                // 다음 필터 실행
+                filterChain.doFilter(request, response);
+                // 조건이 해당되면 메소드 종료
+                throw new ExpiredJwtException(null, null, "Token expired");
+            }
+        } catch (ExpiredJwtException ex) {
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
             return;
         }
 
