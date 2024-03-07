@@ -9,7 +9,7 @@ import "../../styles/Home.css";
 // 스터디원 테이블
 export default function StudyMemberTable() {
   const [searchType, setSearchType] = useState("PARTICIPATION");
-  const [wakeupTimeCondition, setWakeupTimeCondition] = React.useState("이하");
+  const [wakeupTimeCondition, setWakeupTimeCondition] = React.useState("이전");
   const [membersInfo, setMembersInfo] = useState([]);
   const [searchKeyword, setSearchKeyword] = useState("");
   const [page, setPage] = useState(0);
@@ -38,7 +38,7 @@ export default function StudyMemberTable() {
       sort: "name,asc",
       searchType: searchType,
       searchKeyWord: searchKeyword,
-      comparisonOperators: wakeupTimeCondition === "이하" ? "<=" : ">=",
+      comparisonOperators: wakeupTimeCondition === "이전" ? "<=" : ">=",
     };
 
     authClient
@@ -119,20 +119,20 @@ export default function StudyMemberTable() {
             <label>
               <input
                 type="radio"
-                value="이상"
-                checked={wakeupTimeCondition === "이상"}
+                value="이전"
+                checked={wakeupTimeCondition === "이전"}
                 onChange={(e) => setWakeupTimeCondition(e.target.value)}
               />
-              이상
+              이전
             </label>
             <label>
               <input
                 type="radio"
-                value="이하"
-                checked={wakeupTimeCondition === "이하"}
+                value="이후"
+                checked={wakeupTimeCondition === "이후"}
                 onChange={(e) => setWakeupTimeCondition(e.target.value)}
               />
-              이하
+              이후
             </label>
           </React.Fragment>
         )}
