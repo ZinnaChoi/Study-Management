@@ -46,3 +46,23 @@ dependencies {
 tasks.named('test', Test) {
     useJUnitPlatform()
 }
+
+sourceSets {
+    main {
+        resources {
+            srcDirs('../frontend/build/static')
+        }
+    }
+}
+
+// frontend 모듈의 결과물을 복사하는 태스크 추가
+task copyFrontend(type: Copy) {
+    from '../frontend/build/static'
+    into 'src/main/resources/static'
+}
+
+// 빌드와 frontend 결과물 복사를 함께 수행하는 최종 빌드 태스크 설정
+task buildFull {
+    dependsOn 'bootJar'
+    dependsOn 'copyFrontend'
+}
