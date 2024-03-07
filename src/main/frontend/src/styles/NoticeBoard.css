@@ -149,3 +149,7 @@
   justify-content: center;
   margin-bottom: 1rem;
 }
+
+.time-input {
+  height: 30px;
+}

@@ -5,6 +5,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -24,6 +25,8 @@ import mogakco.StudyManagement.dto.MemberIdDuplRes;
 import mogakco.StudyManagement.dto.MemberInfoRes;
 import mogakco.StudyManagement.dto.MemberInfoUpdateReq;
 import mogakco.StudyManagement.dto.MemberJoinReq;
+import mogakco.StudyManagement.dto.MemberInfosReq;
+import mogakco.StudyManagement.dto.MemberInfosRes;
 import mogakco.StudyManagement.dto.MemberListRes;
 import mogakco.StudyManagement.dto.MemberLoginReq;
 import mogakco.StudyManagement.dto.MemberLoginRes;
@@ -167,6 +170,30 @@ public class MemberController extends CommonController {
         return result;
     }
 
+    @Operation(summary = "스터디원 정보 조건 조회", description = "스터디원 정보(참여 시간, 기상시간 조건) 및 페이지 별 조회")
+    @SecurityRequirement(name = "bearer-key")
+    @GetMapping("/members-info")
+    public MemberInfosRes getMembersInfo(
+            HttpServletRequest request, @ModelAttribute @Valid MemberInfosReq memberListReq,
+            @PageableDefault(size = 10, page = 0, sort = "name", direction = Sort.Direction.DESC) Pageable pageable) {
+        MemberInfosRes result = new MemberInfosRes();
+        try {
+            result = memberService.getMembersInfo(memberListReq, pageable);
+        } catch (Exception e) {
+            result = new MemberInfosRes(systemId, ErrorCode.INTERNAL_ERROR.getCode(),
+                    ErrorCode.INTERNAL_ERROR.getMessage(), null, null);
+        }
+        return result;
+    }
+
+    /**
+     * @deprecated
+     *             홈 화면 재구성에 따른 미사용 API, 조건 조회를 기능을 포함하여 통합된 하기 메소드를 대신 사용
+     *             <p>
+     *             {@link MemberController#getMembersInfo(HttpServletRequest, MemberInfosReq, Pageable)}
+     *             .
+     */
+    @Deprecated
     @Operation(summary = "스케줄 이름 별 멤버 조회", description = "스케줄 이름을 통한 멤버 조회(schedule == null일 경우 스터디 참여 인원 전체 조회)")
     @SecurityRequirement(name = "bearer-key")
     @GetMapping("/members/schedule-name")
@@ -187,6 +214,14 @@ public class MemberController extends CommonController {
         return result;
     }
 
+    /**
+     * @deprecated
+     *             홈 화면 재구성에 따른 미사용 API, 조건 조회를 기능을 포함하여 통합된 하기 메소드를 대신 사용
+     *             <p>
+     *             {@link MemberController#getMembersInfo(HttpServletRequest, MemberInfosReq, Pageable)}
+     *             .
+     */
+    @Deprecated
     @Operation(summary = "기상 시간 별 멤버 조회", description = "기상 시간을 통한 멤버 조회(time == null일 경우 스터디 참여 인원 전체 조회)")
     @SecurityRequirement(name = "bearer-key")
     @GetMapping("/members/wakeup-time")

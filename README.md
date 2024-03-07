@@ -12,11 +12,11 @@
 
 ### (2) 팀원 및 역할
 
-| 작업자 | 담당 기능                 | 담당 역할     | 추가 역할                                                                                                                               | git 주소                          |
-| ------ | ------------------------- | ------------- | --------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------- |
-| 최예희 | 부재일정 관리, 게시판     | 설계, API, UI | 프로젝트 기획, Docker 환경 구성, JPA 엔티티 설계 및 구현, 로깅 시스템 개발                                                              | https://github.com/ZinnaChoi      |
-| 이다연 | 통계, 알림                | 설계, API, UI | Readme 작성, 프로젝트 init, 배포                                                                                                        | https://github.com/dayeon-dayeon  |
-| 이찬혁 | 계정 및 권한, 스터디 관리 | 설계, API, UI | [프로젝트 일정 관리](https://docs.google.com/spreadsheets/d/1VXsirwc0Vpu-1I1Nq3qSeFSSbDZcV-1SRO0ZoidfiSI/edit#gid=148490993), UI Layout | https://github.com/MeMyself-And-I |
+| 작업자 | 담당 기능                 | 담당 역할     | 추가 역할                                                                                                                                                     | git 주소                          |
+| ------ | ------------------------- | ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------- |
+| 최예희 | 부재일정 관리, 게시판     | 설계, API, UI | 프로젝트 기획, Docker 환경 구성, JPA 엔티티 설계 및 구현, 로깅 시스템 개발                                                                                    | https://github.com/ZinnaChoi      |
+| 이다연 | 통계, 알림                | 설계, API, UI | Readme 작성, 프로젝트 init, 배포                                                                                                                              | https://github.com/dayeon-dayeon  |
+| 이찬혁 | 계정 및 권한, 스터디 관리 | 설계, API, UI | [프로젝트 일정 관리](https://docs.google.com/spreadsheets/d/1VXsirwc0Vpu-1I1Nq3qSeFSSbDZcV-1SRO0ZoidfiSI/edit#gid=148490993), UI Layout, Spring Security 설정 | https://github.com/MeMyself-And-I |
 
 ### (3) ERD
 
@@ -66,7 +66,7 @@
 
 ### Development
 
-<img src="https://img.shields.io/badge/Spring Boot-6DB33F?style=for-the-badge&logo=Spring Boot&logoColor=white"> <img src="https://img.shields.io/badge/Java-437291?style=for-the-badge&logo=OpenJDK&logoColor=white"> <img src="https://img.shields.io/badge/React-61DAFB?style=for-the-badge&logo=React&logoColor=white"> <img src="https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=Docker&logoColor=white"> <img src="https://img.shields.io/badge/MySQL-39477F?style=for-the-badge&logo=mysql&logoColor=white">
+<img src="https://img.shields.io/badge/Spring Boot-6DB33F?style=for-the-badge&logo=Spring Boot&logoColor=white"> <img src="https://img.shields.io/badge/Java-437291?style=for-the-badge&logo=OpenJDK&logoColor=white"> <img src="https://img.shields.io/badge/React-61DAFB?style=for-the-badge&logo=React&logoColor=white"> <img src="https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=Docker&logoColor=white"> <img src="https://img.shields.io/badge/MySQL-39477F?style=for-the-badge&logo=mysql&logoColor=white"> <img alt="Redis" src ="https://img.shields.io/badge/Redis-DC382D.svg?&style=for-the-badge&logo=Redis&logoColor=white"/>
 
 ### Communication
 

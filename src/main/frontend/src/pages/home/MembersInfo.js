@@ -1,11 +1,11 @@
 import React, { useState } from "react";
-import CommonDialog from "../../components/CommonDialog";
-import { Button, TextField } from "@mui/material";
-import MemberBySchedule from "./MemberBySchedule";
-import MemberByWakeup from "./MemberByWakeup";
+import { Button } from "@mui/material";
+import StudyMemberTable from "./StudyMemberTable";
+import ScheduleTable from "./ScheduleTable";
 import WakeupPopup from "./WakeupPopup";
 import "../../styles/Button.css";
 import "../../styles/NoticeBoard.css";
+import "../../styles/Home.css";
 
 // 홈 화면
 export default function MembersInfo() {
@@ -21,17 +21,23 @@ export default function MembersInfo() {
 
   return (
     <React.Fragment>
-      <div className="wakeup-block">
-        <h3>스케줄 별 스터디원</h3>
+      <div className="wakeup-check-align">
         <Button className="accept-btn" type="button" onClick={wakeupSuccess}>
           기상 체크
         </Button>
       </div>
-      <hr />
-      <MemberBySchedule />
-      <h3>기상 시간 별 스터디원</h3>
-      <hr />
-      <MemberByWakeup />
+      <div className="wakeup-block">
+        <div className="schedule-table">
+          <h3>스터디 시간표</h3>
+          <hr />
+          <ScheduleTable />
+        </div>
+        <div className="study-member-table">
+          <h3>스터디원</h3>
+          <hr />
+          <StudyMemberTable />
+        </div>
+      </div>
       <WakeupPopup open={openWakeupPopup} onClose={closeWakeupPopup} />
     </React.Fragment>
   );
