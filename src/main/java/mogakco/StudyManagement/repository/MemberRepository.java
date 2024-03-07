@@ -25,19 +25,25 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     Boolean existsById(String id);
 
-    @Query(value = "SELECT m.id, " +
-            "m.name, " +
-            "GROUP_CONCAT(DISTINCT s.schedule_name ORDER BY s.schedule_name ASC SEPARATOR ', ') AS schedules, " +
-            "w.wakeup_time " +
-            "FROM member m " +
-            "LEFT JOIN wakeup w ON m.member_id = w.member_id " +
-            "LEFT JOIN member_schedule ms ON m.member_id = ms.member_id " +
-            "LEFT JOIN schedule s ON ms.schedule_id = s.schedule_id " +
-            "WHERE m.id != 'admin' " +
-            "GROUP BY m.id, m.name, w.wakeup_time", nativeQuery = true)
+    @Query(value = MemberQueries.BASE_QUERY + MemberQueries.GROUP_BY)
     Page<Object[]> findMembersWithSchedulesAndWakeupTime(Pageable pageable);
 
-    @Query(value = "SELECT m.id, m.name, " +
+    @Query(value = MemberQueries.BASE_QUERY + " AND s.scheduleName LIKE %:searchKeyword% " + MemberQueries.GROUP_BY)
+    Page<Object[]> findMembersWithSchedulesAndWakeupTimeByScheduleName(@Param("searchKeyword") String searchKeyword,
+            Pageable pageable);
+
+    @Query(value = MemberQueries.BASE_QUERY
+            + " AND CASE WHEN :comparisonOperators = '>=' THEN CONCAT(SUBSTRING(w.wakeupTime, 1, 2), ':', SUBSTRING(w.wakeupTime, 3, 2)) >= :searchKeyword"
+            + " WHEN :comparisonOperators = '<=' THEN CONCAT(SUBSTRING(w.wakeupTime, 1, 2), ':', SUBSTRING(w.wakeupTime, 3, 2)) <= :searchKeyword END "
+            + MemberQueries.GROUP_BY)
+    Page<Object[]> findMembersWithSchedulesAndWakeupTimeByWakeupTime(@Param("searchKeyword") String searchKeyword,
+            @Param("comparisonOperators") String comparisonOperators,
+            Pageable pageable);
+
+}
+
+class MemberQueries {
+    public static final String BASE_QUERY = "SELECT m.id, m.name, " +
             "(SELECT GROUP_CONCAT(DISTINCT s.scheduleName) FROM MemberSchedule ms " +
             "INNER JOIN schedule s ON ms.schedule.scheduleId = s.scheduleId WHERE ms.member.memberId = m.memberId) AS schedules, "
             +
@@ -46,21 +52,7 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
             "LEFT JOIN WakeUp w ON m.memberId = w.member.memberId " +
             "INNER JOIN MemberSchedule ms ON m.memberId = ms.member.memberId " +
             "INNER JOIN Schedule s ON ms.schedule.scheduleId = s.scheduleId " +
-            "WHERE m.id != 'admin' AND s.scheduleName LIKE %:searchKeyword% " +
-            "GROUP BY m.memberId, m.name, w.wakeupTime")
-    Page<Object[]> findMembersWithSchedulesAndWakeupTimeByScheduleName(@Param("searchKeyword") String searchKeyword,
-            Pageable pageable);
+            "WHERE m.id != 'admin' ";
 
-    @Query(value = "SELECT m.id, m.name, " +
-            "GROUP_CONCAT(DISTINCT s.schedule_name ORDER BY s.schedule_name ASC SEPARATOR ', ') AS schedules, " +
-            "w.wakeup_time " +
-            "FROM member m " +
-            "LEFT JOIN wakeup w ON m.member_id = w.member_id " +
-            "INNER JOIN member_schedule ms ON m.member_id = ms.member_id " +
-            "INNER JOIN schedule s ON ms.schedule_id = s.schedule_id " +
-            "WHERE m.id != 'admin' AND TIME_FORMAT(w.wakeup_time, '%H%i') <= TIME_FORMAT(:searchKeyword, '%H%i') " +
-            "GROUP BY m.member_id, m.name, w.wakeup_time", nativeQuery = true)
-    Page<Object[]> findMembersWithSchedulesAndWakeupTimeByWakeupTime(@Param("searchKeyword") String searchKeyword,
-            Pageable pageable);
-
+    public static final String GROUP_BY = " GROUP BY m.memberId, m.name, w.wakeupTime";
 }

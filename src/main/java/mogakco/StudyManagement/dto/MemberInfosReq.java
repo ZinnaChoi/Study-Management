@@ -1,6 +1,7 @@
 package mogakco.StudyManagement.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -15,8 +16,13 @@ public class MemberInfosReq {
 
     private MemberSearchType searchType;
 
-    public MemberInfosReq(String searchKeyWord, MemberSearchType searchType) {
+    @Schema(example = ">= or <=")
+    @Pattern(regexp = "^(>=|<=)$")
+    private String comparisonOperators;
+
+    public MemberInfosReq(String searchKeyWord, MemberSearchType searchType, String comparisonOperators) {
         this.searchKeyWord = searchKeyWord;
         this.searchType = searchType;
+        this.comparisonOperators = comparisonOperators;
     }
 }

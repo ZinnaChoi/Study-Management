@@ -283,14 +283,9 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
                 members = memberRepository.findMembersWithSchedulesAndWakeupTimeByScheduleName(searchKeyWord,
                         pageable);
             } else {
-                searchKeyWord = searchKeyWord.replaceAll("[:시분]", "");
-                // 시간만 입력 했을 경우 검색 키워드 앞 또는 앞, 뒤에 시, 분단위 추가(사용 편의성)
-                if (searchKeyWord.length() == 2) {
-                    searchKeyWord += "00";
-                } else if (searchKeyWord.length() == 1) {
-                    searchKeyWord = "0" + searchKeyWord + "00";
-                }
+                String comparisonOperators = memberInfosReq.getComparisonOperators();
                 members = memberRepository.findMembersWithSchedulesAndWakeupTimeByWakeupTime(searchKeyWord,
+                        comparisonOperators,
                         pageable);
             }
         }

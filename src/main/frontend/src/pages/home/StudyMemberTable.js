@@ -9,6 +9,7 @@ import "../../styles/Home.css";
 // 스터디원 테이블
 export default function StudyMemberTable() {
   const [searchType, setSearchType] = useState("PARTICIPATION");
+  const [wakeupTimeCondition, setWakeupTimeCondition] = React.useState("이하");
   const [membersInfo, setMembersInfo] = useState([]);
   const [searchKeyword, setSearchKeyword] = useState("");
   const [page, setPage] = useState(0);
@@ -37,6 +38,7 @@ export default function StudyMemberTable() {
       sort: "name,asc",
       searchType: searchType,
       searchKeyWord: searchKeyword,
+      comparisonOperators: wakeupTimeCondition === "이하" ? "<=" : ">=",
     };
 
     authClient
@@ -88,19 +90,52 @@ export default function StudyMemberTable() {
       <div className="member-info-layout">
         <select
           value={searchType}
-          onChange={(e) => setSearchType(e.target.value)}
+          onChange={(e) => {
+            setSearchType(e.target.value);
+            setSearchKeyword("");
+          }}
           className="selectAndInputBase select"
         >
           <option value="PARTICIPATION">참여 스케줄</option>
           <option value="WAKEUP">기상 시간</option>
         </select>
-        <input
-          type="text"
-          value={searchKeyword}
-          onChange={(e) => setSearchKeyword(e.target.value)}
-          onKeyDown={handleKeyDown}
-          className="selectAndInputBase input"
-        />
+        {searchType === "PARTICIPATION" ? (
+          <input
+            type="text"
+            value={searchKeyword}
+            onChange={(e) => setSearchKeyword(e.target.value)}
+            onKeyDown={handleKeyDown}
+            className="selectAndInputBase input"
+          />
+        ) : (
+          <React.Fragment>
+            <input
+              type="time"
+              value={searchKeyword}
+              onChange={(e) => setSearchKeyword(e.target.value)}
+              onKeyDown={handleKeyDown}
+              className="selectAndInputBase input time-input"
+            />
+            <label>
+              <input
+                type="radio"
+                value="이상"
+                checked={wakeupTimeCondition === "이상"}
+                onChange={(e) => setWakeupTimeCondition(e.target.value)}
+              />
+              이상
+            </label>
+            <label>
+              <input
+                type="radio"
+                value="이하"
+                checked={wakeupTimeCondition === "이하"}
+                onChange={(e) => setWakeupTimeCondition(e.target.value)}
+              />
+              이하
+            </label>
+          </React.Fragment>
+        )}
         <button onClick={getMembersInfo} className="searchButton search-btn">
           검색
         </button>
