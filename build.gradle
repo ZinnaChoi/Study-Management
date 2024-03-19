@@ -46,27 +46,6 @@ dependencies {
 tasks.named('test', Test) {
     useJUnitPlatform()
 }
-/*
-task buildFrontend(type: Exec) {
-    workingDir file('src/main/frontend')
-    commandLine 'npm', 'install'
-    commandLine 'npm', 'run', 'build'
-}
-
-task copyFrontend(type: Copy) {
-    from 'src/main/frontend/build/static'
-    into 'src/main/resources/static'
-}
-
-// 빌드와 frontend 결과물 복사를 함께 수행하는 최종 빌드 태스크 설정
-task buildFull {
-    dependsOn 'bootJar'
-    dependsOn 'copyFrontend'
-}
-// processResources 태스크가 copyFrontend 태스크 결과를 사용할 수 있도록 설정
-processResources.dependsOn copyFrontend
-*/
-
 
 def reactDir = "$projectDir/src/main/frontend";
 
