@@ -32,8 +32,7 @@
 ### (5) 배포 URL
 
 ```
-개발 버전 :
-릴리즈 버전 :
+http://54.180.198.112:8090/login
 ```
 
 ## 02. 주요 기능
@@ -110,12 +109,6 @@ npm start
 ```cmd
 cd docker
 docker-compose up -d
-```
-
-##### JDBC URL
-
-```
-jdbc:mysql://localhost:3307/study
 ```
 
 ##### Junit Test
