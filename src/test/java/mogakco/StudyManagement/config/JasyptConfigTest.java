@@ -17,7 +17,7 @@ public class JasyptConfigTest {
     void stringEncryptor() {
         String dbUrl = "dbUrl";
         String dbUsername = "dbUsername";
-        String dbPassword = "dbPassword!";
+        String dbPassword = "dbPassword";
         String secretKey = "secretKey";
         String adminId = "adminId";
         String adminPassword = "adminPassword";
@@ -32,12 +32,12 @@ public class JasyptConfigTest {
 
     @Test
     void stringDecryptor() {
-        String dbUrl = "dbUrl";
-        String dbUsername = "dbUsername";
-        String dbPassword = "dbPassword!";
-        String secretKey = "secretKey";
-        String adminId = "adminId";
-        String adminPassword = "adminPassword";
+        String dbUrl = "gQS6Big/3WlqTjFY4FGrxg=="; // dbUrl
+        String dbUsername = "gMs64oreSLpvxiF2Oebv0DmS7+1vhfTQ"; // dbUsername
+        String dbPassword = "lGmWk51pN3awpHLazWK68jihvfKxV8Ro"; // dbPassword
+        String secretKey = "fQilxnWt3Un46+b/Ir92UlSCrc4G8JSu"; // secretKey
+        String adminId = "nyhunuGSFeKvK5hKK8D0dQ=="; // adminId
+        String adminPassword = "UJXZ1c5ujFKk1BqMBoL1K65zjrez1zKh"; // adminPassword
 
         System.out.println("DE_dbUrl : " + jasyptDecoding(dbUrl));
         System.out.println("DE_dbUsername : " + jasyptDecoding(dbUsername));

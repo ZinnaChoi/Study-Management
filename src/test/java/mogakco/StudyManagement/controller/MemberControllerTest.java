@@ -57,7 +57,7 @@ public class MemberControllerTest {
     private String adminId;
 
     @Value("${account.admin.password}")
-    private String password;
+    private String adminPassword;
 
     private static final String LOGIN_URL = "/api/v1/login";
     private static final String LOGOUT_URL = "/api/v1/logout";
@@ -75,7 +75,8 @@ public class MemberControllerTest {
     @WithMockUser(authorities = "ADMIN")
     @DisplayName("로그인 API 성공")
     void loginSuccess() throws Exception {
-        MemberLoginReq req = new MemberLoginReq(adminId, password);
+
+        MemberLoginReq req = new MemberLoginReq(adminId, adminPassword);
         String requestBodyJson = objectMapper.writeValueAsString(req);
 
         TestUtil.performRequest(mockMvc, LOGIN_URL, requestBodyJson, "POST", 200, 200);
@@ -86,7 +87,7 @@ public class MemberControllerTest {
     @DisplayName("로그인 API 실패_incorrect ID")
     void loginFail_IncorrectId() throws Exception {
         String wrongId = "asdkawqwrjajsd12312";
-        MemberLoginReq req = new MemberLoginReq(wrongId, password);
+        MemberLoginReq req = new MemberLoginReq(wrongId, adminPassword);
         String requestBodyJson = objectMapper.writeValueAsString(req);
 
         TestUtil.performRequest(mockMvc, LOGIN_URL, requestBodyJson, "POST", 200, 404);
@@ -109,7 +110,7 @@ public class MemberControllerTest {
     @WithMockUser(authorities = "ADMIN")
     @DisplayName("로그아웃 API 성공")
     void logoutSuccess() throws Exception {
-        MemberLoginReq req = new MemberLoginReq(adminId, password);
+        MemberLoginReq req = new MemberLoginReq(adminId, adminPassword);
         String requestBodyJson = objectMapper.writeValueAsString(req);
 
         TestUtil.performRequest(mockMvc, LOGOUT_URL, requestBodyJson, "POST", 200, 200);
