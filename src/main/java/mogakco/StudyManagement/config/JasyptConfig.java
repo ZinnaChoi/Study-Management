@@ -3,7 +3,6 @@ package mogakco.StudyManagement.config;
 import org.jasypt.encryption.StringEncryptor;
 import org.jasypt.encryption.pbe.PooledPBEStringEncryptor;
 import org.jasypt.encryption.pbe.config.SimpleStringPBEConfig;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -13,8 +12,13 @@ import com.ulisesbocchio.jasyptspringboot.annotation.EnableEncryptableProperties
 @EnableEncryptableProperties
 public class JasyptConfig {
 
-    @Value("${jasypt.encryptor.password}")
+    private static final String JASYPT_PASSWORD_ENV_VAR = "JASYPT_ENCRYPTOR_PASSWORD";
+
     private String PASSWORD;
+
+    public JasyptConfig() {
+        this.PASSWORD = System.getenv(JASYPT_PASSWORD_ENV_VAR);
+    }
 
     @Bean("jasyptStringEncryptor")
     public StringEncryptor stringEncryptor() {
