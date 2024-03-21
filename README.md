@@ -31,6 +31,20 @@
 
 ### (5) 배포
 
+#### 서버 정보
+
+```
+AWS EC2 인스턴스
+- 유형 : t2.micro
+- 메모리 : 30G
+- 네트워크 성능 : 낮음에서 중간
+- 운영체제 : Amazon Linux
+```
+
+#### 아키텍쳐
+
+![image](https://github.com/ZinnaChoi/Study-Management/assets/73517372/91ed8074-57de-455d-95bc-a277a1027536)
+
 #### URL
 
 ```

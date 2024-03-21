@@ -5,6 +5,7 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 logs/
+/src/main/resources/static/*
 
 ### STS ###
 .apt_generated

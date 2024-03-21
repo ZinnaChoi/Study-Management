@@ -62,18 +62,18 @@ processResources{
 	dependsOn "copyReactBuildFiles"
 }
 
+def getNpmCommand() {
+    return System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows') ? "npm.cmd" : "npm"
+}
+
 task installReact(type:Exec){
 	workingDir "$reactDir"
 	inputs.dir "$reactDir"
 	group = BasePlugin.BUILD_GROUP
-	
-	if(System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')){
-		commandLine "npm.cmd", "audit", "fix"
-		commandLine 'npm.cmd', 'install'
-	}else{
-		commandLine "npm", "audit", "fix"
-		commandLine 'npm', 'install'
-	}
+
+	commandLine getNpmCommand(), "audit", "fix"
+	commandLine getNpmCommand(), "install"
+
 }
 
 task buildReact(type:Exec){
@@ -82,11 +82,9 @@ task buildReact(type:Exec){
 	inputs.dir "$reactDir"
 	group = BasePlugin.BUILD_GROUP
 	
-	if(System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')){
-		commandLine "npm.cmd", "run-script", "build"
-	}else{
-		commandLine "npm", "run-script", "build"
-	}
+	commandLine getNpmCommand(), "run-script", "build"
+	commandLine getNpmCommand(), "run-script", "build"
+
 }
 
 task copyReactBuildFiles(type:Copy){
