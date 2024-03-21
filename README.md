@@ -20,14 +20,22 @@
 
 ### (3) ERD
 
+<div align="center">
+
 ![image](https://github.com/ZinnaChoi/Study-Management/assets/73517372/dc938b1b-1a33-4658-be7e-57a08abfd4ad)
 
+</div>
+
 ### (4) 화면 정의서
+
+<div align="center">
 
 ![image](https://github.com/ZinnaChoi/Study-Management/assets/73517372/7b3d01d8-f9ae-46cd-979b-3f0a3ccf0ae9)
 ![image](https://github.com/ZinnaChoi/Study-Management/assets/73517372/72e99447-b4ec-485c-82c3-6c15586a2228)
 
 참조 : https://docs.google.com/presentation/d/1fEcGCQcjfnf8uTkW8xaAKWsY-t_qPGdPkzJy83yHVJA/edit
+
+</div>
 
 ### (5) 배포
 
