@@ -29,11 +29,22 @@
 
 참조 : https://docs.google.com/presentation/d/1fEcGCQcjfnf8uTkW8xaAKWsY-t_qPGdPkzJy83yHVJA/edit
 
-### (5) 배포 URL
+### (5) 배포
+
+#### URL
 
 ```
-http://54.180.198.112:8090/login
+http://54.180.198.112:8090
 ```
+
+#### 테스트 계정
+
+```
+ID : viewer
+PASSWORD : password123!
+```
+
+---
 
 ## 02. 주요 기능
 
@@ -57,6 +68,8 @@ http://54.180.198.112:8090/login
 - AS-IS : 기상 시 카카오톡 메시지에 기상 확인 카톡 전송, 부재 시 사전 공유함.
 - TO-BE : 부재 일정을 통한 참여왕, 개인별 목표 기상시간 설정 및 달성일 측정으로 기상왕을 선정하여 스터디원의 참여율 증진 및 의욕을 고취함.
 
+---
+
 ## 03. 기술 스택
 
 ### Environment
@@ -70,6 +83,8 @@ http://54.180.198.112:8090/login
 ### Communication
 
 <img src="https://img.shields.io/badge/Google Drive-4285F4?style=for-the-badge&logo=Google Drive&logoColor=white"> <img src="https://img.shields.io/badge/Google Meet-00897B?style=for-the-badge&logo=Google Meet&logoColor=white">
+
+---
 
 ## 04. 시작 가이드
 
