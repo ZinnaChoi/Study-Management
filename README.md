@@ -43,7 +43,11 @@ AWS EC2 인스턴스
 
 #### 아키텍쳐
 
+<div align="center">
+
 ![image](https://github.com/ZinnaChoi/Study-Management/assets/73517372/91ed8074-57de-455d-95bc-a277a1027536)
+
+</div>
 
 #### URL
 
