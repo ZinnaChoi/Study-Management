@@ -20,21 +20,57 @@
 
 ### (3) ERD
 
+<div align="center">
+
 ![image](https://github.com/ZinnaChoi/Study-Management/assets/73517372/dc938b1b-1a33-4658-be7e-57a08abfd4ad)
 
+</div>
+
 ### (4) 화면 정의서
+
+<div align="center">
 
 ![image](https://github.com/ZinnaChoi/Study-Management/assets/73517372/7b3d01d8-f9ae-46cd-979b-3f0a3ccf0ae9)
 ![image](https://github.com/ZinnaChoi/Study-Management/assets/73517372/72e99447-b4ec-485c-82c3-6c15586a2228)
 
 참조 : https://docs.google.com/presentation/d/1fEcGCQcjfnf8uTkW8xaAKWsY-t_qPGdPkzJy83yHVJA/edit
 
-### (5) 배포 URL
+</div>
+
+### (5) 배포
+
+#### 서버 정보
 
 ```
-개발 버전 :
-릴리즈 버전 :
+AWS EC2 인스턴스
+- 유형 : t2.micro
+- 메모리 : 30G
+- 네트워크 성능 : 낮음에서 중간
+- 운영체제 : Amazon Linux
 ```
+
+#### 아키텍쳐
+
+<div align="center">
+
+![image](https://github.com/ZinnaChoi/Study-Management/assets/73517372/91ed8074-57de-455d-95bc-a277a1027536)
+
+</div>
+
+#### URL
+
+```
+http://54.180.198.112:8090
+```
+
+#### 테스트 계정
+
+```
+ID : viewer
+PASSWORD : password123!
+```
+
+---
 
 ## 02. 주요 기능
 
@@ -58,6 +94,8 @@
 - AS-IS : 기상 시 카카오톡 메시지에 기상 확인 카톡 전송, 부재 시 사전 공유함.
 - TO-BE : 부재 일정을 통한 참여왕, 개인별 목표 기상시간 설정 및 달성일 측정으로 기상왕을 선정하여 스터디원의 참여율 증진 및 의욕을 고취함.
 
+---
+
 ## 03. 기술 스택
 
 ### Environment
@@ -71,6 +109,8 @@
 ### Communication
 
 <img src="https://img.shields.io/badge/Google Drive-4285F4?style=for-the-badge&logo=Google Drive&logoColor=white"> <img src="https://img.shields.io/badge/Google Meet-00897B?style=for-the-badge&logo=Google Meet&logoColor=white">
+
+---
 
 ## 04. 시작 가이드
 
@@ -110,12 +150,6 @@ npm start
 ```cmd
 cd docker
 docker-compose up -d
-```
-
-##### JDBC URL
-
-```
-jdbc:mysql://localhost:3307/study
 ```
 
 ##### Junit Test

@@ -38,7 +38,8 @@ public class SecurityConfig {
         http.httpBasic((auth) -> auth.disable());
         // 경로별 인가 작업
         http.authorizeHttpRequests((auth) -> auth
-                .requestMatchers("/", "api/v1/login", "api/v1/join", "api/v1/join/check-id")
+                .requestMatchers("/index.html", "/static/**", "/", "api/v1/login", "api/v1/join",
+                        "api/v1/join/check-id")
                 .permitAll() // 회원가입, 로그인, 중복 아이디 확인은 인증 X
                 .requestMatchers(HttpMethod.GET, "api/v1/schedules").permitAll()
                 .requestMatchers("/swagger-ui.html", "/v1/api-docs/**", "/swagger-ui/**", "/swagger-resources/**")

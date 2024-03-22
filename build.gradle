@@ -47,3 +47,48 @@ dependencies {
 tasks.named('test', Test) {
     useJUnitPlatform()
 }
+
+def reactDir = "$projectDir/src/main/frontend";
+
+sourceSets{
+	main{
+		resources{
+			srcDirs = ["$projectDir/src/main/resources"]
+		}
+	}
+}
+
+processResources{
+	dependsOn "copyReactBuildFiles"
+}
+
+def getNpmCommand() {
+    return System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows') ? "npm.cmd" : "npm"
+}
+
+task installReact(type:Exec){
+	workingDir "$reactDir"
+	inputs.dir "$reactDir"
+	group = BasePlugin.BUILD_GROUP
+
+	commandLine getNpmCommand(), "audit", "fix"
+	commandLine getNpmCommand(), "install"
+
+}
+
+task buildReact(type:Exec){
+	dependsOn "installReact"
+	workingDir "$reactDir"
+	inputs.dir "$reactDir"
+	group = BasePlugin.BUILD_GROUP
+	
+	commandLine getNpmCommand(), "run-script", "build"
+	commandLine getNpmCommand(), "run-script", "build"
+
+}
+
+task copyReactBuildFiles(type:Copy){
+	dependsOn "buildReact"
+	from "$reactDir/build"
+	into "$projectDir/src/main/resources/static"
+}

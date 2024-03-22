@@ -78,6 +78,9 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
     @Value("${study.systemId}")
     protected String systemId;
 
+    @Value("${viewer-id}")
+    protected String viewerId;
+
     public MemberServiceImpl(MemberRepository memberRepository,
             MemberScheduleRepository memberScheduleRepository,
             WakeUpRepository wakeUpRepository,
@@ -211,6 +214,10 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
             String loginUserId = SecurityUtil.getLoginUserId();
             Member member = memberRepository.findById(loginUserId);
 
+            if (loginUserId.equals(viewerId)) {
+                throw new InvalidRequestException(viewerId + " 계정은 회원 탈퇴가 불가능 합니다.");
+            }
+
             if (loginUserId == null || member == null) {
                 throw new NullPointerException("삭제할 회원 아이디가 올바르지 않습니다.");
             }
@@ -221,8 +228,8 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
             }
             memberRepository.delete(member);
 
-        } catch (NullPointerException npe) {
-            return ExceptionUtil.handleException(new InvalidRequestException(npe.getMessage()));
+        } catch (NullPointerException | InvalidRequestException e) {
+            return ExceptionUtil.handleException(new InvalidRequestException(e.getMessage()));
         }
 
         return new CommonRes(systemId, ErrorCode.OK.getCode(), ErrorCode.OK.getMessage());
