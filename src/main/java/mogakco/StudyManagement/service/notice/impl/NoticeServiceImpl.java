@@ -7,6 +7,7 @@ import java.util.ArrayList;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +26,7 @@ import mogakco.StudyManagement.repository.MemberRepository;
 import mogakco.StudyManagement.repository.MemberScheduleRepository;
 import mogakco.StudyManagement.repository.NoticeRepository;
 import mogakco.StudyManagement.repository.ScheduleRepository;
+import mogakco.StudyManagement.repository.spec.NoticeSpecification;
 import mogakco.StudyManagement.service.external.SendEmailService;
 import mogakco.StudyManagement.service.notice.NoticeService;
 import mogakco.StudyManagement.util.DateUtil;
@@ -157,28 +159,13 @@ public class NoticeServiceImpl implements NoticeService {
 
     public void createSpecificNotice(Member member, MessageType type) {
 
-        List<Long> targetedMembers = new ArrayList<>();
-        try {
-            switch (type) {
-                case ABSENT:
-                    targetedMembers = noticeRepository.findMemberIdByAbsentIsTrue();
-                    break;
-                case NEW_POST:
-                    targetedMembers = noticeRepository.findByNewPostTrue();
-                    break;
-                case WAKE_UP:
-                    targetedMembers = noticeRepository.findByWakeupTrue();
-                    break;
-                default:
-                    break;
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        Specification<Notice> spec = NoticeSpecification.matchMessageType(type);
 
-        for (Long targetedMemberId : targetedMembers) {
-            Optional<Member> mmember = memberRepository.findById(targetedMemberId);
-            sendEmailService.sendEmail(member.getName(), type, mmember.get().getEmail());
+        List<Notice> targetedNotice = noticeRepository.findAll(spec);
+
+        for (Notice notice : targetedNotice) {
+            Member targetMember = memberRepository.findById(notice.getMember().getId());
+            sendEmailService.sendEmail(member.getName(), type, targetMember.getEmail());
         }
 
     }

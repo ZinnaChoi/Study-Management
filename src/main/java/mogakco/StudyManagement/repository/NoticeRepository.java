@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -14,7 +15,7 @@ import mogakco.StudyManagement.domain.Notice;
 import org.springframework.transaction.annotation.Transactional;
 
 @Repository
-public interface NoticeRepository extends JpaRepository<Notice, Long> {
+public interface NoticeRepository extends JpaRepository<Notice, Long>, JpaSpecificationExecutor<Notice> {
 
     Optional<Notice> findByMember_MemberId(@Param("memberId") Long memberId);
 
@@ -27,15 +28,6 @@ public interface NoticeRepository extends JpaRepository<Notice, Long> {
 
     @Query("SELECT n.member.memberId FROM Notice n ORDER BY n.lastShareDate ASC, n.member.memberId DESC")
     List<Long> findLastShareDateByMemberId();
-
-    @Query("SELECT n.member.memberId FROM Notice n WHERE n.absent = true")
-    List<Long> findMemberIdByAbsentIsTrue();
-
-    @Query("SELECT n.member.memberId FROM Notice n WHERE n.newPost = true")
-    List<Long> findByNewPostTrue();
-
-    @Query("SELECT n.member.memberId FROM Notice n WHERE n.wakeup = true")
-    List<Long> findByWakeupTrue();
 
     @Modifying
     default void insertNoticeForMember(Member member) {
