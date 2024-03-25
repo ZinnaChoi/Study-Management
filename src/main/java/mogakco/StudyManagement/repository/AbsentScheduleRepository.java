@@ -17,14 +17,14 @@ import mogakco.StudyManagement.domain.Schedule;
 public interface AbsentScheduleRepository
                 extends JpaRepository<AbsentSchedule, Long>, JpaSpecificationExecutor<AbsentSchedule> {
 
-        @EntityGraph(attributePaths = { "member", "schedule" }, type = EntityGraphType.FETCH)
         List<AbsentSchedule> findByAbsentDate(String absentDate);
 
-        @Query("SELECT a FROM AbsentSchedule a JOIN FETCH a.member JOIN FETCH a.schedule WHERE a.absentDate = :absentDate AND a.member = :member")
+        @EntityGraph(attributePaths = { "member" }, type = EntityGraphType.FETCH)
+        // @Query("SELECT a FROM AbsentSchedule a JOIN FETCH a.member WHERE a.absentDate
+        // = :absentDate AND a.member = :member")
         List<AbsentSchedule> findByAbsentDateAndMember(@Param("absentDate") String absentDate,
                         @Param("member") Member member);
 
-        @Query("SELECT COUNT(a) FROM AbsentSchedule a WHERE a.absentDate = :absentDate AND a.schedule = :schedule AND a.member = :member")
         Integer countByAbsentDateAndScheduleAndMember(@Param("absentDate") String absentDate,
                         @Param("schedule") Schedule schedule, @Param("member") Member member);
 
