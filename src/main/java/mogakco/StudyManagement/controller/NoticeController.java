@@ -11,7 +11,6 @@ import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import mogakco.StudyManagement.dto.CommonRes;
 import mogakco.StudyManagement.dto.NoticeGetRes;
@@ -33,8 +32,7 @@ public class NoticeController extends CommonController {
 
     @Operation(summary = "알림 상태 조회", description = "개인별 알림 수신 여부 상태 조회")
     @GetMapping("/notice")
-    public NoticeGetRes getNotice(
-            HttpServletRequest request) {
+    public NoticeGetRes getNotice() {
 
         NoticeGetRes result = new NoticeGetRes();
 
@@ -51,7 +49,7 @@ public class NoticeController extends CommonController {
     @Operation(summary = "알림 상태 수정", description = "개인별 알림 수신 여부 상태 수정")
     @SecurityRequirement(name = "bearer-key")
     @PatchMapping(value = "/notice")
-    public CommonRes updateNotice(HttpServletRequest request, @RequestBody @Valid NoticeReq noticeReq) {
+    public CommonRes updateNotice(@RequestBody @Valid NoticeReq noticeReq) {
         CommonRes result = new CommonRes();
 
         try {
@@ -69,7 +67,7 @@ public class NoticeController extends CommonController {
     @PostMapping("/notice/general")
     @Hidden
     // ScheduleStartTimeMonitoring.java 내 스케줄링의 기능 확인용 이므로 Hidden처리함.
-    public CommonRes createGeneralNotice(HttpServletRequest request) {
+    public CommonRes createGeneralNotice() {
 
         CommonRes result = new CommonRes();
         try {

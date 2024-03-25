@@ -10,7 +10,6 @@ import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.HttpServletRequest;
 import mogakco.StudyManagement.dto.CommonRes;
 import mogakco.StudyManagement.dto.StatGetRes;
 import mogakco.StudyManagement.enums.ErrorCode;
@@ -31,8 +30,7 @@ public class StatController extends CommonController {
 
     @Operation(summary = "통계 조회", description = "출석률 통계 조회, 기상률 조회")
     @GetMapping("/stat")
-    public StatGetRes getStat(
-            HttpServletRequest request, @RequestParam("type") LogType type,
+    public StatGetRes getStat(@RequestParam("type") LogType type,
             @RequestParam("startDate") String startDate,
             @RequestParam("endDate") String endDate) {
 
@@ -55,8 +53,7 @@ public class StatController extends CommonController {
     @PostMapping("/stat/absent")
     @Hidden
     // AbsentScheduleBatch.java 내 스케줄링의 기능 확인용 이므로 Hidden처리함.
-    public CommonRes createAbsentLog(HttpServletRequest request) {
-
+    public CommonRes createAbsentLog() {
         CommonRes result = new CommonRes();
         try {
             result = statService.createAbsentLog();
@@ -69,7 +66,7 @@ public class StatController extends CommonController {
 
     @Operation(summary = "기상 로그 저장", description = "통계 생성을 위한 기상 로그 업데이트")
     @PostMapping("/stat/wakeup")
-    public CommonRes createWakeUpLog(HttpServletRequest request) {
+    public CommonRes createWakeUpLog() {
 
         CommonRes result = new CommonRes();
         try {

@@ -12,7 +12,6 @@ import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.web.bind.annotation.PatchMapping;
 import jakarta.validation.Valid;
 import mogakco.StudyManagement.dto.CommonRes;
@@ -35,8 +34,7 @@ public class PostCommentController extends CommonController {
 
     @Operation(summary = "게시판 댓글 등록", description = "새 댓글 추가")
     @PostMapping("/{postId}/comments")
-    public CommonRes createPostComment(HttpServletRequest request,
-            @PathVariable(name = "postId", required = true) Long postId,
+    public CommonRes createPostComment(@PathVariable(name = "postId", required = true) Long postId,
             @RequestBody @Valid PostCommentReq postCommentReq) {
 
         CommonRes result = new CommonRes();
@@ -50,11 +48,14 @@ public class PostCommentController extends CommonController {
         return result;
     }
 
+    /**
+     * @Hidden
+     *         댓글에 대한 답글 기능 1차 배포 버전 미반영으로 인한 Hidden 처리
+     */
     @Hidden
     @Operation(summary = "게시판 답글 등록", description = "새 답글 추가")
     @PostMapping("/{postId}/comments/{commentId}/replies")
-    public CommonRes createPostCommentReply(HttpServletRequest request,
-            @PathVariable(name = "postId", required = true) Long postId,
+    public CommonRes createPostCommentReply(@PathVariable(name = "postId", required = true) Long postId,
             @PathVariable(name = "commentId", required = true) Long commentId,
             @RequestBody @Valid PostCommentReq postCommentReq) {
 
@@ -69,11 +70,14 @@ public class PostCommentController extends CommonController {
         return result;
     }
 
+    /**
+     * @Hidden
+     *         댓글에 대한 답글 기능 1차 배포 버전 미반영으로 인한 Hidden 처리
+     */
     @Hidden
     @Operation(summary = "게시판 답글 조회", description = "답글 조회")
     @GetMapping("/{postId}/comments/{commentId}/replies")
-    public PostCommentReplyRes getCommentReply(HttpServletRequest request,
-            @PathVariable(name = "postId", required = true) Long postId,
+    public PostCommentReplyRes getCommentReply(@PathVariable(name = "postId", required = true) Long postId,
             @PathVariable(name = "commentId", required = true) Long commentId) {
 
         PostCommentReplyRes result = new PostCommentReplyRes();
@@ -89,8 +93,7 @@ public class PostCommentController extends CommonController {
 
     @Operation(summary = "게시판 댓글 수정", description = "게시판의 댓글 수정")
     @PatchMapping("/{postId}/comments/{commentId}")
-    public CommonRes updateComment(HttpServletRequest request,
-            @PathVariable(name = "postId", required = true) Long postId,
+    public CommonRes updateComment(@PathVariable(name = "postId", required = true) Long postId,
             @PathVariable(name = "commentId", required = true) Long commentId,
             @RequestBody @Valid PostCommentReq postCommentReq) {
         CommonRes result = new CommonRes();
@@ -107,8 +110,7 @@ public class PostCommentController extends CommonController {
 
     @Operation(summary = "게시판 댓글 삭제", description = "특정 게시판 댓글 삭제")
     @DeleteMapping("/{postId}/comments/{commentId}")
-    public CommonRes deleteComment(HttpServletRequest request,
-            @PathVariable(name = "postId", required = true) Long postId,
+    public CommonRes deleteComment(@PathVariable(name = "postId", required = true) Long postId,
             @PathVariable(name = "commentId", required = true) Long commentId) {
         CommonRes result = new CommonRes();
         try {

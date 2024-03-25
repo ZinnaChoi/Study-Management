@@ -49,7 +49,7 @@ public class MemberController extends CommonController {
 
     @Operation(summary = "로그인", description = "로그인을 통해 JWT 발급")
     @PostMapping("/login")
-    public MemberLoginRes doLogin(HttpServletRequest request, @Valid @RequestBody MemberLoginReq loginInfo) {
+    public MemberLoginRes doLogin(@Valid @RequestBody MemberLoginReq loginInfo) {
         MemberLoginRes result = new MemberLoginRes();
 
         try {
@@ -65,7 +65,7 @@ public class MemberController extends CommonController {
     @Operation(summary = "로그아웃", description = "로그아웃 통해 JWT 토큰 만료 처리")
     @SecurityRequirement(name = "bearer-key")
     @PostMapping("/logout")
-    public CommonRes doLogout(HttpServletRequest request) {
+    public CommonRes doLogout() {
         CommonRes result = new CommonRes();
 
         try {
@@ -79,7 +79,7 @@ public class MemberController extends CommonController {
 
     @Operation(summary = "회원가입", description = "회원가입을 통해 사용자 정보 등록")
     @PostMapping("/join")
-    public CommonRes doJoin(HttpServletRequest request, @Valid @RequestBody MemberJoinReq joinInfo) {
+    public CommonRes doJoin(@Valid @RequestBody MemberJoinReq joinInfo) {
         CommonRes result = new CommonRes();
 
         try {
@@ -94,7 +94,7 @@ public class MemberController extends CommonController {
 
     @Operation(summary = "중복 아이디 확인", description = "회원가입시 사용자가 입력한 아이디 중복 검증 true: 중복 false: 사용 가능")
     @PostMapping("/join/check-id")
-    public MemberIdDuplRes checkIdDuplicated(HttpServletRequest request, @Valid @RequestBody MemberIdDuplReq idInfo) {
+    public MemberIdDuplRes checkIdDuplicated(@Valid @RequestBody MemberIdDuplReq idInfo) {
         MemberIdDuplRes result = new MemberIdDuplRes();
 
         try {
@@ -112,7 +112,7 @@ public class MemberController extends CommonController {
     @Operation(summary = "회원탈퇴", description = "회원탈퇴를 통해 사용자 정보 삭제")
     @SecurityRequirement(name = "bearer-key")
     @DeleteMapping("/withdraw")
-    public CommonRes doWithDraw(HttpServletRequest request) {
+    public CommonRes doWithDraw() {
         CommonRes result = new CommonRes();
 
         try {
@@ -127,7 +127,7 @@ public class MemberController extends CommonController {
     @Operation(summary = "MyPage 회원 정보 조회", description = "로그인 된 회원 정보 조회")
     @SecurityRequirement(name = "bearer-key")
     @GetMapping("/member")
-    public MemberInfoRes getMemberInfo(HttpServletRequest request) {
+    public MemberInfoRes getMemberInfo() {
         MemberInfoRes result = new MemberInfoRes();
 
         try {
@@ -143,7 +143,7 @@ public class MemberController extends CommonController {
     @Operation(summary = "회원 목록 조회", description = "스터디에 가입한 회원 목록 조회")
     @SecurityRequirement(name = "bearer-key")
     @GetMapping("/members")
-    public MemberListRes getMemberList(HttpServletRequest request) {
+    public MemberListRes getMemberList() {
         MemberListRes result = new MemberListRes();
         try {
             result = memberService.getMemberList();
@@ -157,7 +157,7 @@ public class MemberController extends CommonController {
     @Operation(summary = "MyPage 회원 정보변경", description = "로그인된 회원 정보 변경(이름 or 스터디 시간 or 기상 시간 or 비밀번호)")
     @SecurityRequirement(name = "bearer-key")
     @PatchMapping("/member")
-    public CommonRes setMemberInfo(HttpServletRequest request, @Valid @RequestBody MemberInfoUpdateReq updateInfo) {
+    public CommonRes setMemberInfo(@Valid @RequestBody MemberInfoUpdateReq updateInfo) {
         CommonRes result = new CommonRes();
 
         try {
@@ -173,8 +173,7 @@ public class MemberController extends CommonController {
     @Operation(summary = "스터디원 정보 조건 조회", description = "스터디원 정보(참여 시간, 기상시간 조건) 및 페이지 별 조회")
     @SecurityRequirement(name = "bearer-key")
     @GetMapping("/members-info")
-    public MemberInfosRes getMembersInfo(
-            HttpServletRequest request, @ModelAttribute @Valid MemberInfosReq memberListReq,
+    public MemberInfosRes getMembersInfo(@ModelAttribute @Valid MemberInfosReq memberListReq,
             @PageableDefault(size = 10, page = 0, sort = "name", direction = Sort.Direction.DESC) Pageable pageable) {
         MemberInfosRes result = new MemberInfosRes();
         try {
@@ -198,7 +197,6 @@ public class MemberController extends CommonController {
     @SecurityRequirement(name = "bearer-key")
     @GetMapping("/members/schedule-name")
     public StudyMembersRes getMembersBySchedule(
-            HttpServletRequest request,
             @Parameter(name = "paging", description = "paging") @PageableDefault(size = 10, page = 0, sort = "memberId", direction = Sort.Direction.DESC) Pageable pageable,
             @RequestParam(name = "schedule", required = false) String schedule) {
 
@@ -226,7 +224,6 @@ public class MemberController extends CommonController {
     @SecurityRequirement(name = "bearer-key")
     @GetMapping("/members/wakeup-time")
     public StudyMembersRes getMembersByWakeup(
-            HttpServletRequest request,
             @Parameter(name = "paging", description = "paging") @PageableDefault(size = 10, page = 0, sort = "memberId", direction = Sort.Direction.DESC) Pageable pageable,
             @Parameter(description = "(HHmm) format") @RequestParam(name = "time", required = false) String time) {
 
@@ -245,8 +242,7 @@ public class MemberController extends CommonController {
     @Operation(summary = "등록 스케줄 조희", description = "현재 등록되어 있는 스케줄 정보를 조회")
     @SecurityRequirement(name = "bearer-key")
     @GetMapping("/schedules")
-    public RegistedScheduleRes getRegistedSchedule(
-            HttpServletRequest request) {
+    public RegistedScheduleRes getRegistedSchedule() {
 
         RegistedScheduleRes result = new RegistedScheduleRes();
         try {
@@ -263,8 +259,7 @@ public class MemberController extends CommonController {
     @Operation(summary = "등록 기상 시간 조희", description = "현재 등록되어 있는 기상 시간 정보를 조회")
     @SecurityRequirement(name = "bearer-key")
     @GetMapping("/wakeup-times")
-    public RegistedWakeupRes getRegistedWakeupTime(
-            HttpServletRequest request) {
+    public RegistedWakeupRes getRegistedWakeupTime() {
 
         RegistedWakeupRes result = new RegistedWakeupRes();
         try {

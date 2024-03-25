@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.RestController;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.HttpServletRequest;
 import mogakco.StudyManagement.dto.CommonRes;
 import mogakco.StudyManagement.enums.ErrorCode;
 import mogakco.StudyManagement.service.post.PostLikeService;
@@ -28,8 +27,7 @@ public class PostLikeController extends CommonController {
 
     @Operation(summary = "게시글 좋아요 등록", description = "게시글 좋아요 추가")
     @PostMapping("/{postId}/likes")
-    public CommonRes createPostLike(HttpServletRequest request,
-            @PathVariable(name = "postId", required = true) Long postId) {
+    public CommonRes createPostLike(@PathVariable(name = "postId", required = true) Long postId) {
 
         CommonRes result = new CommonRes();
         try {
@@ -44,8 +42,7 @@ public class PostLikeController extends CommonController {
 
     @Operation(summary = "게시글 좋아요 취소", description = "게시글 좋아요 삭제")
     @DeleteMapping("/{postId}/likes")
-    public CommonRes deletePostLike(HttpServletRequest request,
-            @PathVariable(name = "postId", required = true) Long postId) {
+    public CommonRes deletePostLike(@PathVariable(name = "postId", required = true) Long postId) {
         CommonRes result = new CommonRes();
         try {
             result = postLikeService.deletePostLike(postId);

@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RestController;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Pattern;
 import mogakco.StudyManagement.dto.AbsentDetailReq;
@@ -39,8 +38,7 @@ public class AbsentController extends CommonController {
 
     @Operation(summary = "부재일정 등록", description = "새 부재일정 등록")
     @PostMapping("/absent")
-    public CommonRes registerAbsentSchedule(HttpServletRequest request,
-            @RequestBody @Valid AbsentReq absentReq) {
+    public CommonRes registerAbsentSchedule(@RequestBody @Valid AbsentReq absentReq) {
 
         CommonRes result = new CommonRes();
         try {
@@ -55,8 +53,7 @@ public class AbsentController extends CommonController {
 
     @Operation(summary = "부재일정 캘린더 조회", description = "부재일정 월별 캘린더 조회")
     @GetMapping("/absent/calendar")
-    public AbsentCalendarRes getAbsentScheduleByMonth(HttpServletRequest request,
-            @ModelAttribute @Valid AbsentCalendarReq absentCalendarReq) {
+    public AbsentCalendarRes getAbsentScheduleByMonth(@ModelAttribute @Valid AbsentCalendarReq absentCalendarReq) {
 
         AbsentCalendarRes result = new AbsentCalendarRes();
         try {
@@ -71,8 +68,7 @@ public class AbsentController extends CommonController {
 
     @Operation(summary = "부재일정 상세 조회", description = "부재일정 일별 상세 조회")
     @GetMapping("/absent/detail")
-    public AbsentDetailRes getAbsentScheduleDetail(HttpServletRequest request,
-            @ModelAttribute @Valid AbsentDetailReq absentDetailReq) {
+    public AbsentDetailRes getAbsentScheduleDetail(@ModelAttribute @Valid AbsentDetailReq absentDetailReq) {
 
         AbsentDetailRes result = new AbsentDetailRes();
         try {
@@ -87,8 +83,7 @@ public class AbsentController extends CommonController {
 
     @Operation(summary = "부재일정 수정", description = "부재일정 상세 수정")
     @PatchMapping("/absent")
-    public CommonRes updateAbsentSchedule(HttpServletRequest request,
-            @RequestBody @Valid AbsentReq absentReq) {
+    public CommonRes updateAbsentSchedule(@RequestBody @Valid AbsentReq absentReq) {
 
         CommonRes result = new CommonRes();
         try {
@@ -104,7 +99,7 @@ public class AbsentController extends CommonController {
 
     @Operation(summary = "부재일정 삭제", description = "부재일정 삭제")
     @DeleteMapping("/absent")
-    public CommonRes deleteAbsentSchedule(HttpServletRequest request,
+    public CommonRes deleteAbsentSchedule(
             @RequestParam(name = "absentDate") @Pattern(regexp = "^[0-9]{8}$") String absentDate) {
         CommonRes result = new CommonRes();
 
