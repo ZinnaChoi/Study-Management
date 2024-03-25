@@ -6,10 +6,11 @@ import org.springframework.http.HttpStatus;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 
 @Getter
 @RequiredArgsConstructor
-
+@ToString
 public enum ErrorCode {
 
     OK(200, HttpStatus.OK, "성공"),
@@ -26,21 +27,12 @@ public enum ErrorCode {
     private final HttpStatus httpStatus;
     private final String message;
 
-    public HttpStatus getHttpStatus() {
-        return this.httpStatus;
-    }
-
     public String getMessage(Throwable e) {
         return this.getMessage(this.getMessage() + " - " + e.getMessage());
     }
 
     public String getMessage(String... args) {
         return MessageFormat.format(this.message, (Object[]) args);
-    }
-
-    @Override
-    public String toString() {
-        return String.format("%s (%d)", this.name(), this.getCode());
     }
 
 }
